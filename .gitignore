@@ -1,11 +1,11 @@
-# Dependency directories
+#  Dependency directories
 node_modules
 
-# Editor directories and files
+#  Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 
-# Environments
+#  Environments
 .env
 .envrc
 .venv
@@ -14,3 +14,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+#  Python cache files
+__pycache__/
