@@ -10,7 +10,7 @@ import psycopg2
 from psycopg2 import sql, OperationalError
 from colorama import Fore
 
-from litscout.server.logger import ColorLogger
+from server.logger import ColorLogger
 
 log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
 
@@ -20,7 +20,7 @@ DEFAULT_PGDATA = BASE_DIR / "pgdata"
 SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 ENV_DB_NAME = os.getenv("LITSCOUT_DB_NAME", "litscout")
-ENV_DB_USER = os.getenv("LITSCOUT_DB_USER", "postgres")
+ENV_DB_USER = os.getenv("LITSCOUT_DB_USER", "admin")
 ENV_DB_PASSWORD = os.getenv("LITSCOUT_DB_PASSWORD", "")
 ENV_DB_HOST = os.getenv("LITSCOUT_DB_HOST", "localhost")
 ENV_DB_PORT = os.getenv("LITSCOUT_DB_PORT", "5432")
@@ -95,7 +95,7 @@ def _connect_with_optional_prompt(
     """
     Try to connect with given password.
     If password is empty or invalid, prompt once and retry.
-    Returns the connection object.
+    Returns (connection, final_password).
     """
     attempted_prompt = False
     current_password = password
@@ -109,7 +109,7 @@ def _connect_with_optional_prompt(
                 host=host,
                 port=port,
             )
-            return conn
+            return conn, current_password
         except OperationalError as e:
             msg = str(e)
             needs_prompt = (
@@ -141,9 +141,8 @@ def apply_schema(
         log.error(f"schema.sql not found at {SCHEMA_PATH}")
         sys.exit(1)
 
-    log.info(f"Applying schema from {SCHEMA_PATH} to database '{db_name}'...")
 
-    conn = _connect_with_optional_prompt(
+    conn, _ = _connect_with_optional_prompt(
         dbname=db_name,
         user=user,
         password=password,
@@ -151,6 +150,13 @@ def apply_schema(
         port=port,
         purpose=f"applying schema to '{db_name}'",
     )
+
+    if schema_exists(conn):
+        log.warn("Schema already exists. To force override, run with -F.")
+        conn.close()
+        return
+
+    log.info(f"Applying schema from {SCHEMA_PATH} to database '{db_name}'...")
     conn.autocommit = True
     cur = conn.cursor()
 
@@ -161,6 +167,18 @@ def apply_schema(
     conn.close()
 
     log.success("Schema applied successfully.")
+
+
+def schema_exists(conn) -> bool:
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_schema = 'public';
+    """)
+    count = cur.fetchone()[0]
+    cur.close()
+    return count > 0
 
 
 def ensure_database_exists(admin_conn, db_name: str, force: bool = False) -> None:
@@ -207,7 +225,7 @@ def init_database(
     Initialize the LitScout database:
 
     - Resolve config from args/env/defaults.
-    - Connect to admin DB 'postgres' (with password prompt if needed).
+    - Connect to admin DB 'admin' (with password prompt if needed).
     - Create/drop target DB as required.
     - Apply schema.sql to the target DB.
 
@@ -228,15 +246,15 @@ def init_database(
         f"(user='{user}', host='{host}', port='{port}', force={force})"
     )
 
-    #  1) Connect to admin DB 'postgres' using the user/password, with prompt if needed
-    log.info("Connecting to admin database 'postgres'...")
+    #  1) Connect to admin DB 'admin' using the user/password, with prompt if needed
+    log.info(f"Connecting to admin database 'postgres'...")
     admin_conn, final_password = _connect_with_optional_prompt(
         dbname="postgres",
         user=user,
         password=initial_password,
         host=host,
         port=port,
-        purpose="admin connection to 'postgres'",
+        purpose=f"admin connection to 'postgres'",
     )
 
     #  2) Ensure target DB exists (or drop & recreate if force=True)

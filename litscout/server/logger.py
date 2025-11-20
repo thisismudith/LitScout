@@ -26,8 +26,9 @@ class ColorLogger:
     COLOR_CMD = Fore.MAGENTA
 
 
-    def __init__(self, name: str, tag_color: str = Fore.CYAN, include_timestamps: bool = False):
+    def __init__(self, name: str = "", tag_color: str = Fore.CYAN, include_timestamps: bool = False):
         self.name = name.upper()
+        self.include_name = bool(name)
         self.include_timestamps = include_timestamps
         self.tag_color = tag_color
 
@@ -35,14 +36,20 @@ class ColorLogger:
         """
         Build the tag portion: [NAME - LABEL - TIMESTAMP]
         """
+
+        if self.include_name:
+            name_part = f"{self.name} - "
+        else:
+            name_part = ""
+
         if self.include_timestamps:
             ts = datetime.now().strftime("%H:%M:%S")
-            return f"{self.tag_color}[{self.name} - {color}{label}{self.tag_color} - {ts}]{Style.RESET_ALL}"
+            return f"{self.tag_color}[{name_part}{color}{label}{self.tag_color} - {ts}]{Style.RESET_ALL}"
         else:
-            return f"{self.tag_color}[{self.name} - {color}{label}{self.tag_color}]{Style.RESET_ALL}"
+            return f"{self.tag_color}[{name_part}{color}{label}{self.tag_color}]{Style.RESET_ALL}"
 
     def _print(self, tag: str, message: str, color: str = Fore.RESET):
-        print(f"{tag} {color}{message}{Style.RESET_ALL}")
+        print(f"{tag} {color}{message}{Fore.RESET}{Style.RESET_ALL}")
 
 
     #  Public Logging Method
