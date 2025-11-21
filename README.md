@@ -1,4 +1,4 @@
-#  📘LitScout
+# 📘LitScout
 
 **LitScout** is a Python-based platform that acts as your **personal research companion**. It helps you discover, analyze, and plan your research journey — from finding relevant papers to exploring top conferences, authors, and publishing opportunities. 
 
@@ -8,7 +8,7 @@ LitScout consists of:
 
 ---
 
-##  🚀 Project Overview
+## 🚀 Project Overview
 
 LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, and **Natural Language Processing (NLP)** to create a unified research ecosystem that enables users to:
 
@@ -20,23 +20,23 @@ LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, a
 
 ---
 
-##  🧩 Project Architecture
+## 🧩 Project Architecture
 
 LitScout follows an architecture with **two sub-sections**:
 
-###  **1. Backend (FastAPI)**
+### **1. Backend (FastAPI)**
 - Handles all data processing, ML, and API logic.
 - Exposes endpoints that the React frontend can interact with.
 - Manages integrations with research APIs (Semantic Scholar, arXiv, Crossref, OpenAlex, WikiCFP, etc.).
 
-###  **2. Frontend (React.js)**
+### **2. Frontend (React.js)**
 - Provides a modern, responsive UI for users.
 - Fetches processed data from the FastAPI backend.
 - Displays papers, clusters, author stats, conference data, and recommendations through interactive components and dashboards.
 
 ---
 
-##  ⚙️ Main Components
+## ⚙️ Main Components
 
 | Component | Description |
 |------------|--------------|
@@ -54,7 +54,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  🔄 Data Flow
+## 🔄 Data Flow
 
 1. **User Action**
    - The user enters a topic or uploads a research paper in the React interface.  
@@ -76,7 +76,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  📊 Module Planning (6-Week Development Roadmap)
+## 📊 Module Planning (6-Week Development Roadmap)
 
 | Week | Focus | Key Deliverables |
 |------|--------|------------------|
@@ -89,7 +89,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  🧰 Tech Stack
+## 🧰 Tech Stack
 
 | Category | Tools / Frameworks |
 |-----------|------------------|
@@ -104,7 +104,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  🖥️ Dashboard Overview (Frontend Pages)
+## 🖥️ Dashboard Overview (Frontend Pages)
 
 | Page | Purpose |
 |------|----------|
@@ -116,7 +116,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  📍 Key Features Summary
+## 📍 Key Features Summary
 
 ✅ AI-based search and clustering of research papers  
 ✅ Topic-wise summaries and keyword insights  
@@ -127,7 +127,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  📚 What Will I Learn?
+## 📚 What Will I Learn?
 
 - Using transformer models and testing their accuracy.
 - AI-model training for finding relevant research papers.
@@ -136,7 +136,7 @@ LitScout follows an architecture with **two sub-sections**:
 
 ---
 
-##  📝 Notes
+## 📝 Notes
 - Might switch to a different database if needed (PostgreSQL).
 - Deployment options may evolve based on project needs and deadlines.
 - Might switch to different AI/NLP libraries if better suited for tasks.

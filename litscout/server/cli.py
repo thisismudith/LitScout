@@ -1,4 +1,4 @@
-#  litscout/server/cli.py
+# server/cli.py
 
 import argparse
 from colorama import Fore
@@ -41,10 +41,10 @@ def build_parser() -> argparse.ArgumentParser:
         description="LitScout Server CLI (db, and other components in future)."
     )
 
-    #  Top-level components: db, (future: api, worker, etc.)
+    # Top-level components: db, (future: api, worker, etc.)
     subparsers = parser.add_subparsers(dest="component", required=True)
 
-    #  Database component: supports both "db" and "database"
+    # Database component: supports both "db" and "database"
     db_parser = subparsers.add_parser(
         "db",
         help="Database management commands.",
@@ -56,7 +56,7 @@ def build_parser() -> argparse.ArgumentParser:
         required=True,
     )
 
-    #  db init
+    # db init
     init_parser = db_subparsers.add_parser(
         "init",
         help="Initialize or reinstall the LitScout database schema from schema.sql.",
@@ -69,13 +69,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     add_db_options(init_parser)
 
-    #  db start
+    # db start
     db_subparsers.add_parser(
         "start",
         help="Start local PostgreSQL instance (PGDATA under server/database/pgdata by default).",
     )
 
-    #  db stop
+    # db stop
     db_subparsers.add_parser(
         "stop",
         help="Stop local PostgreSQL instance.",
@@ -90,7 +90,7 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    #  Handle DB-related commands ("db" or "database")
+    # Handle DB-related commands ("db" or "database")
     if args.component in ("db", "database"):
         if args.db_command == "init":
             cli_log.info("Initializing database schema...")

@@ -53,6 +53,7 @@ CREATE TABLE papers (
     id                      BIGSERIAL PRIMARY KEY,
     title                   TEXT NOT NULL,
     abstract                TEXT,
+    conclusion              TEXT,
     year                    INTEGER,
     publication_date        DATE,
     doi                     TEXT UNIQUE,

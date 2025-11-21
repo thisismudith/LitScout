@@ -1,241 +1,114 @@
-2025-11-20 08:10:08.994 IST [33188] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:10:09.001 IST [33188] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:10:09.002 IST [33188] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:10:09.096 IST [580] LOG:  database system was shut down at 2025-11-20 08:09:56 IST
-2025-11-20 08:10:09.108 IST [33188] LOG:  database system is ready to accept connections
-2025-11-20 08:10:50.112 IST [32272] FATAL:  role "postgres" does not exist
-2025-11-20 08:10:59.154 IST [13208] FATAL:  role "postgres" does not exist
-2025-11-20 08:13:27.011 IST [12460] ERROR:  canceling statement due to user request
-2025-11-20 08:13:27.011 IST [33188] LOG:  received fast shutdown request
-2025-11-20 08:13:27.011 IST [25272] LOG:  shutting down
-2025-11-20 08:13:27.017 IST [33188] LOG:  aborting any active transactions
-2025-11-20 08:13:27.018 IST [25272] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:13:27.046 IST [33188] LOG:  background worker "logical replication launcher" (PID 12460) exited with exit code 1
-2025-11-20 08:13:27.084 IST [25272] LOG:  checkpoint complete: wrote 43 buffers (0.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.014 s, sync=0.030 s, total=0.073 s; sync files=11, longest=0.004 s, average=0.003 s; distance=333 kB, estimate=333 kB; lsn=0/18448F0, redo lsn=0/18448F0
-2025-11-20 08:13:27.121 IST [33188] LOG:  database system is shut down
-2025-11-20 08:15:53.778 IST [32628] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:15:53.783 IST [32628] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:15:53.783 IST [32628] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:15:53.856 IST [28384] LOG:  database system was shut down at 2025-11-20 08:13:27 IST
-2025-11-20 08:15:53.867 IST [32628] LOG:  database system is ready to accept connections
-2025-11-20 08:15:57.699 IST [5288] FATAL:  role "admin" does not exist
-2025-11-20 08:15:59.551 IST [18032] FATAL:  role "admin" does not exist
-2025-11-20 08:18:02.116 IST [24072] FATAL:  role "admin" does not exist
-2025-11-20 08:18:03.182 IST [11584] FATAL:  role "admin" does not exist
-2025-11-20 08:19:47.898 IST [32992] ERROR:  canceling statement due to user request
-2025-11-20 08:19:47.898 IST [32628] LOG:  received fast shutdown request
-2025-11-20 08:19:47.898 IST [32368] LOG:  shutting down
-2025-11-20 08:19:47.906 IST [32368] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:19:47.908 IST [32628] LOG:  aborting any active transactions
-2025-11-20 08:19:47.926 IST [32628] LOG:  background worker "logical replication launcher" (PID 32992) exited with exit code 1
-2025-11-20 08:19:47.934 IST [32368] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.006 s, total=0.036 s; sync files=2, longest=0.004 s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=0/18449A0, redo lsn=0/18449A0
-2025-11-20 08:19:48.092 IST [32628] LOG:  database system is shut down
-2025-11-20 08:20:35.807 IST [13692] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:20:35.811 IST [13692] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:20:35.811 IST [13692] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:20:35.882 IST [23032] LOG:  database system was shut down at 2025-11-20 08:19:47 IST
-2025-11-20 08:20:35.894 IST [13692] LOG:  database system is ready to accept connections
-2025-11-20 08:21:14.967 IST [18140] ERROR:  canceling statement due to user request
-2025-11-20 08:21:14.967 IST [13692] LOG:  received fast shutdown request
-2025-11-20 08:21:14.967 IST [30420] LOG:  shutting down
-2025-11-20 08:21:14.974 IST [30420] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:21:14.976 IST [13692] LOG:  aborting any active transactions
-2025-11-20 08:21:14.976 IST [13692] LOG:  background worker "logical replication launcher" (PID 18140) exited with exit code 1
-2025-11-20 08:21:15.011 IST [30420] LOG:  checkpoint complete: wrote 4 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.008 s, sync=0.014 s, total=0.044 s; sync files=6, longest=0.003 s, average=0.003 s; distance=3 kB, estimate=3 kB; lsn=0/1845860, redo lsn=0/1845860
-2025-11-20 08:21:15.060 IST [13692] LOG:  database system is shut down
-2025-11-20 08:22:15.753 IST [7300] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:22:15.761 IST [7300] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:22:15.761 IST [7300] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:22:15.832 IST [31832] LOG:  database system was shut down at 2025-11-20 08:21:15 IST
-2025-11-20 08:22:15.841 IST [7300] LOG:  database system is ready to accept connections
-2025-11-20 08:22:49.850 IST [10700] ERROR:  role "admin" already exists
-2025-11-20 08:22:49.850 IST [10700] STATEMENT:  CREATE ROLE admin WITH LOGIN SUPERUSER PASSWORD 'admin';
-2025-11-20 08:23:05.571 IST [4744] ERROR:  canceling statement due to user request
-2025-11-20 08:23:05.572 IST [7300] LOG:  received fast shutdown request
-2025-11-20 08:23:05.572 IST [4552] LOG:  shutting down
-2025-11-20 08:23:05.578 IST [4552] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:23:05.579 IST [7300] LOG:  aborting any active transactions
-2025-11-20 08:23:05.596 IST [7300] LOG:  background worker "logical replication launcher" (PID 4744) exited with exit code 1
-2025-11-20 08:23:05.611 IST [4552] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.008 s, sync=0.008 s, total=0.039 s; sync files=3, longest=0.004 s, average=0.003 s; distance=2 kB, estimate=2 kB; lsn=0/1846230, redo lsn=0/1846230
-2025-11-20 08:23:05.642 IST [7300] LOG:  database system is shut down
-2025-11-20 08:23:27.093 IST [32480] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:23:27.097 IST [32480] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:23:27.097 IST [32480] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:23:27.176 IST [6732] LOG:  database system was shut down at 2025-11-20 08:23:05 IST
-2025-11-20 08:23:27.188 IST [32480] LOG:  database system is ready to accept connections
-2025-11-20 08:23:34.510 IST [32480] LOG:  received fast shutdown request
-2025-11-20 08:23:34.511 IST [32388] ERROR:  canceling statement due to user request
-2025-11-20 08:23:34.511 IST [512] LOG:  shutting down
-2025-11-20 08:23:34.518 IST [512] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:23:34.520 IST [32480] LOG:  aborting any active transactions
-2025-11-20 08:23:34.548 IST [32480] LOG:  background worker "logical replication launcher" (PID 32388) exited with exit code 1
-2025-11-20 08:23:34.554 IST [512] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.007 s, total=0.043 s; sync files=2, longest=0.004 s, average=0.004 s; distance=0 kB, estimate=0 kB; lsn=0/18462A8, redo lsn=0/18462A8
-2025-11-20 08:23:34.599 IST [32480] LOG:  database system is shut down
-2025-11-20 08:23:38.549 IST [20688] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
-2025-11-20 08:23:38.552 IST [20688] LOG:  listening on IPv6 address "::1", port 5432
-2025-11-20 08:23:38.552 IST [20688] LOG:  listening on IPv4 address "127.0.0.1", port 5432
-2025-11-20 08:23:38.659 IST [32340] LOG:  database system was shut down at 2025-11-20 08:23:34 IST
-2025-11-20 08:23:38.670 IST [20688] LOG:  database system is ready to accept connections
-2025-11-20 08:26:29.849 IST [17460] ERROR:  type "venue_type" already exists
-2025-11-20 08:26:29.849 IST [17460] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
-	
-	-- Authors
-	CREATE TABLE authors (
-	    id                      BIGSERIAL PRIMARY KEY,
-	    full_name               TEXT NOT NULL,
-	    affiliation             TEXT,
-	    orcid                   TEXT UNIQUE,
-	    external_ids            JSONB,
-	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
-	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
-	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	
-	    CONSTRAINT authors_clusters_same_length
-	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
-	);
-	
-	-- Venues (conferences / journals)
-	CREATE TABLE venues (
-	    id              BIGSERIAL PRIMARY KEY,
-	    name            TEXT NOT NULL,
-	    short_name      TEXT,
-	    venue_type      venue_type NOT NULL,
-	    homepage_url    TEXT,
-	    location        TEXT,
-	    rank_label      TEXT,
-	    external_ids    JSONB,
-	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);
-	
-	-- Specific yearly / edition instances of a venue
-	CREATE TABLE venue_instances (
-	    id                      BIGSERIAL PRIMARY KEY,
-	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
-	    year                    INTEGER NOT NULL,
-	    submission_deadline     DATE,
-	    notification_date       DATE,
-	    camera_ready_deadline   DATE,
-	    start_date              DATE,
-	    end_date                DATE,
-	    location_override       TEXT,  -- if this year's location differs
-	    notes                   TEXT,
-	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	
-	    UNIQUE (venue_id, year)
-	);
-	
-	-- Papers
-	CREATE TABLE papers (
-	    id                      BIGSERIAL PRIMARY KEY,
-	    title                   TEXT NOT NULL,
-	    abstract                TEXT,
-	    year                    INTEGER,
-	    publication_date        DATE,
-	    doi                     TEXT UNIQUE,
-	    field                   TEXT,
-	    language                TEXT,
-	    venue_id                BIGINT REFERENCES venues(id),
-	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
-	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
-	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
-	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	
-	    CONSTRAINT papers_clusters_same_length
-	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
-	);
-	
-	-- Many-to-many: which authors wrote which papers, in what order
-	CREATE TABLE paper_authors (
-	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
-	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
-	    author_order    INTEGER NOT NULL, -- Starts from 1
-	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
-	
-	    PRIMARY KEY (paper_id, author_id),
-	    UNIQUE (paper_id, author_order)
-	);
-	
-	-- Paper Sources
-	CREATE TABLE sources (
-	    id      SMALLSERIAL PRIMARY KEY,
-	    name    TEXT NOT NULL UNIQUE 
-	);
-	
-	CREATE TABLE paper_sources (
-	    paper_id    BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
-	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
-	    external_id TEXT NOT NULL,
-	    url         TEXT,
-	
-	    PRIMARY KEY (paper_id, source_id),
-	    UNIQUE (source_id, external_id)
-	);
-	
-	-- Author Specialties / Research Areas
-	CREATE TABLE specialties (
-	    id          BIGSERIAL PRIMARY KEY,
-	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
-	    parent_id   BIGINT REFERENCES specialties(id),
-	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);
-	
-	CREATE TABLE author_specialties (
-	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
-	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
-	    PRIMARY KEY (author_id, specialty_id)
-	);
-	
-	-- Clusters for papers and authors
-	CREATE TABLE clusters (
-	    id          BIGSERIAL PRIMARY KEY,
-	    label       TEXT,  -- human-readable
-	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
-	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
-	    params      JSONB,  -- hyperparameters snapshot
-	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-	);
-	
-	-- Indexing for faster lookups
-	
-	-- Lookup all papers for an author
-	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
-	    ON paper_authors(paper_id);
-	
-	-- Lookup all authors for a paper
-	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
-	    ON paper_authors(author_id);
-	
-	-- Lookup papers by year
-	CREATE INDEX IF NOT EXISTS idx_papers_year
-	    ON papers(year);
-	
-	-- Source-based filtering
-	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
-	    ON paper_sources(source_id);
-	
-	-- Deadline-based queries for conferences
-	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
-	    ON venue_instances(submission_deadline);
-	
-	-- Fast "papers in cluster X" queries
-	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
-	    ON papers USING GIN (cluster_ids);
-	
-	-- Fast "authors in cluster X" queries
-	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
-	    ON authors USING GIN (cluster_ids);
-2025-11-20 08:28:38.659 IST [29396] LOG:  checkpoint starting: time
-2025-11-20 08:30:32.829 IST [29396] LOG:  checkpoint complete: wrote 1038 buffers (6.3%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=113.637 s, sync=0.432 s, total=114.170 s; sync files=363, longest=0.008 s, average=0.002 s; distance=5017 kB, estimate=5017 kB; lsn=0/1D2C760, redo lsn=0/1D2C6D0
-2025-11-20 08:34:50.130 IST [29396] LOG:  shutting down
-2025-11-20 08:34:50.130 IST [2368] ERROR:  canceling statement due to user request
-2025-11-20 08:34:50.131 IST [20688] LOG:  received fast shutdown request
-2025-11-20 08:34:50.138 IST [29396] LOG:  checkpoint starting: shutdown immediate
-2025-11-20 08:34:50.139 IST [20688] LOG:  aborting any active transactions
-2025-11-20 08:34:50.146 IST [20688] LOG:  background worker "logical replication launcher" (PID 2368) exited with exit code 1
-2025-11-20 08:34:50.150 IST [29396] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.020 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=4515 kB; lsn=0/1D2C810, redo lsn=0/1D2C810
-2025-11-20 08:34:50.197 IST [20688] LOG:  database system is shut down
+2025-11-21 12:14:26.618 IST [35292] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:14:26.623 IST [35292] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:14:26.624 IST [35292] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:14:26.695 IST [33168] LOG:  database system was interrupted; last known up at 2025-11-20 08:40:21 IST
+2025-11-21 12:14:27.473 IST [33168] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-21 12:14:27.481 IST [33168] LOG:  redo starts at 0/1D2E778
+2025-11-21 12:14:27.481 IST [33168] LOG:  invalid record length at 0/1D2E880: expected at least 24, got 0
+2025-11-21 12:14:27.481 IST [33168] LOG:  redo done at 0/1D2E848 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-11-21 12:14:27.490 IST [33904] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-21 12:14:27.513 IST [33904] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.003 s, total=0.028 s; sync files=2, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/1D2E880, redo lsn=0/1D2E880
+2025-11-21 12:14:27.522 IST [35292] LOG:  database system is ready to accept connections
+2025-11-21 12:14:33.979 IST [33904] LOG:  checkpoint starting: immediate force wait
+2025-11-21 12:14:34.001 IST [33904] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.007 s, total=0.022 s; sync files=2, longest=0.005 s, average=0.004 s; distance=3 kB, estimate=3 kB; lsn=0/1D2F648, redo lsn=0/1D2F5F0
+2025-11-21 12:15:25.163 IST [33904] LOG:  checkpoint starting: immediate force wait
+2025-11-21 12:15:25.234 IST [33904] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.006 s, sync=0.039 s, total=0.071 s; sync files=7, longest=0.018 s, average=0.006 s; distance=4675 kB, estimate=4675 kB; lsn=0/21C0678, redo lsn=0/21C05E8
+2025-11-21 12:16:58.211 IST [33904] LOG:  checkpoint starting: immediate force wait
+2025-11-21 12:16:58.250 IST [33904] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.015 s, total=0.040 s; sync files=7, longest=0.003 s, average=0.002 s; distance=4974 kB, estimate=4974 kB; lsn=0/269BE80, redo lsn=0/269BE28
+2025-11-21 12:17:59.586 IST [9344] FATAL:  database "dagam" does not exist
+2025-11-21 12:18:08.205 IST [30476] FATAL:  database "help" does not exist
+2025-11-21 12:18:21.017 IST [38428] FATAL:  database "dagam" does not exist
+2025-11-21 12:18:25.689 IST [18688] FATAL:  database "dagam" does not exist
+2025-11-21 12:20:11.975 IST [25452] FATAL:  database "delete" does not exist
+2025-11-21 12:20:23.431 IST [23956] ERROR:  database "liscout" does not exist
+2025-11-21 12:20:23.431 IST [23956] STATEMENT:  DROP DATABASE liscout;
+2025-11-21 12:20:25.812 IST [33904] LOG:  checkpoint starting: immediate force wait
+2025-11-21 12:20:25.859 IST [33904] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.010 s, sync=0.017 s, total=0.047 s; sync files=7, longest=0.003 s, average=0.003 s; distance=5023 kB, estimate=5023 kB; lsn=0/2B83E58, redo lsn=0/2B83E00
+2025-11-21 12:20:28.791 IST [33904] LOG:  checkpoint starting: immediate force wait
+2025-11-21 12:20:28.825 IST [33904] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.009 s, total=0.034 s; sync files=3, longest=0.004 s, average=0.003 s; distance=2 kB, estimate=4521 kB; lsn=0/2B847C8, redo lsn=0/2B84770
+2025-11-21 12:22:12.570 IST [35292] LOG:  background worker "logical replication launcher" (PID 38716) was terminated by exception 0xC000013A
+2025-11-21 12:22:12.570 IST [35292] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-21 12:22:12.570 IST [35292] LOG:  terminating any other active server processes
+2025-11-21 12:22:49.066 IST [28264] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:22:49.072 IST [28264] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:22:49.073 IST [28264] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:22:49.182 IST [31332] LOG:  database system was shut down at 2025-11-21 12:22:35 IST
+2025-11-21 12:22:49.190 IST [28264] LOG:  database system is ready to accept connections
+2025-11-21 12:22:59.790 IST [35268] FATAL:  database "litscout" does not exist
+2025-11-21 12:25:42.259 IST [28264] LOG:  received fast shutdown request
+2025-11-21 12:25:42.259 IST [13292] LOG:  shutting down
+2025-11-21 12:25:42.267 IST [38640] ERROR:  canceling statement due to user request
+2025-11-21 12:25:42.267 IST [13292] LOG:  checkpoint starting: shutdown immediate
+2025-11-21 12:25:42.271 IST [28264] LOG:  aborting any active transactions
+2025-11-21 12:25:42.297 IST [28264] LOG:  background worker "logical replication launcher" (PID 38640) exited with exit code 1
+2025-11-21 12:25:42.330 IST [13292] LOG:  checkpoint complete: wrote 38 buffers (0.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.009 s, sync=0.032 s, total=0.071 s; sync files=10, longest=0.005 s, average=0.004 s; distance=286 kB, estimate=286 kB; lsn=0/1838E58, redo lsn=0/1838E58
+2025-11-21 12:25:42.356 IST [28264] LOG:  database system is shut down
+2025-11-21 12:26:04.305 IST [23700] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:26:04.311 IST [23700] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:26:04.311 IST [23700] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:26:04.383 IST [37536] LOG:  database system was shut down at 2025-11-21 12:25:42 IST
+2025-11-21 12:26:04.397 IST [23700] LOG:  database system is ready to accept connections
+2025-11-21 12:26:12.078 IST [17348] FATAL:  database "litscout_db" does not exist
+2025-11-21 12:26:54.971 IST [37024] FATAL:  database "litscout" does not exist
+2025-11-21 12:28:02.430 IST [36300] FATAL:  database "start" does not exist
+2025-11-21 12:28:17.843 IST [27044] ERROR:  canceling statement due to user request
+2025-11-21 12:28:17.844 IST [23700] LOG:  received fast shutdown request
+2025-11-21 12:28:17.844 IST [29012] LOG:  shutting down
+2025-11-21 12:28:17.850 IST [29012] LOG:  checkpoint starting: shutdown immediate
+2025-11-21 12:28:17.850 IST [23700] LOG:  aborting any active transactions
+2025-11-21 12:28:17.865 IST [23700] LOG:  background worker "logical replication launcher" (PID 27044) exited with exit code 1
+2025-11-21 12:28:17.897 IST [29012] LOG:  checkpoint complete: wrote 30 buffers (0.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.010 s, sync=0.017 s, total=0.053 s; sync files=7, longest=0.003 s, average=0.003 s; distance=201 kB, estimate=201 kB; lsn=0/186B4A0, redo lsn=0/186B4A0
+2025-11-21 12:28:17.936 IST [23700] LOG:  database system is shut down
+2025-11-21 12:28:23.351 IST [37840] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:28:23.355 IST [37840] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:28:23.356 IST [37840] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:28:23.432 IST [25688] LOG:  database system was shut down at 2025-11-21 12:28:17 IST
+2025-11-21 12:28:23.444 IST [37840] LOG:  database system is ready to accept connections
+2025-11-21 12:29:03.390 IST [26872] ERROR:  canceling statement due to user request
+2025-11-21 12:29:03.391 IST [37840] LOG:  received fast shutdown request
+2025-11-21 12:29:03.391 IST [26196] LOG:  shutting down
+2025-11-21 12:29:03.399 IST [26196] LOG:  checkpoint starting: shutdown immediate
+2025-11-21 12:29:03.399 IST [37840] LOG:  aborting any active transactions
+2025-11-21 12:29:03.417 IST [37840] LOG:  background worker "logical replication launcher" (PID 26872) exited with exit code 1
+2025-11-21 12:29:03.434 IST [26196] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.007 s, total=0.043 s; sync files=2, longest=0.004 s, average=0.004 s; distance=0 kB, estimate=0 kB; lsn=0/186B550, redo lsn=0/186B550
+2025-11-21 12:29:03.493 IST [37840] LOG:  database system is shut down
+2025-11-21 12:29:33.805 IST [25140] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:29:33.810 IST [25140] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:29:33.810 IST [25140] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:29:33.880 IST [38064] LOG:  database system was shut down at 2025-11-21 12:29:03 IST
+2025-11-21 12:29:33.890 IST [25140] LOG:  database system is ready to accept connections
+2025-11-21 12:29:37.084 IST [36076] ERROR:  database "litscout" does not exist
+2025-11-21 12:29:37.084 IST [36076] STATEMENT:  DROP DATABASE litscout;
+2025-11-21 12:29:41.419 IST [28308] ERROR:  database "litscout_db" does not exist
+2025-11-21 12:29:41.419 IST [28308] STATEMENT:  DROP DATABASE litscout_db;
+2025-11-21 12:30:00.284 IST [15364] FATAL:  role "admin" does not exist
+2025-11-21 12:30:02.141 IST [26244] FATAL:  role "admin" does not exist
+2025-11-21 12:31:37.675 IST [38680] ERROR:  canceling statement due to user request
+2025-11-21 12:31:37.675 IST [25140] LOG:  received fast shutdown request
+2025-11-21 12:31:37.675 IST [31016] LOG:  shutting down
+2025-11-21 12:31:37.682 IST [25140] LOG:  aborting any active transactions
+2025-11-21 12:31:37.684 IST [31016] LOG:  checkpoint starting: shutdown immediate
+2025-11-21 12:31:37.696 IST [25140] LOG:  background worker "logical replication launcher" (PID 38680) exited with exit code 1
+2025-11-21 12:31:37.720 IST [31016] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.008 s, sync=0.007 s, total=0.045 s; sync files=2, longest=0.004 s, average=0.004 s; distance=0 kB, estimate=0 kB; lsn=0/186B600, redo lsn=0/186B600
+2025-11-21 12:31:37.763 IST [25140] LOG:  database system is shut down
+2025-11-21 12:31:49.388 IST [26252] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:31:49.393 IST [26252] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:31:49.394 IST [26252] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:31:49.469 IST [37904] LOG:  database system was shut down at 2025-11-21 12:31:37 IST
+2025-11-21 12:31:49.483 IST [26252] LOG:  database system is ready to accept connections
+2025-11-21 12:32:37.012 IST [31804] ERROR:  canceling statement due to user request
+2025-11-21 12:32:37.013 IST [26252] LOG:  received fast shutdown request
+2025-11-21 12:32:37.014 IST [17988] LOG:  shutting down
+2025-11-21 12:32:37.026 IST [17988] LOG:  checkpoint starting: shutdown immediate
+2025-11-21 12:32:37.029 IST [26252] LOG:  aborting any active transactions
+2025-11-21 12:32:37.055 IST [26252] LOG:  background worker "logical replication launcher" (PID 31804) exited with exit code 1
+2025-11-21 12:32:37.070 IST [17988] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.011 s, total=0.057 s; sync files=2, longest=0.008 s, average=0.006 s; distance=0 kB, estimate=0 kB; lsn=0/186B6B0, redo lsn=0/186B6B0
+2025-11-21 12:32:37.137 IST [26252] LOG:  database system is shut down
+2025-11-21 12:32:38.450 IST [13056] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-21 12:32:38.459 IST [13056] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-21 12:32:38.459 IST [13056] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-21 12:32:38.540 IST [35872] LOG:  database system was shut down at 2025-11-21 12:32:37 IST
+2025-11-21 12:32:38.553 IST [13056] LOG:  database system is ready to accept connections
+2025-11-21 12:37:38.544 IST [9148] LOG:  checkpoint starting: time
+2025-11-21 12:39:33.381 IST [9148] LOG:  checkpoint complete: wrote 1042 buffers (6.4%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=113.988 s, sync=0.704 s, total=114.838 s; sync files=367, longest=0.005 s, average=0.002 s; distance=5021 kB, estimate=5021 kB; lsn=0/1D52E80, redo lsn=0/1D52DF0
+2025-11-21 17:09:44.550 IST [31132] FATAL:  terminating connection due to unexpected postmaster exit

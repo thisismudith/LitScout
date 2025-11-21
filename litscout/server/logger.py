@@ -1,9 +1,9 @@
-#  litscout/server/logger.py
+# server/logger.py
 
 from colorama import Fore, Style, init as colorama_init
 from datetime import datetime
 
-#  Initialize once for whole project
+# Initialize once for whole project
 colorama_init(autoreset=True)
 
 
@@ -18,7 +18,7 @@ class ColorLogger:
     """
 
 
-    #  TAG colors
+    # TAG colors
     COLOR_INFO = Fore.CYAN
     COLOR_SUCCESS = Fore.GREEN
     COLOR_ERROR = Fore.RED
@@ -52,7 +52,7 @@ class ColorLogger:
         print(f"{tag} {color}{message}{Fore.RESET}{Style.RESET_ALL}")
 
 
-    #  Public Logging Method
+    # Public Logging Method
     def info(self, message: str, use_color: bool = True):
         tag = self._tag("INFO", self.COLOR_INFO)
         self._print(tag, message, self.COLOR_INFO if use_color else Fore.RESET)
