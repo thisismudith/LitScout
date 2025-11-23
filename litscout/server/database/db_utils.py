@@ -16,7 +16,7 @@ log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
 # Shared env-based configuration
 ENV_DB_NAME = os.getenv("LITSCOUT_DB_NAME", "litscout")
 ENV_DB_USER = os.getenv("LITSCOUT_DB_USER", "admin")
-ENV_DB_PASSWORD = os.getenv("LITSCOUT_DB_PASSWORD", "")
+ENV_DB_PASSWORD = os.getenv("LITSCOUT_DB_PASSWORD", "admin")
 ENV_DB_HOST = os.getenv("LITSCOUT_DB_HOST", "localhost")
 ENV_DB_PORT = os.getenv("LITSCOUT_DB_PORT", "5432")
 

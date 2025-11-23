@@ -112,3 +112,2228 @@
 2025-11-21 12:37:38.544 IST [9148] LOG:  checkpoint starting: time
 2025-11-21 12:39:33.381 IST [9148] LOG:  checkpoint complete: wrote 1042 buffers (6.4%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=113.988 s, sync=0.704 s, total=114.838 s; sync files=367, longest=0.005 s, average=0.002 s; distance=5021 kB, estimate=5021 kB; lsn=0/1D52E80, redo lsn=0/1D52DF0
 2025-11-21 17:09:44.550 IST [31132] FATAL:  terminating connection due to unexpected postmaster exit
+2025-11-24 02:42:50.666 IST [35400] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 02:42:50.670 IST [35400] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 02:42:50.670 IST [35400] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 02:42:50.727 IST [34272] LOG:  database system was interrupted; last known up at 2025-11-21 12:39:33 IST
+2025-11-24 02:42:51.204 IST [34272] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-24 02:42:51.211 IST [34272] LOG:  redo starts at 0/1D52DF0
+2025-11-24 02:42:51.212 IST [34272] LOG:  invalid record length at 0/1D52F30: expected at least 24, got 0
+2025-11-24 02:42:51.212 IST [34272] LOG:  redo done at 0/1D52EF8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2025-11-24 02:42:51.219 IST [35872] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-24 02:42:51.232 IST [35872] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.002 s, total=0.015 s; sync files=2, longest=0.002 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/1D52F30, redo lsn=0/1D52F30
+2025-11-24 02:42:51.239 IST [35400] LOG:  database system is ready to accept connections
+2025-11-24 02:43:43.090 IST [35872] LOG:  shutting down
+2025-11-24 02:43:43.090 IST [35400] LOG:  received fast shutdown request
+2025-11-24 02:43:43.090 IST [17132] ERROR:  canceling statement due to user request
+2025-11-24 02:43:43.090 IST [22464] ERROR:  canceling statement due to user request
+2025-11-24 02:43:43.093 IST [35872] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 02:43:43.093 IST [35400] LOG:  aborting any active transactions
+2025-11-24 02:43:43.110 IST [35872] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.021 s; sync files=1, longest=0.001 s, average=0.001 s; distance=7 kB, estimate=7 kB; lsn=0/1D54E98, redo lsn=0/1D54E98
+2025-11-24 02:43:43.117 IST [35400] LOG:  background worker "logical replication launcher" (PID 17132) exited with exit code 1
+2025-11-24 02:43:43.172 IST [35400] LOG:  database system is shut down
+2025-11-24 02:47:28.464 IST [20416] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 02:47:28.469 IST [20416] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 02:47:28.469 IST [20416] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 02:47:28.533 IST [38540] LOG:  database system was shut down at 2025-11-24 02:43:43 IST
+2025-11-24 02:47:28.543 IST [20416] LOG:  database system is ready to accept connections
+2025-11-24 02:49:10.200 IST [26452] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 02:49:10.200 IST [26452] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex' = 'https://openalex.org/W2194775991';
+2025-11-24 02:51:52.504 IST [15408] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:51:52.518 IST [15408] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.003 s, total=0.014 s; sync files=4, longest=0.001 s, average=0.001 s; distance=15 kB, estimate=15 kB; lsn=0/1D58DE0, redo lsn=0/1D58D88
+2025-11-24 02:51:53.127 IST [14664] ERROR:  relation "sources" does not exist
+2025-11-24 02:51:53.127 IST [14664] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+	    external_id TEXT NOT NULL,
+	    url         TEXT,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Paper Sources
+	CREATE TABLE sources (
+	    id      SMALLSERIAL PRIMARY KEY,
+	    name    TEXT NOT NULL UNIQUE 
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Source-based filtering
+	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
+	    ON paper_sources(source_id);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 02:52:05.642 IST [15408] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:52:05.658 IST [15408] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.003 s, sync=0.005 s, total=0.017 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4816 kB, estimate=4816 kB; lsn=0/220D1B8, redo lsn=0/220D160
+2025-11-24 02:52:06.025 IST [31316] ERROR:  relation "paper_sources" does not exist
+2025-11-24 02:52:06.025 IST [31316] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Paper Sources
+	CREATE TABLE sources (
+	    id      SMALLSERIAL PRIMARY KEY,
+	    name    TEXT NOT NULL UNIQUE 
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+	    external_id TEXT NOT NULL,
+	    url         TEXT,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Source-based filtering
+	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
+	    ON paper_sources(source_id);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 02:54:45.075 IST [15408] LOG:  shutting down
+2025-11-24 02:54:45.075 IST [32900] ERROR:  canceling statement due to user request
+2025-11-24 02:54:45.076 IST [20416] LOG:  received fast shutdown request
+2025-11-24 02:54:45.078 IST [15408] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 02:54:45.079 IST [20416] LOG:  aborting any active transactions
+2025-11-24 02:54:45.088 IST [20416] LOG:  background worker "logical replication launcher" (PID 32900) exited with exit code 1
+2025-11-24 02:54:45.404 IST [15408] LOG:  checkpoint complete: wrote 1023 buffers (6.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.109 s, sync=0.202 s, total=0.330 s; sync files=353, longest=0.003 s, average=0.001 s; distance=4946 kB, estimate=4946 kB; lsn=0/26E1D20, redo lsn=0/26E1D20
+2025-11-24 02:54:45.502 IST [20416] LOG:  database system is shut down
+2025-11-24 02:54:59.702 IST [31340] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 02:54:59.706 IST [31340] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 02:54:59.706 IST [31340] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 02:54:59.759 IST [32020] LOG:  database system was shut down at 2025-11-24 02:54:45 IST
+2025-11-24 02:54:59.768 IST [31340] LOG:  database system is ready to accept connections
+2025-11-24 02:55:36.389 IST [29332] ERROR:  canceling statement due to user request
+2025-11-24 02:55:36.390 IST [21312] LOG:  shutting down
+2025-11-24 02:55:36.390 IST [31340] LOG:  received fast shutdown request
+2025-11-24 02:55:36.394 IST [21312] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 02:55:36.394 IST [31340] LOG:  aborting any active transactions
+2025-11-24 02:55:36.398 IST [31340] LOG:  background worker "logical replication launcher" (PID 29332) exited with exit code 1
+2025-11-24 02:55:36.414 IST [21312] LOG:  checkpoint complete: wrote 5 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.005 s, total=0.025 s; sync files=4, longest=0.002 s, average=0.002 s; distance=40 kB, estimate=40 kB; lsn=0/26EBE70, redo lsn=0/26EBE70
+2025-11-24 02:55:36.458 IST [31340] LOG:  database system is shut down
+2025-11-24 02:55:52.382 IST [32904] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 02:55:52.386 IST [32904] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 02:55:52.386 IST [32904] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 02:55:52.439 IST [24532] LOG:  database system was shut down at 2025-11-24 02:55:36 IST
+2025-11-24 02:55:52.448 IST [32904] LOG:  database system is ready to accept connections
+2025-11-24 02:55:54.221 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:55:54.234 IST [35304] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.003 s, total=0.014 s; sync files=5, longest=0.001 s, average=0.001 s; distance=5 kB, estimate=5 kB; lsn=0/26ED5E8, redo lsn=0/26ED590
+2025-11-24 02:55:54.750 IST [23760] ERROR:  no schema has been selected to create in
+2025-11-24 02:55:54.750 IST [23760] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Paper Sources
+	CREATE TABLE sources (
+	    id      SMALLSERIAL PRIMARY KEY,
+	    name    TEXT NOT NULL UNIQUE 
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+	    external_id TEXT NOT NULL,
+	    url         TEXT,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Source-based filtering
+	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
+	    ON paper_sources(source_id);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 02:56:21.852 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:56:21.871 IST [35304] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.007 s, total=0.019 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4679 kB, estimate=4679 kB; lsn=0/2B7F440, redo lsn=0/2B7F3E8
+2025-11-24 02:56:22.168 IST [16208] ERROR:  no schema has been selected to create in
+2025-11-24 02:56:22.168 IST [16208] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Paper Sources
+	CREATE TABLE sources (
+	    id      SMALLSERIAL PRIMARY KEY,
+	    name    TEXT NOT NULL UNIQUE 
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+	    external_id TEXT NOT NULL,
+	    url         TEXT,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Source-based filtering
+	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
+	    ON paper_sources(source_id);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 02:56:59.462 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:56:59.479 IST [35304] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.004 s, sync=0.004 s, total=0.017 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4679 kB, estimate=4679 kB; lsn=0/30113E0, redo lsn=0/3011388
+2025-11-24 02:56:59.834 IST [19416] ERROR:  relation "paper_sources" does not exist
+2025-11-24 02:56:59.834 IST [19416] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Paper Sources
+	CREATE TABLE sources (
+	    id      SMALLSERIAL PRIMARY KEY,
+	    name    TEXT NOT NULL UNIQUE 
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+	    external_id TEXT NOT NULL,
+	    url         TEXT,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Source-based filtering
+	CREATE INDEX IF NOT EXISTS idx_paper_sources_source
+	    ON paper_sources(source_id);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 02:57:21.526 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:57:21.543 IST [35304] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.006 s, total=0.017 s; sync files=9, longest=0.001 s, average=0.001 s; distance=4984 kB, estimate=4984 kB; lsn=0/34EF6C8, redo lsn=0/34EF670
+2025-11-24 02:57:31.734 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:57:31.747 IST [35304] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.005 s, total=0.013 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4971 kB, estimate=4983 kB; lsn=0/39CA5F0, redo lsn=0/39CA598
+2025-11-24 02:57:40.973 IST [35304] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:57:40.986 IST [35304] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.004 s, total=0.013 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4983 kB, estimate=4983 kB; lsn=0/3EA8280, redo lsn=0/3EA8228
+2025-11-24 02:58:01.152 IST [35304] LOG:  shutting down
+2025-11-24 02:58:01.152 IST [26940] ERROR:  canceling statement due to user request
+2025-11-24 02:58:01.152 IST [32904] LOG:  received fast shutdown request
+2025-11-24 02:58:01.157 IST [35304] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 02:58:01.157 IST [32904] LOG:  aborting any active transactions
+2025-11-24 02:58:01.158 IST [9304] FATAL:  terminating connection due to administrator command
+2025-11-24 02:58:01.165 IST [32904] LOG:  background worker "logical replication launcher" (PID 26940) exited with exit code 1
+2025-11-24 02:58:01.466 IST [35304] LOG:  checkpoint complete: wrote 1034 buffers (6.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.109 s, sync=0.187 s, total=0.315 s; sync files=356, longest=0.002 s, average=0.001 s; distance=4981 kB, estimate=4983 kB; lsn=0/4385890, redo lsn=0/4385890
+2025-11-24 02:58:01.540 IST [32904] LOG:  database system is shut down
+2025-11-24 02:58:06.074 IST [35408] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 02:58:06.091 IST [35408] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 02:58:06.091 IST [35408] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 02:58:06.186 IST [3556] LOG:  database system was shut down at 2025-11-24 02:58:01 IST
+2025-11-24 02:58:06.200 IST [35408] LOG:  database system is ready to accept connections
+2025-11-24 02:58:17.938 IST [35888] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 02:58:17.938 IST [35888] HINT:  Perhaps you meant to reference the column "papers.external_id".
+2025-11-24 02:58:17.938 IST [35888] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex' = 'https://openalex.org/W2194775991';
+2025-11-24 02:59:50.868 IST [16104] LOG:  checkpoint starting: immediate force wait
+2025-11-24 02:59:50.882 IST [16104] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.004 s, total=0.015 s; sync files=4, longest=0.001 s, average=0.001 s; distance=146 kB, estimate=146 kB; lsn=0/43AA2D0, redo lsn=0/43AA240
+2025-11-24 02:59:58.575 IST [24764] ERROR:  null value in column "source_id" of relation "papers" violates not-null constraint
+2025-11-24 02:59:58.575 IST [24764] DETAIL:  Failing row contains (1, Deep Residual Learning for Image Recognition, null, null, 2016, 2016-06-01, https://doi.org/10.1109/cvpr.2016.90, Residual, en, null, null, {}, {}, 2025-11-24 02:59:58.564834+05:30, 2025-11-24 02:59:58.564834+05:30, null, {"openalex": "https://openalex.org/W2194775991"}, null).
+2025-11-24 02:59:58.575 IST [24764] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, year, publication_date,
+	             doi, field, language,
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            ('Deep Residual Learning for Image Recognition', NULL, 2016, '2016-06-01',
+	             'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en',
+	             NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	        RETURNING id;
+	        
+2025-11-24 03:04:50.890 IST [16104] LOG:  checkpoint starting: time
+2025-11-24 03:06:45.715 IST [16104] LOG:  checkpoint complete: wrote 1049 buffers (6.4%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=114.397 s, sync=0.411 s, total=114.826 s; sync files=358, longest=0.007 s, average=0.002 s; distance=5024 kB, estimate=5024 kB; lsn=0/48922F0, redo lsn=0/4892260
+2025-11-24 03:19:50.776 IST [16104] LOG:  checkpoint starting: time
+2025-11-24 03:19:51.576 IST [16104] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.783 s, sync=0.009 s, total=0.801 s; sync files=7, longest=0.003 s, average=0.002 s; distance=6 kB, estimate=4522 kB; lsn=0/4893D78, redo lsn=0/4893CE8
+2025-11-24 03:23:24.985 IST [34584] FATAL:  terminating connection due to administrator command
+2025-11-24 03:23:24.989 IST [16104] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:23:25.001 IST [16104] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.003 s, total=0.013 s; sync files=4, longest=0.001 s, average=0.001 s; distance=14 kB, estimate=4071 kB; lsn=0/4897548, redo lsn=0/48974F0
+2025-11-24 03:26:30.524 IST [16104] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:26:30.539 IST [16104] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.006 s, total=0.016 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4991 kB, estimate=4991 kB; lsn=0/4D77260, redo lsn=0/4D77208
+2025-11-24 03:31:30.553 IST [16104] LOG:  checkpoint starting: time
+2025-11-24 03:33:24.152 IST [16104] LOG:  checkpoint complete: wrote 1040 buffers (6.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=113.311 s, sync=0.267 s, total=113.599 s; sync files=356, longest=0.005 s, average=0.001 s; distance=4991 kB, estimate=4991 kB; lsn=0/5257060, redo lsn=0/5256FD0
+2025-11-24 03:37:11.349 IST [4216] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 03:37:11.349 IST [4216] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2194775991';
+2025-11-24 03:39:45.243 IST [36372] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 03:39:45.243 IST [36372] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2194775991';
+2025-11-24 03:40:41.146 IST [12692] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 03:40:41.146 IST [12692] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2194775991';
+2025-11-24 03:41:23.044 IST [27048] ERROR:  column "external_ids" does not exist at character 29
+2025-11-24 03:41:23.044 IST [27048] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2194775991';
+2025-11-24 03:41:30.181 IST [16104] LOG:  checkpoint starting: time
+2025-11-24 03:41:31.750 IST [16104] LOG:  checkpoint complete: wrote 14 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.540 s, sync=0.010 s, total=1.570 s; sync files=12, longest=0.003 s, average=0.001 s; distance=60 kB, estimate=4498 kB; lsn=0/5266330, redo lsn=0/52662D8
+2025-11-24 03:42:55.944 IST [7804] ERROR:  canceling statement due to user request
+2025-11-24 03:42:55.945 IST [16104] LOG:  shutting down
+2025-11-24 03:42:55.945 IST [35408] LOG:  received fast shutdown request
+2025-11-24 03:42:55.949 IST [35408] LOG:  aborting any active transactions
+2025-11-24 03:42:55.950 IST [16104] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 03:42:55.952 IST [35408] LOG:  background worker "logical replication launcher" (PID 7804) exited with exit code 1
+2025-11-24 03:42:55.959 IST [16104] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.015 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=4048 kB; lsn=0/52663E0, redo lsn=0/52663E0
+2025-11-24 03:42:56.029 IST [35408] LOG:  database system is shut down
+2025-11-24 03:43:11.949 IST [8180] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 03:43:11.956 IST [8180] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 03:43:11.956 IST [8180] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 03:43:12.075 IST [29572] LOG:  database system was shut down at 2025-11-24 03:42:55 IST
+2025-11-24 03:43:12.097 IST [8180] LOG:  database system is ready to accept connections
+2025-11-24 03:43:15.149 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:43:15.160 IST [34452] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.003 s, total=0.013 s; sync files=4, longest=0.001 s, average=0.001 s; distance=7 kB, estimate=7 kB; lsn=0/52682E0, redo lsn=0/5268288
+2025-11-24 03:43:15.587 IST [38572] ERROR:  column "cluster_ids" does not exist at character 2521
+2025-11-24 03:43:15.587 IST [38572] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        JSONB NOT NULL DEFAULT '[]',
+	    related_works           JSONB NOT NULL DEFAULT '[]',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 03:43:27.201 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:43:27.215 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.005 s, total=0.014 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4789 kB, estimate=4789 kB; lsn=0/5715AA8, redo lsn=0/5715A50
+2025-11-24 03:43:27.546 IST [14280] ERROR:  column "cluster_ids" does not exist at character 2521
+2025-11-24 03:43:27.546 IST [14280] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        JSONB NOT NULL DEFAULT '[]',
+	    related_works           JSONB NOT NULL DEFAULT '[]',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL,
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 03:43:50.014 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:43:50.028 IST [34452] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.006 s, total=0.015 s; sync files=9, longest=0.001 s, average=0.001 s; distance=4825 kB, estimate=4825 kB; lsn=0/5BCC078, redo lsn=0/5BCC020
+2025-11-24 03:43:50.346 IST [36488] ERROR:  syntax error at or near ")" at character 2450
+2025-11-24 03:43:50.346 IST [36488] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        JSONB NOT NULL DEFAULT '[]',
+	    related_works           JSONB NOT NULL DEFAULT '[]',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL,
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 03:44:07.143 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:44:07.159 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.003 s, sync=0.005 s, total=0.017 s; sync files=7, longest=0.002 s, average=0.001 s; distance=4677 kB, estimate=4810 kB; lsn=0/605D7F0, redo lsn=0/605D798
+2025-11-24 03:44:07.666 IST [34812] ERROR:  column "cluster_ids" does not exist
+2025-11-24 03:44:07.666 IST [34812] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        JSONB NOT NULL DEFAULT '[]',
+	    related_works           JSONB NOT NULL DEFAULT '[]',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-24 03:44:25.373 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:44:25.386 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.005 s, total=0.013 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4917 kB, estimate=4917 kB; lsn=0/652AC00, redo lsn=0/652ABA8
+2025-11-24 03:44:50.983 IST [10160] ERROR:  column "referenced_works" is of type jsonb but expression is of type text[] at character 2120
+2025-11-24 03:44:50.983 IST [10160] HINT:  You will need to rewrite or cast the expression.
+2025-11-24 03:44:50.983 IST [10160] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            ('Deep Residual Learning for Image Recognition', 'Actualmente diversas investigaciones se han enfocado en analizar a partir de videos de alta velocidad, características de las descargas eléctricas atmosféricas con el fin de adquirir mejor comprensión del fenómeno, que conlleva entre otros aspectos el desarrollo de sistemas de protección robustos. La mayoría de las investigaciones han requerido de un observador que ante el suceso del evento provea un disparo manual a la cámara permitiendo almacenar la información visual del fenómeno. Por tanto, este trabajo se orientó en proponer una metodología para la detección de las descargas utilizando dos implementaciones basadas en procesamiento de señales y visión computacional, con el propósito que el sistema autónomamente sea el que suministre el disparo, apartando al observador de la realización de esta tarea. El sistema de detección basado en técnicas de procesamiento de imágenes requirió la adecuación de métodos de segmentación, representación, descripción y clasificación. El algoritmo de reconocimiento con visión computacional se implementó mediante la red neuronal convolucional EfficientNetB4. Fuera de línea, las técnicas basadas en procesamiento de imágenes suministraron una precisión del 81.81%, mientras que haciendo uso de visión computacional la precisión fue de 71.63%. Con el objeto de evaluar el desempeño en tiempo real, las técnicas de procesamiento se adaptaron en un ordenador de placa reducida correspondiente a la Raspberry Pi 3 modelo B+ obteniéndose una precisión de 86.95%. Adicionalmente, se evaluó la característica de multiplicidad la cual corresponde al número de descargas subsecuentes presentes en el canal de la descarga logrando una precisión de 66.66%. (Texto tomado de la fuente)', NULL, 2016, '2016-06-01',
+	             'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en', ARRAY['https://openalex.org/W6629368666','https://openalex.org/W4212915314','https://openalex.org/W2117812871','https://openalex.org/W6620707391','https://openalex.org/W6682359208','https://openalex.org/W2147238549','https://openalex.org/W6680555419','https://openalex.org/W6637551013','https://openalex.org/W2161388792','https://openalex.org/W1903029394','https://openalex.org/W6637242042','https://openalex.org/W4388297464','https://openalex.org/W2107878631','https://openalex.org/W6787972765','https://openalex.org/W2147800946','https://openalex.org/W6684191040','https://openalex.org/W4238404964','https://openalex.org/W6639102338','https://openalex.org/W1932847118','https://openalex.org/W6676338569','https://openalex.org/W6637373629','https://openalex.org/W1677182931','https://openalex.org/W6640036494','https://openalex.org/W2064675550','https://openalex.org/W6638667902','https://openalex.org/W2124509324','https://openalex.org/W1984309565','https://openalex.org/W1976921161','https://openalex.org/W1997542937','https://openalex.org/W1536680647','https://openalex.org/W2031489346','https://openalex.org/W6631943919','https://openalex.org/W2102605133','https://openalex.org/W6688059459','https://openalex.org/W2964103341','https://openalex.org/W4231990273','https://openalex.org/W4242212377','https://openalex.org/W6626481562','https://openalex.org/W2159979951','https://openalex.org/W2097117768','https://openalex.org/W1665214252','https://openalex.org/W2613718673','https://openalex.org/W2962835968','https://openalex.org/W2914484425','https://openalex.org/W194249466','https://openalex.org/W2022532533','https://openalex.org/W2328425223','https://openalex.org/W1530872699','https://openalex.org/W2139398462','https://openalex.org/W1533861849','https://openalex.org/W1811843574','https://openalex.org/W1686810756','https://openalex.org/W2964118293','https://openalex.org/W2951603627','https://openalex.org/W2963542991','https://openalex.org/W1836465849','https://openalex.org/W2952009708','https://openalex.org/W2206858481','https://openalex.org/W1904365287','https://openalex.org/W1554663460','https://openalex.org/W639708223','https://openalex.org/W2117539524','https://openalex.org/W2125930537','https://openalex.org/W2950621961','https://openalex.org/W1932624639','https://openalex.org/W1799366690','https://openalex.org/W4285719527','https://openalex.org/W2168894214','https://openalex.org/W2025357764','https://openalex.org/W2179352600','https://openalex.org/W2963504252','https://openalex.org/W3038058348','https://openalex.org/W3118608800','https://openalex.org/W2155893237','https://openalex.org/W1861492603','https://openalex.org/W2950094539','https://openalex.org/W2066941820','https://openalex.org/W3037950864','https://openalex.org/W2152424459','https://openalex.org/W1690739335','https://openalex.org/W2163605009'], ARRAY['https://openalex.org/W4380075502','https://openalex.org/W2790662084','https://openalex.org/W4223943233','https://openalex.org/W4312200629','https://openalex.org/W4360585206','https://openalex.org/W4364306694','https://openalex.org/W2970686063','https://openalex.org/W2915754718','https://openalex.org/W2194775991','https://openalex.org/W2563602643'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	        RETURNING id;
+	        
+2025-11-24 03:45:43.810 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:45:43.825 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.005 s, total=0.015 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4939 kB, estimate=4939 kB; lsn=0/69FD800, redo lsn=0/69FD7A8
+2025-11-24 03:45:44.156 IST [34316] ERROR:  malformed array literal: "[]" at character 2219
+2025-11-24 03:45:44.156 IST [34316] DETAIL:  "[" must introduce explicitly-specified array dimensions.
+2025-11-24 03:45:44.156 IST [34316] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '[]',
+	    related_works           TEXT[] NOT NULL DEFAULT '[]',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	    UNIQUE (paper_id, author_order)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	--     ON papers USING GIN (cluster_ids);
+	
+	-- -- Fast "authors in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	--     ON authors USING GIN (cluster_ids);
+2025-11-24 03:45:51.199 IST [34452] LOG:  checkpoint starting: immediate force wait
+2025-11-24 03:45:51.213 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.005 s, total=0.015 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4787 kB, estimate=4923 kB; lsn=0/6EAA6B8, redo lsn=0/6EAA660
+2025-11-24 03:50:51.228 IST [34452] LOG:  checkpoint starting: time
+2025-11-24 03:52:46.894 IST [34452] LOG:  checkpoint complete: wrote 1053 buffers (6.4%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=115.399 s, sync=0.248 s, total=115.667 s; sync files=348, longest=0.007 s, average=0.001 s; distance=4955 kB, estimate=4955 kB; lsn=0/7384100, redo lsn=0/73812E8
+2025-11-24 03:55:13.214 IST [33836] ERROR:  invalid value for parameter "client_encoding": "UTF-asdasdsa8"
+2025-11-24 03:55:13.214 IST [33836] STATEMENT:  SET client_encoding TO 'UTF-asdasdsa8';
+2025-11-24 03:55:51.915 IST [34452] LOG:  checkpoint starting: time
+2025-11-24 03:55:53.143 IST [34452] LOG:  checkpoint complete: wrote 11 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.207 s, sync=0.009 s, total=1.228 s; sync files=11, longest=0.003 s, average=0.001 s; distance=26 kB, estimate=4462 kB; lsn=0/7387C00, redo lsn=0/7387BA8
+2025-11-24 04:00:51.149 IST [34452] LOG:  checkpoint starting: time
+2025-11-24 04:00:51.828 IST [34452] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.652 s, sync=0.010 s, total=0.679 s; sync files=7, longest=0.003 s, average=0.002 s; distance=13 kB, estimate=4017 kB; lsn=0/738B0F8, redo lsn=0/738B0A0
+2025-11-24 04:05:51.834 IST [34452] LOG:  checkpoint starting: time
+2025-11-24 04:05:53.080 IST [34452] LOG:  checkpoint complete: wrote 11 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=1.216 s, sync=0.010 s, total=1.246 s; sync files=11, longest=0.003 s, average=0.001 s; distance=30 kB, estimate=3618 kB; lsn=0/7392908, redo lsn=0/73928B0
+2025-11-24 04:10:07.404 IST [8180] LOG:  received fast shutdown request
+2025-11-24 04:10:07.407 IST [8180] LOG:  aborting any active transactions
+2025-11-24 04:10:07.416 IST [8180] LOG:  background worker "logical replication launcher" (PID 33860) exited with exit code 1
+2025-11-24 04:10:07.416 IST [34452] LOG:  shutting down
+2025-11-24 04:10:07.418 IST [34452] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 04:10:07.442 IST [34452] LOG:  checkpoint complete: wrote 22 buffers (0.1%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.013 s, total=0.026 s; sync files=18, longest=0.002 s, average=0.001 s; distance=93 kB, estimate=3266 kB; lsn=0/73A9FD8, redo lsn=0/73A9FD8
+2025-11-24 04:10:07.472 IST [8180] LOG:  database system is shut down
+2025-11-24 04:11:23.044 IST [6752] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 04:11:23.048 IST [6752] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 04:11:23.048 IST [6752] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 04:11:23.129 IST [36148] LOG:  database system was shut down at 2025-11-24 04:11:16 IST
+2025-11-24 04:11:23.135 IST [6752] LOG:  database system is ready to accept connections
+2025-11-24 04:12:16.486 IST [7272] ERROR:  null value in column "full_name" of relation "authors" violates not-null constraint
+2025-11-24 04:12:16.486 IST [7272] DETAIL:  Failing row contains (4168, null, null, null, {"orcid": null, "scopus": null, "openalex": null, "semantic_scho..., {}, {}, 2025-11-24 04:12:16.484594+05:30, 2025-11-24 04:12:16.484594+05:30).
+2025-11-24 04:12:16.486 IST [7272] STATEMENT:  
+	        INSERT INTO authors (full_name, affiliation, orcid, external_ids)
+	        VALUES (NULL, NULL, NULL, '{"openalex": null, "orcid": null, "scopus": null, "semantic_scholar": null}')
+	        RETURNING id;
+	        
+2025-11-24 04:13:34.131 IST [32236] LOG:  checkpoint starting: immediate force wait
+2025-11-24 04:13:34.163 IST [32236] LOG:  checkpoint complete: wrote 53 buffers (0.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.007 s, sync=0.015 s, total=0.033 s; sync files=21, longest=0.002 s, average=0.001 s; distance=11957 kB, estimate=11957 kB; lsn=0/239E620, redo lsn=0/239E5C8
+2025-11-24 04:14:15.114 IST [38808] ERROR:  null value in column "full_name" of relation "authors" violates not-null constraint
+2025-11-24 04:14:15.114 IST [38808] DETAIL:  Failing row contains (4168, null, null, null, {"orcid": null, "scopus": null, "openalex": null, "semantic_scho..., {}, {}, 2025-11-24 04:14:15.110782+05:30, 2025-11-24 04:14:15.110782+05:30).
+2025-11-24 04:14:15.114 IST [38808] STATEMENT:  
+	        INSERT INTO authors (full_name, affiliation, orcid, external_ids)
+	        VALUES (NULL, NULL, NULL, '{"openalex": null, "orcid": null, "scopus": null, "semantic_scholar": null}')
+	        RETURNING id;
+	        
+2025-11-24 04:16:05.427 IST [34500] ERROR:  canceling statement due to user request
+2025-11-24 04:16:05.427 IST [32236] LOG:  shutting down
+2025-11-24 04:16:05.427 IST [6752] LOG:  received fast shutdown request
+2025-11-24 04:16:05.432 IST [32236] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 04:16:05.432 IST [6752] LOG:  aborting any active transactions
+2025-11-24 04:16:05.433 IST [4768] FATAL:  terminating connection due to administrator command
+2025-11-24 04:16:05.450 IST [6752] LOG:  background worker "logical replication launcher" (PID 34500) exited with exit code 1
+2025-11-24 04:16:05.882 IST [32236] LOG:  checkpoint complete: wrote 1662 buffers (10.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.249 s, sync=0.189 s, total=0.455 s; sync files=360, longest=0.003 s, average=0.001 s; distance=12157 kB, estimate=12157 kB; lsn=0/2F7DB58, redo lsn=0/2F7DB58
+2025-11-24 04:16:05.968 IST [6752] LOG:  database system is shut down
+2025-11-24 04:16:20.346 IST [28952] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 04:16:20.350 IST [28952] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 04:16:20.350 IST [28952] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 04:16:20.395 IST [15256] LOG:  database system was shut down at 2025-11-24 04:16:05 IST
+2025-11-24 04:16:20.403 IST [28952] LOG:  database system is ready to accept connections
+2025-11-24 04:16:21.896 IST [10056] LOG:  checkpoint starting: immediate force wait
+2025-11-24 04:16:21.911 IST [10056] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.003 s, total=0.016 s; sync files=4, longest=0.002 s, average=0.001 s; distance=4 kB, estimate=4 kB; lsn=0/2F7EBF0, redo lsn=0/2F7EB98
+2025-11-24 04:19:57.303 IST [20436] ERROR:  duplicate key value violates unique constraint "paper_authors_paper_id_author_order_key"
+2025-11-24 04:19:57.303 IST [20436] DETAIL:  Key (paper_id, author_order)=(4010, 1) already exists.
+2025-11-24 04:19:57.303 IST [20436] STATEMENT:  
+	            INSERT INTO paper_authors (paper_id, author_id, author_order, is_corresponding)
+	            VALUES (4010, 16251, 1, false)
+	            ON CONFLICT (paper_id, author_id) DO UPDATE
+	              SET author_order = EXCLUDED.author_order,
+	                  is_corresponding = EXCLUDED.is_corresponding;
+	            
+2025-11-24 04:21:21.922 IST [10056] LOG:  checkpoint starting: time
+2025-11-24 04:24:08.533 IST [10056] LOG:  checkpoint complete: wrote 2134 buffers (13.0%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=166.593 s, sync=0.004 s, total=166.611 s; sync files=7, longest=0.001 s, average=0.001 s; distance=33978 kB, estimate=33978 kB; lsn=0/50AE958, redo lsn=0/50AD450
+2025-11-24 04:24:08.547 IST [10056] LOG:  checkpoint starting: immediate force wait
+2025-11-24 04:24:08.556 IST [10056] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.002 s, total=0.009 s; sync files=2, longest=0.001 s, average=0.001 s; distance=5 kB, estimate=30580 kB; lsn=0/50AEA28, redo lsn=0/50AE9D0
+2025-11-24 04:24:08.797 IST [31364] ERROR:  syntax error at or near ")" at character 2852
+2025-11-24 04:24:08.797 IST [31364] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliation             TEXT,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+	    related_works           TEXT[] NOT NULL DEFAULT '{}',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    external_ids            JSONB NOT NULL
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id),
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	--     ON papers USING GIN (cluster_ids);
+	
+	-- -- Fast "authors in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	--     ON authors USING GIN (cluster_ids);
+2025-11-24 04:24:12.480 IST [10056] LOG:  checkpoint starting: immediate force wait
+2025-11-24 04:24:12.494 IST [10056] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.005 s, total=0.014 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4680 kB, estimate=27990 kB; lsn=0/5540A78, redo lsn=0/5540A20
+2025-11-24 04:29:12.509 IST [10056] LOG:  checkpoint starting: time
+2025-11-24 04:33:42.396 IST [10056] LOG:  checkpoint complete: wrote 4653 buffers (28.4%), wrote 5 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=269.591 s, sync=0.263 s, total=269.887 s; sync files=357, longest=0.005 s, average=0.001 s; distance=48124 kB, estimate=48124 kB; lsn=0/91E1B20, redo lsn=0/843FC60
+2025-11-24 04:34:12.429 IST [10056] LOG:  checkpoint starting: time
+2025-11-24 04:34:27.468 IST [31008] ERROR:  syntax error at or near "SELECT" at character 22
+2025-11-24 04:34:27.468 IST [31008] STATEMENT:  SELECT * from papers
+	SELECT * from papers
+	TABLE papers
+	SELECT COUNT(*) FROM your_table_name;
+2025-11-24 04:34:31.733 IST [31008] ERROR:  relation "your_table_name" does not exist at character 22
+2025-11-24 04:34:31.733 IST [31008] STATEMENT:  SELECT COUNT(*) FROM your_table_name;
+2025-11-24 04:34:36.703 IST [31008] ERROR:  syntax error at or near "." at character 1
+2025-11-24 04:34:36.703 IST [31008] STATEMENT:  .
+	SELECT COUNT(*) FROM papers;
+2025-11-24 04:34:54.516 IST [31008] ERROR:  character with byte sequence 0xe2 0x88 0x92 in encoding "UTF8" has no equivalent in encoding "WIN1252"
+2025-11-24 04:34:54.516 IST [31008] STATEMENT:  SELECT * FROM papers;
+2025-11-24 04:35:11.738 IST [10056] LOG:  checkpoint complete: wrote 541 buffers (3.3%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=59.245 s, sync=0.028 s, total=59.310 s; sync files=21, longest=0.006 s, average=0.002 s; distance=13963 kB, estimate=44708 kB; lsn=0/91FFF30, redo lsn=0/91E2910
+2025-11-24 04:51:40.843 IST [19740] ERROR:  canceling statement due to user request
+2025-11-24 04:51:40.843 IST [10056] LOG:  shutting down
+2025-11-24 04:51:40.843 IST [28952] LOG:  received fast shutdown request
+2025-11-24 04:51:40.845 IST [35420] ERROR:  canceling statement due to user request
+2025-11-24 04:51:40.848 IST [10056] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 04:51:40.848 IST [28952] LOG:  aborting any active transactions
+2025-11-24 04:51:40.849 IST [22220] FATAL:  terminating connection due to administrator command
+2025-11-24 04:51:40.875 IST [28952] LOG:  background worker "logical replication launcher" (PID 19740) exited with exit code 1
+2025-11-24 04:51:40.880 IST [10056] LOG:  checkpoint complete: wrote 19 buffers (0.1%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.006 s, total=0.037 s; sync files=3, longest=0.003 s, average=0.002 s; distance=117 kB, estimate=40249 kB; lsn=0/91FFFE0, redo lsn=0/91FFFE0
+2025-11-24 04:51:40.960 IST [28952] LOG:  database system is shut down
+2025-11-24 05:02:45.472 IST [22984] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:02:45.475 IST [22984] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:02:45.475 IST [22984] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:02:45.561 IST [38040] LOG:  database system was shut down at 2025-11-24 04:51:40 IST
+2025-11-24 05:02:45.569 IST [22984] LOG:  database system is ready to accept connections
+2025-11-24 05:02:48.133 IST [27468] LOG:  checkpoint starting: immediate force wait
+2025-11-24 05:02:48.145 IST [27468] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.004 s, total=0.013 s; sync files=5, longest=0.001 s, average=0.001 s; distance=3 kB, estimate=3 kB; lsn=0/9200EF0, redo lsn=0/9200E98
+2025-11-24 05:02:58.432 IST [32808] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:02:58.432 IST [32808] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 21487) already exists.
+2025-11-24 05:02:58.432 IST [32808] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:02:58.432 IST [29656] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:02:58.432 IST [29656] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 21487) already exists.
+2025-11-24 05:02:58.432 IST [29656] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:02:58.432 IST [4700] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:02:58.432 IST [4700] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 21487) already exists.
+2025-11-24 05:02:58.432 IST [4700] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:02:58.432 IST [27956] ERROR:  type "openalex_ingested_concepts" already exists
+2025-11-24 05:02:58.432 IST [27956] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:03:05.907 IST [32960] ERROR:  duplicate key value violates unique constraint "papers_doi_key"
+2025-11-24 05:03:05.907 IST [32960] DETAIL:  Key (doi)=(https://doi.org/10.1007/s11187-009-9215-5) already exists.
+2025-11-24 05:03:05.907 IST [32960] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            ('Why encouraging more people to become entrepreneurs is bad public policy', 'Economic growth, Entrepreneurship, Entrepreneurship Award Winner, Job creation, New firm formation, J24, L26, M13,', NULL, 2009, '2009-06-08',
+	             'https://doi.org/10.1007/s11187-009-9215-5', 'Subsidy', 'en', ARRAY['https://openalex.org/W2070426106','https://openalex.org/W1976035633','https://openalex.org/W3122237540','https://openalex.org/W2079395771','https://openalex.org/W2103077003','https://openalex.org/W2085208778','https://openalex.org/W2127351996','https://openalex.org/W1746989959','https://openalex.org/W205748994','https://openalex.org/W2123253124','https://openalex.org/W2011088550','https://openalex.org/W2035312480','https://openalex.org/W6674542123','https://openalex.org/W1972947373','https://openalex.org/W3123632740','https://openalex.org/W2046980317','https://openalex.org/W189749835','https://openalex.org/W4254148325','https://openalex.org/W2095823159','https://openalex.org/W2011962554','https://openalex.org/W6689963985','https://openalex.org/W7000140537','https://openalex.org/W2064467819','https://openalex.org/W154223910','https://openalex.org/W3123640985','https://openalex.org/W2140015881','https://openalex.org/W2235284495','https://openalex.org/W2203804303','https://openalex.org/W2105619957','https://openalex.org/W3122269189','https://openalex.org/W3124425292'], ARRAY['https://openalex.org/W2019279242','https://openalex.org/W2015540671','https://openalex.org/W1971923255','https://openalex.org/W2061977064','https://openalex.org/W4230879807','https://openalex.org/W2804118169','https://openalex.org/W3143432369','https://openalex.org/W2968548752','https://openalex.org/W3146972800','https://openalex.org/W3122593038'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W2142996576"}')
+	        RETURNING id;
+	        
+2025-11-24 05:03:09.345 IST [6632] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:03:09.345 IST [6632] DETAIL:  Failing row contains (3652, null, null, null, 2002, 2002-03-01, https://doi.org/10.1007/s101010100039, Language change, null, {https://openalex.org/W2164141257,https://openalex.org/W31520286..., {https://openalex.org/W4226147570,https://openalex.org/W32133211..., null, null, {"openalex": "https://openalex.org/W3124274053"}).
+2025-11-24 05:03:09.345 IST [6632] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 2002, '2002-03-01',
+	             'https://doi.org/10.1007/s101010100039', 'Language change', NULL, ARRAY['https://openalex.org/W2164141257','https://openalex.org/W3152028683','https://openalex.org/W1994719822','https://openalex.org/W1547594580','https://openalex.org/W2133369488','https://openalex.org/W1991381779','https://openalex.org/W3094331542','https://openalex.org/W3126087228','https://openalex.org/W1862736203','https://openalex.org/W2022983327','https://openalex.org/W2152826757','https://openalex.org/W3123697343','https://openalex.org/W3122379731','https://openalex.org/W2033274221','https://openalex.org/W3122705141','https://openalex.org/W1991128340','https://openalex.org/W1539773122','https://openalex.org/W140572812','https://openalex.org/W1963651339','https://openalex.org/W1517974838','https://openalex.org/W188548871','https://openalex.org/W3124886457','https://openalex.org/W3122947389','https://openalex.org/W2046381379','https://openalex.org/W1523735555','https://openalex.org/W2107992979','https://openalex.org/W1493573584','https://openalex.org/W2010235856','https://openalex.org/W2031975519','https://openalex.org/W607032178','https://openalex.org/W2047665426','https://openalex.org/W1787942827','https://openalex.org/W2169223645','https://openalex.org/W3124937039','https://openalex.org/W3122760018','https://openalex.org/W2970496240','https://openalex.org/W2054972192','https://openalex.org/W3122305536','https://openalex.org/W2071240032','https://openalex.org/W2142848963','https://openalex.org/W3124227283','https://openalex.org/W3122361005','https://openalex.org/W2099793938','https://openalex.org/W2134472446','https://openalex.org/W3121409021','https://openalex.org/W2095537052','https://openalex.org/W639546590','https://openalex.org/W1606964474','https://openalex.org/W1593224091','https://openalex.org/W2057811978','https://openalex.org/W3121784735','https://openalex.org/W2107729441'], ARRAY['https://openalex.org/W4226147570','https://openalex.org/W3213321156','https://openalex.org/W2351967401','https://openalex.org/W1550364616','https://openalex.org/W3121879630','https://openalex.org/W2562904767','https://openalex.org/W2064083586','https://openalex.org/W646050805','https://openalex.org/W1535095215','https://openalex.org/W2186138316'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W3124274053"}')
+	        RETURNING id;
+	        
+2025-11-24 05:03:11.431 IST [28764] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:03:11.431 IST [28764] DETAIL:  Failing row contains (4713, null, null, null, 2002, 2002-03-01, https://doi.org/10.1007/s101010100039, Language change, null, {https://openalex.org/W2164141257,https://openalex.org/W31520286..., {https://openalex.org/W4226147570,https://openalex.org/W32133211..., null, null, {"openalex": "https://openalex.org/W3124274053"}).
+2025-11-24 05:03:11.431 IST [28764] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 2002, '2002-03-01',
+	             'https://doi.org/10.1007/s101010100039', 'Language change', NULL, ARRAY['https://openalex.org/W2164141257','https://openalex.org/W3152028683','https://openalex.org/W1994719822','https://openalex.org/W1547594580','https://openalex.org/W2133369488','https://openalex.org/W1991381779','https://openalex.org/W3094331542','https://openalex.org/W3126087228','https://openalex.org/W1862736203','https://openalex.org/W2022983327','https://openalex.org/W2152826757','https://openalex.org/W3123697343','https://openalex.org/W3122379731','https://openalex.org/W2033274221','https://openalex.org/W3122705141','https://openalex.org/W1991128340','https://openalex.org/W1539773122','https://openalex.org/W140572812','https://openalex.org/W1963651339','https://openalex.org/W1517974838','https://openalex.org/W188548871','https://openalex.org/W3124886457','https://openalex.org/W3122947389','https://openalex.org/W2046381379','https://openalex.org/W1523735555','https://openalex.org/W2107992979','https://openalex.org/W1493573584','https://openalex.org/W2010235856','https://openalex.org/W2031975519','https://openalex.org/W607032178','https://openalex.org/W2047665426','https://openalex.org/W1787942827','https://openalex.org/W2169223645','https://openalex.org/W3124937039','https://openalex.org/W3122760018','https://openalex.org/W2970496240','https://openalex.org/W2054972192','https://openalex.org/W3122305536','https://openalex.org/W2071240032','https://openalex.org/W2142848963','https://openalex.org/W3124227283','https://openalex.org/W3122361005','https://openalex.org/W2099793938','https://openalex.org/W2134472446','https://openalex.org/W3121409021','https://openalex.org/W2095537052','https://openalex.org/W639546590','https://openalex.org/W1606964474','https://openalex.org/W1593224091','https://openalex.org/W2057811978','https://openalex.org/W3121784735','https://openalex.org/W2107729441'], ARRAY['https://openalex.org/W4226147570','https://openalex.org/W3213321156','https://openalex.org/W2351967401','https://openalex.org/W1550364616','https://openalex.org/W3121879630','https://openalex.org/W2562904767','https://openalex.org/W2064083586','https://openalex.org/W646050805','https://openalex.org/W1535095215','https://openalex.org/W2186138316'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W3124274053"}')
+	        RETURNING id;
+	        
+2025-11-24 05:03:21.850 IST [31232] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:03:21.850 IST [31232] DETAIL:  Failing row contains (9471, null, null, null, 2002, 2002-03-01, https://doi.org/10.1007/s101010100039, Language change, null, {https://openalex.org/W2164141257,https://openalex.org/W31520286..., {https://openalex.org/W4226147570,https://openalex.org/W32133211..., null, null, {"openalex": "https://openalex.org/W3124274053"}).
+2025-11-24 05:03:21.850 IST [31232] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 2002, '2002-03-01',
+	             'https://doi.org/10.1007/s101010100039', 'Language change', NULL, ARRAY['https://openalex.org/W2164141257','https://openalex.org/W3152028683','https://openalex.org/W1994719822','https://openalex.org/W1547594580','https://openalex.org/W2133369488','https://openalex.org/W1991381779','https://openalex.org/W3094331542','https://openalex.org/W3126087228','https://openalex.org/W1862736203','https://openalex.org/W2022983327','https://openalex.org/W2152826757','https://openalex.org/W3123697343','https://openalex.org/W3122379731','https://openalex.org/W2033274221','https://openalex.org/W3122705141','https://openalex.org/W1991128340','https://openalex.org/W1539773122','https://openalex.org/W140572812','https://openalex.org/W1963651339','https://openalex.org/W1517974838','https://openalex.org/W188548871','https://openalex.org/W3124886457','https://openalex.org/W3122947389','https://openalex.org/W2046381379','https://openalex.org/W1523735555','https://openalex.org/W2107992979','https://openalex.org/W1493573584','https://openalex.org/W2010235856','https://openalex.org/W2031975519','https://openalex.org/W607032178','https://openalex.org/W2047665426','https://openalex.org/W1787942827','https://openalex.org/W2169223645','https://openalex.org/W3124937039','https://openalex.org/W3122760018','https://openalex.org/W2970496240','https://openalex.org/W2054972192','https://openalex.org/W3122305536','https://openalex.org/W2071240032','https://openalex.org/W2142848963','https://openalex.org/W3124227283','https://openalex.org/W3122361005','https://openalex.org/W2099793938','https://openalex.org/W2134472446','https://openalex.org/W3121409021','https://openalex.org/W2095537052','https://openalex.org/W639546590','https://openalex.org/W1606964474','https://openalex.org/W1593224091','https://openalex.org/W2057811978','https://openalex.org/W3121784735','https://openalex.org/W2107729441'], ARRAY['https://openalex.org/W4226147570','https://openalex.org/W3213321156','https://openalex.org/W2351967401','https://openalex.org/W1550364616','https://openalex.org/W3121879630','https://openalex.org/W2562904767','https://openalex.org/W2064083586','https://openalex.org/W646050805','https://openalex.org/W1535095215','https://openalex.org/W2186138316'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W3124274053"}')
+	        RETURNING id;
+	        
+2025-11-24 05:03:28.441 IST [29304] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [29304] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5046941513';
+2025-11-24 05:03:28.441 IST [25012] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [25012] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W1936266449';
+2025-11-24 05:03:28.441 IST [28900] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [28900] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2071954570';
+2025-11-24 05:03:28.441 IST [34568] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [34568] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5103109813';
+2025-11-24 05:03:28.441 IST [17948] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [17948] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2015604995';
+2025-11-24 05:03:28.441 IST [14392] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.441 IST [14392] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5041901142';
+2025-11-24 05:03:28.442 IST [29468] ERROR:  canceling statement due to user request
+2025-11-24 05:03:28.442 IST [22984] LOG:  received fast shutdown request
+2025-11-24 05:03:28.442 IST [27468] LOG:  shutting down
+2025-11-24 05:03:28.444 IST [22984] LOG:  aborting any active transactions
+2025-11-24 05:03:28.444 IST [29304] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [35824] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [28900] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [25012] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [34568] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [30008] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [37440] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [13216] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [17948] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [27468] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:03:28.444 IST [35640] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [14392] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [3676] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [24764] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [26452] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.445 IST [14104] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.444 IST [8008] FATAL:  terminating connection due to administrator command
+2025-11-24 05:03:28.459 IST [22984] LOG:  background worker "logical replication launcher" (PID 29468) exited with exit code 1
+2025-11-24 05:03:28.492 IST [9220] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.494 IST [23940] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.498 IST [38492] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.501 IST [6064] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.507 IST [31632] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.511 IST [34956] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.522 IST [23224] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.525 IST [38220] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.525 IST [17424] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.531 IST [29120] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.536 IST [5560] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.540 IST [26748] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.551 IST [37240] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.554 IST [27540] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.558 IST [29868] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.565 IST [20820] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.565 IST [33280] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.573 IST [18560] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.581 IST [16308] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.584 IST [15932] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.589 IST [32012] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.594 IST [33860] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.599 IST [2936] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.603 IST [29092] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.610 IST [30304] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.612 IST [13500] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.620 IST [6348] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.621 IST [29700] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.628 IST [17364] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.635 IST [23568] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.640 IST [17916] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.645 IST [13120] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.651 IST [29324] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.655 IST [37336] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.658 IST [30068] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.665 IST [36024] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.668 IST [31888] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.674 IST [5728] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.678 IST [1880] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.684 IST [35160] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.688 IST [32316] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.693 IST [16072] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.700 IST [38728] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.702 IST [29276] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.707 IST [18720] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.713 IST [32260] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.715 IST [27288] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.723 IST [30640] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.730 IST [29656] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.732 IST [28956] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.737 IST [10948] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.744 IST [4216] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.745 IST [1612] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.754 IST [8168] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.760 IST [33844] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.763 IST [38100] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.766 IST [31244] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.773 IST [23676] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.779 IST [36404] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.785 IST [21828] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.790 IST [30240] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.793 IST [35304] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.797 IST [9144] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.807 IST [9244] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.813 IST [38428] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.819 IST [31452] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.820 IST [22436] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.826 IST [36088] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.832 IST [24760] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.841 IST [2268] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.845 IST [37956] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.847 IST [28448] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.853 IST [36696] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.859 IST [27052] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.870 IST [35264] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.872 IST [13844] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.875 IST [19264] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.881 IST [32992] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.885 IST [28792] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.907 IST [29664] FATAL:  the database system is shutting down
+2025-11-24 05:03:28.922 IST [27468] LOG:  checkpoint complete: wrote 5525 buffers (33.7%), wrote 7 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=0.220 s, sync=0.239 s, total=0.480 s; sync files=367, longest=0.012 s, average=0.001 s; distance=58229 kB, estimate=58229 kB; lsn=0/CADE448, redo lsn=0/CADE448
+2025-11-24 05:03:28.975 IST [25952] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.011 IST [25540] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.013 IST [7604] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.014 IST [31556] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.016 IST [15916] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.039 IST [37620] FATAL:  the database system is shutting down
+2025-11-24 05:03:29.052 IST [22984] LOG:  database system is shut down
+2025-11-24 05:04:51.439 IST [29712] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:04:51.443 IST [29712] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:04:51.443 IST [29712] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:04:51.507 IST [33860] LOG:  database system was shut down at 2025-11-24 05:03:28 IST
+2025-11-24 05:04:51.518 IST [29712] LOG:  database system is ready to accept connections
+2025-11-24 05:05:15.754 IST [8168] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:05:15.754 IST [8168] DETAIL:  Failing row contains (12412, null, null, null, 2002, 2002-03-01, https://doi.org/10.1007/s101010100039, Language change, null, {https://openalex.org/W2164141257,https://openalex.org/W31520286..., {https://openalex.org/W4226147570,https://openalex.org/W32133211..., null, null, {"openalex": "https://openalex.org/W3124274053"}).
+2025-11-24 05:05:15.754 IST [8168] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 2002, '2002-03-01',
+	             'https://doi.org/10.1007/s101010100039', 'Language change', NULL, ARRAY['https://openalex.org/W2164141257','https://openalex.org/W3152028683','https://openalex.org/W1994719822','https://openalex.org/W1547594580','https://openalex.org/W2133369488','https://openalex.org/W1991381779','https://openalex.org/W3094331542','https://openalex.org/W3126087228','https://openalex.org/W1862736203','https://openalex.org/W2022983327','https://openalex.org/W2152826757','https://openalex.org/W3123697343','https://openalex.org/W3122379731','https://openalex.org/W2033274221','https://openalex.org/W3122705141','https://openalex.org/W1991128340','https://openalex.org/W1539773122','https://openalex.org/W140572812','https://openalex.org/W1963651339','https://openalex.org/W1517974838','https://openalex.org/W188548871','https://openalex.org/W3124886457','https://openalex.org/W3122947389','https://openalex.org/W2046381379','https://openalex.org/W1523735555','https://openalex.org/W2107992979','https://openalex.org/W1493573584','https://openalex.org/W2010235856','https://openalex.org/W2031975519','https://openalex.org/W607032178','https://openalex.org/W2047665426','https://openalex.org/W1787942827','https://openalex.org/W2169223645','https://openalex.org/W3124937039','https://openalex.org/W3122760018','https://openalex.org/W2970496240','https://openalex.org/W2054972192','https://openalex.org/W3122305536','https://openalex.org/W2071240032','https://openalex.org/W2142848963','https://openalex.org/W3124227283','https://openalex.org/W3122361005','https://openalex.org/W2099793938','https://openalex.org/W2134472446','https://openalex.org/W3121409021','https://openalex.org/W2095537052','https://openalex.org/W639546590','https://openalex.org/W1606964474','https://openalex.org/W1593224091','https://openalex.org/W2057811978','https://openalex.org/W3121784735','https://openalex.org/W2107729441'], ARRAY['https://openalex.org/W4226147570','https://openalex.org/W3213321156','https://openalex.org/W2351967401','https://openalex.org/W1550364616','https://openalex.org/W3121879630','https://openalex.org/W2562904767','https://openalex.org/W2064083586','https://openalex.org/W646050805','https://openalex.org/W1535095215','https://openalex.org/W2186138316'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W3124274053"}')
+	        RETURNING id;
+	        
+2025-11-24 05:07:09.979 IST [24080] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:07:09.979 IST [24080] DETAIL:  Failing row contains (26141, null, null, null, 2003, 2003-01-01, https://doi.org/10.1023/a:1025887707652, Linguistics, null, {https://openalex.org/W1526249390,https://openalex.org/W15602656..., {https://openalex.org/W1980564716,https://openalex.org/W20530273..., null, null, {"openalex": "https://openalex.org/W166502714"}).
+2025-11-24 05:07:09.979 IST [24080] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 2003, '2003-01-01',
+	             'https://doi.org/10.1023/a:1025887707652', 'Linguistics', NULL, ARRAY['https://openalex.org/W1526249390','https://openalex.org/W1560265695','https://openalex.org/W1500278335','https://openalex.org/W93159618','https://openalex.org/W2089765404','https://openalex.org/W2097139554','https://openalex.org/W2155870910','https://openalex.org/W1711163617','https://openalex.org/W1504955803','https://openalex.org/W1585753929','https://openalex.org/W2133255799','https://openalex.org/W2125791099','https://openalex.org/W2126860295','https://openalex.org/W1773417665','https://openalex.org/W1007634244','https://openalex.org/W3089212421','https://openalex.org/W2091905720','https://openalex.org/W2967426412','https://openalex.org/W2060505358','https://openalex.org/W2081539155','https://openalex.org/W2158628246','https://openalex.org/W1658909445','https://openalex.org/W2044902544','https://openalex.org/W2132623301','https://openalex.org/W2145506147','https://openalex.org/W1566474193','https://openalex.org/W2053089403','https://openalex.org/W769084227'], ARRAY['https://openalex.org/W1980564716','https://openalex.org/W2053027362','https://openalex.org/W2008715437','https://openalex.org/W2393743926','https://openalex.org/W2355743474','https://openalex.org/W2501506560','https://openalex.org/W2781186952','https://openalex.org/W2025861605','https://openalex.org/W2777195608','https://openalex.org/W2087637864'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W166502714"}')
+	        RETURNING id;
+	        
+2025-11-24 05:09:51.680 IST [12368] LOG:  checkpoint starting: time
+2025-11-24 05:12:19.436 IST [29784] ERROR:  null value in column "title" of relation "papers" violates not-null constraint
+2025-11-24 05:12:19.436 IST [29784] DETAIL:  Failing row contains (48906, null, null, null, 1998, 1998-01-01, https://doi.org/10.1023/a:1022160015408, Sociology, null, {https://openalex.org/W2043053851,https://openalex.org/W42857195..., {https://openalex.org/W2328502948,https://openalex.org/W20874054..., null, null, {"openalex": "https://openalex.org/W1541147023"}).
+2025-11-24 05:12:19.436 IST [29784] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            (NULL, NULL, NULL, 1998, '1998-01-01',
+	             'https://doi.org/10.1023/a:1022160015408', 'Sociology', NULL, ARRAY['https://openalex.org/W2043053851','https://openalex.org/W4285719527','https://openalex.org/W2801694095','https://openalex.org/W2315298919','https://openalex.org/W2045326726','https://openalex.org/W1994597521','https://openalex.org/W1590556438','https://openalex.org/W2799042264','https://openalex.org/W2090859597','https://openalex.org/W2063903943','https://openalex.org/W2009939314','https://openalex.org/W2057825753','https://openalex.org/W2158203993','https://openalex.org/W2125367155','https://openalex.org/W2997231411','https://openalex.org/W2165089346','https://openalex.org/W2022225239','https://openalex.org/W2068368661','https://openalex.org/W2482402068','https://openalex.org/W2024642405','https://openalex.org/W1969819482','https://openalex.org/W1994434576','https://openalex.org/W9343035','https://openalex.org/W2081273039','https://openalex.org/W591607284','https://openalex.org/W2796754207','https://openalex.org/W2006674114','https://openalex.org/W2065964013','https://openalex.org/W2046314330','https://openalex.org/W2407022682','https://openalex.org/W2326922119','https://openalex.org/W1987695603','https://openalex.org/W2894021963','https://openalex.org/W2094379452','https://openalex.org/W2161979973','https://openalex.org/W627092373','https://openalex.org/W2028952236','https://openalex.org/W2051397929','https://openalex.org/W2329474625','https://openalex.org/W2009361241','https://openalex.org/W2021017146','https://openalex.org/W2043684539','https://openalex.org/W1490034998','https://openalex.org/W2033946357','https://openalex.org/W2125377513'], ARRAY['https://openalex.org/W2328502948','https://openalex.org/W2087405487','https://openalex.org/W2859800817','https://openalex.org/W3194310639','https://openalex.org/W2368258619','https://openalex.org/W97658597','https://openalex.org/W643072582','https://openalex.org/W659028809','https://openalex.org/W2007148061','https://openalex.org/W2142138096'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W1541147023"}')
+	        RETURNING id;
+	        
+2025-11-24 05:12:49.214 IST [7260] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [7260] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2171403830';
+2025-11-24 05:12:49.214 IST [14228] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [14228] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5103003762';
+2025-11-24 05:12:49.214 IST [2628] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [2628] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5109587007';
+2025-11-24 05:12:49.214 IST [38664] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [38664] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5101404781';
+2025-11-24 05:12:49.214 IST [30640] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [30640] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5060164687';
+2025-11-24 05:12:49.214 IST [996] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [996] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W1998284588';
+2025-11-24 05:12:49.214 IST [22004] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.214 IST [22004] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5024480160';
+2025-11-24 05:12:49.215 IST [35808] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [35808] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5066765330';
+2025-11-24 05:12:49.215 IST [20008] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [20008] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5052802693';
+2025-11-24 05:12:49.215 IST [11668] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [11668] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5083444072';
+2025-11-24 05:12:49.215 IST [38356] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [38356] STATEMENT:  SELECT id FROM papers WHERE external_ids ->> 'openalex'='https://openalex.org/W2153145705';
+2025-11-24 05:12:49.215 IST [29328] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [29328] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5021761022';
+2025-11-24 05:12:49.215 IST [29864] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [29864] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5001547897';
+2025-11-24 05:12:49.215 IST [16072] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.215 IST [16072] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5009118238';
+2025-11-24 05:12:49.215 IST [20684] ERROR:  canceling statement due to user request
+2025-11-24 05:12:49.216 IST [29712] LOG:  received fast shutdown request
+2025-11-24 05:12:49.218 IST [29712] LOG:  aborting any active transactions
+2025-11-24 05:12:49.218 IST [14228] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.218 IST [2628] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.218 IST [7260] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.218 IST [38664] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.218 IST [996] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.218 IST [30640] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [28820] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [22004] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [35720] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [20008] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [35808] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [11668] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [38356] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [29864] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [29328] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.219 IST [16072] FATAL:  terminating connection due to administrator command
+2025-11-24 05:12:49.221 IST [29712] LOG:  background worker "logical replication launcher" (PID 20684) exited with exit code 1
+2025-11-24 05:12:49.301 IST [31448] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.306 IST [35036] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.310 IST [15680] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.316 IST [30828] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.321 IST [5720] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.325 IST [33592] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.328 IST [30220] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.332 IST [13844] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.337 IST [14396] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.341 IST [25256] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.345 IST [16112] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.347 IST [12368] LOG:  checkpoint complete: wrote 10283 buffers (62.8%), wrote 25 SLRU buffers; 0 WAL file(s) added, 0 removed, 11 recycled; write=177.548 s, sync=0.046 s, total=177.667 s; sync files=38, longest=0.010 s, average=0.002 s; distance=173346 kB, estimate=173346 kB; lsn=0/1DE7DED0, redo lsn=0/17426F90
+2025-11-24 05:12:49.349 IST [34388] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.349 IST [12368] LOG:  shutting down
+2025-11-24 05:12:49.351 IST [12368] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:12:49.353 IST [31440] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.359 IST [38104] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.364 IST [31540] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.366 IST [19084] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.372 IST [12468] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.375 IST [37940] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.380 IST [35268] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.385 IST [19220] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.389 IST [37580] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.394 IST [29848] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.401 IST [31404] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.402 IST [37544] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.406 IST [33868] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.412 IST [1968] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.415 IST [29756] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.418 IST [7808] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.423 IST [9820] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.427 IST [30452] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.429 IST [24724] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.433 IST [31660] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.438 IST [5728] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.444 IST [33716] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.448 IST [30436] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.452 IST [18684] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.458 IST [7632] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.460 IST [32432] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.466 IST [34664] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.471 IST [7336] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.473 IST [27276] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.477 IST [34060] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.482 IST [18704] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.487 IST [4380] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.490 IST [31672] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.495 IST [29236] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.499 IST [35780] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.502 IST [36052] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.509 IST [37048] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.510 IST [37404] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.517 IST [33056] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.521 IST [27284] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.527 IST [35108] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.528 IST [12500] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.534 IST [20504] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.536 IST [34592] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.541 IST [26968] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.544 IST [14148] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.550 IST [29912] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.557 IST [5032] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.558 IST [17424] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.563 IST [28984] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.567 IST [38364] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.570 IST [27552] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.577 IST [22396] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.578 IST [31824] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.582 IST [37592] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.584 IST [31152] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.590 IST [7232] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.597 IST [12044] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.598 IST [29584] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.602 IST [30012] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.608 IST [14864] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.611 IST [11464] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.617 IST [8432] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.621 IST [17116] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.625 IST [14316] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.630 IST [10940] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.633 IST [22760] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.639 IST [37868] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.643 IST [28624] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.646 IST [19064] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.650 IST [11728] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.655 IST [38496] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.660 IST [38620] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.667 IST [30572] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.670 IST [35272] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.673 IST [30380] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.677 IST [35300] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.682 IST [27520] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.685 IST [32648] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.690 IST [3280] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.696 IST [34768] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.699 IST [2868] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.700 IST [35556] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.705 IST [25344] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.710 IST [15348] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.715 IST [29108] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.718 IST [30872] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.724 IST [12368] LOG:  checkpoint complete: wrote 8607 buffers (52.5%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=0.157 s, sync=0.180 s, total=0.376 s; sync files=29, longest=0.099 s, average=0.007 s; distance=108891 kB, estimate=166901 kB; lsn=0/1DE7DF48, redo lsn=0/1DE7DF48
+2025-11-24 05:12:49.726 IST [34364] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.727 IST [26140] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.733 IST [38592] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.735 IST [6592] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.738 IST [13116] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.742 IST [33248] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.747 IST [1904] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.750 IST [17488] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.756 IST [36340] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.763 IST [9536] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.767 IST [36024] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.769 IST [34068] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.776 IST [37968] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.778 IST [33696] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.782 IST [3664] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.783 IST [19972] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.807 IST [21772] FATAL:  the database system is shutting down
+2025-11-24 05:12:49.828 IST [29712] LOG:  database system is shut down
+2025-11-24 05:14:43.707 IST [38612] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:14:43.712 IST [38612] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:14:43.712 IST [38612] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:14:43.762 IST [36976] LOG:  database system was shut down at 2025-11-24 05:12:49 IST
+2025-11-24 05:14:43.773 IST [38612] LOG:  database system is ready to accept connections
+2025-11-24 05:15:15.929 IST [3864] ERROR:  canceling statement due to user request
+2025-11-24 05:15:15.930 IST [16464] LOG:  shutting down
+2025-11-24 05:15:15.931 IST [38612] LOG:  received fast shutdown request
+2025-11-24 05:15:15.934 IST [16464] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:15:15.935 IST [38612] LOG:  aborting any active transactions
+2025-11-24 05:15:15.935 IST [5104] FATAL:  terminating connection due to administrator command
+2025-11-24 05:15:15.935 IST [35140] FATAL:  terminating connection due to administrator command
+2025-11-24 05:15:15.935 IST [38152] FATAL:  terminating connection due to administrator command
+2025-11-24 05:15:15.935 IST [38840] FATAL:  terminating connection due to administrator command
+2025-11-24 05:15:15.961 IST [38612] LOG:  background worker "logical replication launcher" (PID 3864) exited with exit code 1
+2025-11-24 05:15:15.961 IST [16464] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.004 s, total=0.032 s; sync files=2, longest=0.003 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/1DE7DFF8, redo lsn=0/1DE7DFF8
+2025-11-24 05:15:16.038 IST [38612] LOG:  database system is shut down

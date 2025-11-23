@@ -1,11 +1,8 @@
 # server/ingestion/db_writer.py
 
-from typing import Dict
+from typing import List
 from psycopg2.extras import Json
 
-from server.ingestion.models import NormalizedPaper, NormalizedAuthor, NormalizedVenue
-from server.logger import ColorLogger
-from colorama import Fore
 from server.database.db_utils import (
     ENV_DB_NAME,
     ENV_DB_USER,
@@ -13,38 +10,69 @@ from server.database.db_utils import (
     ENV_DB_HOST,
     ENV_DB_PORT,
     _connect_with_optional_prompt,
+    log,
 )
 
-log = ColorLogger("INGESTION", tag_color=Fore.GREEN, include_timestamps=False)
+from server.ingestion.models import (
+    NormalizedVenue,
+    NormalizedVenueInstance,
+    NormalizedAuthor,
+    NormalizedPaper,
+)
+
+
+# server/ingestion/db_writer.py
+
+import psycopg2
+from psycopg2 import OperationalError
+
+from server.database.db_utils import log  # or whatever you named these
+
 
 def get_conn():
-    log.info(f"Connecting to database '{ENV_DB_NAME}' as user '{ENV_DB_USER}'...")
-    
-    conn, _ = _connect_with_optional_prompt(
-        dbname=ENV_DB_NAME,
-        user=ENV_DB_USER,
-        password=ENV_DB_PASSWORD,
-        host=ENV_DB_HOST,
-        port=ENV_DB_PORT,
-        purpose=f"ingestion connection to '{ENV_DB_NAME}'",
-    )
-    conn.autocommit = False
-    log.success(f"Connected to '{ENV_DB_NAME}'.")
-    return conn
+    """
+    Get a psycopg2 connection for ingestion.
 
+    Silent on success to avoid log spam when used by many threads.
+    """
 
-def ensure_source(cur, name: str) -> int:
-    cur.execute("SELECT id FROM sources WHERE name = %s;", (name,))
-    row = cur.fetchone()
-    if row:
-        return row[0]
-    cur.execute("INSERT INTO sources (name) VALUES (%s) RETURNING id;", (name,))
-    (sid,) = cur.fetchone()
-    return sid
+    try:
+        dbname = ENV_DB_NAME
+        user = ENV_DB_USER
+        password = ENV_DB_PASSWORD
+        host = ENV_DB_HOST
+        port = ENV_DB_PORT
 
+        log.info(f"[INGEST] Connecting to database '{dbname}' as '{user}'...")
 
+        conn, _ = _connect_with_optional_prompt(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host,
+            port=port,
+            purpose=f"ingestion connection to '{dbname}'",
+        )
+        conn.autocommit = False
+        return conn
+    except OperationalError as e:
+        # Only log on real failure
+        log.error(
+            f"[INGEST] Failed to connect to database '{dbname}' as '{user}'."
+        )
+        log.error(str(e))
+        raise
+
+# ---------------------------------------------------------
+# VENUE + VENUE INSTANCES
+# ---------------------------------------------------------
 def upsert_venue(cur, venue: NormalizedVenue) -> int:
+    """
+    Insert or reuse a venue.
+    Prefer external_ids->'openalex'
+    """
     openalex_id = (venue.external_ids or {}).get("openalex")
+
     if openalex_id:
         cur.execute(
             "SELECT id FROM venues WHERE external_ids ->> 'openalex' = %s;",
@@ -54,17 +82,18 @@ def upsert_venue(cur, venue: NormalizedVenue) -> int:
         if row:
             return row[0]
 
+    # fallback by name
     cur.execute(
         """
         INSERT INTO venues (name, short_name, venue_type, homepage_url,
                             location, rank_label, external_ids)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (name) DO UPDATE
-          SET short_name = EXCLUDED.short_name,
-              venue_type = EXCLUDED.venue_type,
+          SET short_name   = EXCLUDED.short_name,
+              venue_type   = EXCLUDED.venue_type,
               homepage_url = EXCLUDED.homepage_url,
-              location = EXCLUDED.location,
-              rank_label = EXCLUDED.rank_label,
+              location     = EXCLUDED.location,
+              rank_label   = EXCLUDED.rank_label,
               external_ids = EXCLUDED.external_ids
         RETURNING id;
         """,
@@ -82,32 +111,51 @@ def upsert_venue(cur, venue: NormalizedVenue) -> int:
     return venue_id
 
 
-def get_or_create_venue_instance(cur, venue_id: int, year: int | None) -> int | None:
+def get_or_create_venue_instance(cur, venue_id: int, year: int | None):
+    """
+    Create or reuse a specific venue instance (venue + year)
+    """
     if year is None:
         return None
+
     cur.execute(
-        "SELECT id FROM venue_instances WHERE venue_id = %s AND year = %s;",
+        """
+        SELECT id FROM venue_instances
+        WHERE venue_id = %s AND year = %s;
+        """,
         (venue_id, year),
     )
     row = cur.fetchone()
     if row:
         return row[0]
+
     cur.execute(
-        "INSERT INTO venue_instances (venue_id, year) VALUES (%s, %s) RETURNING id;",
+        """
+        INSERT INTO venue_instances (venue_id, year)
+        VALUES (%s, %s)
+        RETURNING id;
+        """,
         (venue_id, year),
     )
     (vi_id,) = cur.fetchone()
     return vi_id
 
 
+# ---------------------------------------------------------
+# AUTHORS
+# ---------------------------------------------------------
 def upsert_author(cur, author: NormalizedAuthor) -> int:
+    """
+    Insert or reuse an author.
+    Prefer external_ids->openalex, else insert new.
+    """
     ext = author.external_ids or {}
-    openalex_id = ext.get("openalex")
+    oa = ext.get("openalex")
 
-    if openalex_id:
+    if oa:
         cur.execute(
             "SELECT id FROM authors WHERE external_ids ->> 'openalex' = %s;",
-            (openalex_id,),
+            (oa,),
         )
         row = cur.fetchone()
         if row:
@@ -119,64 +167,101 @@ def upsert_author(cur, author: NormalizedAuthor) -> int:
         VALUES (%s, %s, %s, %s)
         RETURNING id;
         """,
-        (author.full_name, author.affiliation, author.orcid, Json(author.external_ids)),
+        (author.full_name, author.affiliation, author.orcid, Json(ext)),
     )
     (author_id,) = cur.fetchone()
     return author_id
 
 
-def upsert_paper(cur, p: NormalizedPaper, venue_id: int | None, venue_instance_id: int | None) -> int:
-    doi = p.doi
-    oa_id = (p.external_ids or {}).get("openalex")
+# ---------------------------------------------------------
+# PAPERS
+# ---------------------------------------------------------
+def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
+    """
+    Insert or reuse a paper.
+    Priority:
+        1. DOI
+        2. external_ids->openalex
+    Updates venue_id & venue_instance_id if found.
+    """
 
+    doi = p.doi
+    oa = (p.external_ids or {}).get("openalex")
+
+    # match by DOI
     if doi:
-        cur.execute("SELECT id FROM papers WHERE doi = %s;", (doi,))
+        cur.execute("SELECT id FROM papers WHERE doi=%s;", (doi,))
         row = cur.fetchone()
         if row:
-            return row[0]
-    if oa_id:
+            pid = row[0]
+            cur.execute(
+                """
+                UPDATE papers
+                SET venue_id = COALESCE(%s, venue_id),
+                    venue_instance_id = COALESCE(%s, venue_instance_id),
+                    external_ids = external_ids || %s
+                WHERE id=%s;
+                """,
+                (venue_id, venue_instance_id, Json(p.external_ids), pid),
+            )
+            return pid
+
+    # match by OpenAlex ID
+    if oa:
         cur.execute(
-            "SELECT id FROM papers WHERE external_ids ->> 'openalex' = %s;",
-            (oa_id,),
+            "SELECT id FROM papers WHERE external_ids ->> 'openalex'=%s;",
+            (oa,),
         )
         row = cur.fetchone()
         if row:
-            return row[0]
+            pid = row[0]
+            cur.execute(
+                """
+                UPDATE papers
+                SET venue_id = COALESCE(%s, venue_id),
+                    venue_instance_id = COALESCE(%s, venue_instance_id),
+                    external_ids = external_ids || %s
+                WHERE id=%s;
+                """,
+                (venue_id, venue_instance_id, Json(p.external_ids), pid),
+            )
+            return pid
 
+    # new insert
     cur.execute(
         """
         INSERT INTO papers
-            (title, abstract, year, publication_date,
-             doi, field, language,
+            (title, abstract, conclusion, year, publication_date,
+             doi, field, language, referenced_works, related_works, 
              venue_id, venue_instance_id, external_ids)
         VALUES
-            (%s, %s, %s, %s,
-             %s, %s, %s,
+            (%s, %s, %s, %s, %s,
+             %s, %s, %s, %s, %s,
              %s, %s, %s)
         RETURNING id;
         """,
         (
-            p.title,
-            p.abstract,
-            p.year,
-            p.publication_date,
-            p.doi,
-            p.field,
-            p.language,
-            venue_id,
-            venue_instance_id,
-            Json(p.external_ids),
+            p.title, p.abstract, p.conclusion, p.year, p.publication_date,
+            p.doi, p.field, p.language, p.referenced_works, p.related_works,
+            venue_id, venue_instance_id, Json(p.external_ids),
         ),
     )
-    (paper_id,) = cur.fetchone()
-    return paper_id
+    (pid,) = cur.fetchone()
+    return pid
 
 
-def insert_paper_authors(cur, paper_id: int, p: NormalizedPaper, author_ids: Dict[int, int]):
-    for idx, author in enumerate(p.authors):
-        order = p.author_order[idx] if idx < len(p.author_order) else idx + 1
-        is_corr = p.is_corresponding_flags[idx] if idx < len(p.is_corresponding_flags) else False
+# ---------------------------------------------------------
+# PAPER-AUTHORS
+# ---------------------------------------------------------
+def insert_paper_authors(cur, paper_id, p: NormalizedPaper, author_ids: List[int]):
+    """
+    Insert/Upsert rows in paper_authors.
+    """
+    for idx, author_obj in enumerate(p.authors):
+
         author_id = author_ids[idx]
+        order = p.author_order[idx] if idx < len(p.author_order) else idx + 1
+        corr = p.is_corresponding_flags[idx] if idx < len(p.is_corresponding_flags) else False
 
         cur.execute(
             """
@@ -186,16 +271,5 @@ def insert_paper_authors(cur, paper_id: int, p: NormalizedPaper, author_ids: Dic
               SET author_order = EXCLUDED.author_order,
                   is_corresponding = EXCLUDED.is_corresponding;
             """,
-            (paper_id, author_id, order, is_corr),
+            (paper_id, author_id, order, corr),
         )
-
-
-def insert_paper_source(cur, paper_id: int, source_id: int, external_id: str, url: str | None):
-    cur.execute(
-        """
-        INSERT INTO paper_sources (paper_id, source_id, external_id, url)
-        VALUES (%s, %s, %s, %s)
-        ON CONFLICT (paper_id, source_id) DO NOTHING;
-        """,
-        (paper_id, source_id, external_id, url),
-    )

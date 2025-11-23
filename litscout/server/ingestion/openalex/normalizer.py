@@ -1,24 +1,60 @@
 # server/ingestion/openalex/normalizer.py
 
-from typing import Dict, Any
-from server.ingestion.models import NormalizedPaper, NormalizedAuthor, NormalizedVenue, NormalizedVenueInstance
+from typing import Dict, Any, Optional, List
+
+from server.ingestion.models import (
+    NormalizedPaper,
+    NormalizedAuthor,
+    NormalizedVenue,
+    NormalizedVenueInstance,
+)
+
+
+def _reconstruct_abstract(inverted_index: Dict[str, List[int]]) -> str:
+    """
+    OpenAlex may give abstract as inverted index: {word: [positions...]}.
+    This reconstructs it into a plain text abstract.
+    """
+    if not inverted_index:
+        return ""
+
+    max_pos = max(pos for positions in inverted_index.values() for pos in positions)
+    tokens: List[Optional[str]] = [None] * (max_pos + 1)
+
+    for word, positions in inverted_index.items():
+        for pos in positions:
+            tokens[pos] = word
+
+    return " ".join(token for token in tokens if token is not None)
 
 
 def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
+    # Title
+    raw_title = work.get("title") or work.get("display_name")
+    title = raw_title.strip() if isinstance(raw_title, str) and raw_title.strip() else "(untitled)"
+
     host_venue = work.get("host_venue") or {}
     concepts = work.get("concepts") or []
     primary_field = concepts[0]["display_name"] if concepts else None
 
-    # Venue
+    # Abstract
+    abstract = work.get("abstract")
+    if not abstract:
+        inv = work.get("abstract_inverted_index")
+        if inv:
+            abstract = _reconstruct_abstract(inv)
+
+    # Venue normalization
     venue = None
     venue_instance = None
-    if host_venue.get("id"):
-        venue_type_raw = (host_venue.get("type") or "").lower()
-        if venue_type_raw in ("journal", "book-series"):
+    if host_venue.get("display_name"):
+        vt_raw = (host_venue.get("type") or "").lower()
+        if vt_raw in ("journal", "book-series"):
             venue_type = "journal"
-        elif venue_type_raw in ("conference", "proceedings"):
+        elif vt_raw in ("conference", "proceedings"):
             venue_type = "conference"
         else:
+            # default guess
             venue_type = "journal"
 
         venue = NormalizedVenue(
@@ -44,12 +80,16 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
 
     for idx, auth in enumerate(authorships, start=1):
         author = auth.get("author") or {}
+        name = author.get("display_name")
+        if not name:
+            continue
+
         institutions = auth.get("institutions") or []
         affiliation = institutions[0].get("display_name") if institutions else None
         ids = author.get("ids") or {}
 
         na = NormalizedAuthor(
-            full_name=author.get("display_name"),
+            full_name=name,
             affiliation=affiliation,
             orcid=ids.get("orcid"),
             external_ids={
@@ -61,11 +101,12 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         )
         authors.append(na)
         author_order.append(idx)
-        is_corr.append(False)
+        is_corr.append(False)  # OpenAlex doesn't expose this cleanly
 
     return NormalizedPaper(
-        title=work.get("title"),
-        abstract=work.get("abstract"),
+        title=title,
+        abstract=abstract,
+        conclusion=None,
         year=work.get("publication_year"),
         publication_date=work.get("publication_date"),
         doi=work.get("doi"),
@@ -75,6 +116,7 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         venue_instance=venue_instance,
         authors=authors,
         author_order=author_order,
-        is_corresponding_flags=is_corr,
+        referenced_works=work.get("referenced_works", []),
+        related_works=work.get("related_works", []),
         external_ids={"openalex": work.get("id")},
     )

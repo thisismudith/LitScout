@@ -52,8 +52,13 @@ def start_postgres() -> None:
 
     # Initialize a new cluster if needed
     if not (pgdata / "PG_VERSION").exists():
-        log.info(f"Initializing new Postgres cluster in {pgdata}...")
-        run_cmd(["initdb", "-D", str(pgdata)])
+        log.info(f"Initializing new Postgres cluster in {pgdata} (UTF8)...")
+        run_cmd([
+            "initdb",
+            "-D", str(pgdata),
+            "-E", "UTF8",
+            "--locale=C",
+        ])
 
     port = os.getenv("LITSCOUT_DB_PORT", ENV_DB_PORT)
     log_file = BASE_DIR / "postgres.log"
@@ -147,8 +152,12 @@ def apply_schema(
         conn.close()
         return
 
-    log.info(f"Applying schema from {SCHEMA_PATH} to database '{db_name}'...")
+    log.info("Dropping existing schema (if any)...")
+
     cur = conn.cursor()
+    cur.execute(f"DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;")
+
+    log.info(f"Applying schema from {SCHEMA_PATH} to database '{db_name}'...")
 
     sql_text = SCHEMA_PATH.read_text(encoding="utf-8")
     cur.execute(sql_text)

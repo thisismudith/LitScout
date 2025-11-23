@@ -1,116 +1,203 @@
 # server/cli.py
 
+import os
+import sys
 import argparse
 from colorama import Fore
 
+from server.logger import ColorLogger
 from server.database.db_manager import (
     start_postgres,
     stop_postgres,
     init_database,
 )
-from server.logger import ColorLogger
-
-cli_log = ColorLogger("", tag_color=Fore.CYAN, include_timestamps=False)
-
-
-def add_db_options(parser: argparse.ArgumentParser) -> None:
-    """
-    Add common DB override options to a subcommand parser.
-    These override environment variables if provided.
-    """
-    parser.add_argument(
-        "--db-name",
-        help="Database name (overrides LITSCOUT_DB_NAME if provided).",
-    )
-    parser.add_argument(
-        "--db-user",
-        help="Database user (overrides LITSCOUT_DB_USER if provided).",
-    )
-    parser.add_argument(
-        "--db-host",
-        help="Database host (overrides LITSCOUT_DB_HOST if provided).",
-    )
-    parser.add_argument(
-        "--db-port",
-        help="Database port (overrides LITSCOUT_DB_PORT if provided).",
-    )
+from server.ingestion.openalex.ingest import ingest_openalex_concept
+from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
 
 
-def build_parser() -> argparse.ArgumentParser:
+cli_log = ColorLogger("CLI", tag_color=Fore.CYAN, include_timestamps=False)
+
+
+def add_db_options(parser: argparse.ArgumentParser):
+    """Common DB override flags used by db init/start/stop."""
+    parser.add_argument("--db-name", help="Override database name.")
+    parser.add_argument("--db-user", help="Override database user.")
+    parser.add_argument("--db-host", help="Override database host.")
+    parser.add_argument("--db-port", help="Override database port.")
+
+
+def build_parser():
+    """Build the full CLI argument parser."""
     parser = argparse.ArgumentParser(
-        description="LitScout Server CLI (db, and other components in future)."
+        description="LitScout Command Line Interface"
     )
+    subparsers = parser.add_subparsers(dest="category", required=True)
 
-    # Top-level components: db, (future: api, worker, etc.)
-    subparsers = parser.add_subparsers(dest="component", required=True)
+    # -------------------------------------------------------------
+    # DB COMMANDS
+    # aliases: db, database
+    # -------------------------------------------------------------
+    for db_alias in ("db", "database"):
+        db_parser = subparsers.add_parser(db_alias, help="Database operations")
+        db_subp = db_parser.add_subparsers(dest="db_cmd", required=True)
 
-    # Database component: supports both "db" and "database"
-    db_parser = subparsers.add_parser(
-        "db",
-        help="Database management commands.",
-        aliases=["database"],
-    )
+        # db start
+        db_subp.add_parser("start", help="Start PostgreSQL server.")
 
-    db_subparsers = db_parser.add_subparsers(
-        dest="db_command",
+        # db stop
+        db_subp.add_parser("stop", help="Stop PostgreSQL server.")
+
+        # db init [-F]
+        init_p = db_subp.add_parser("init", help="Initialize or reinitialize DB schema.")
+        init_p.add_argument(
+            "-F", "--force", action="store_true",
+            help="Force: drop and recreate database before applying schema."
+        )
+        add_db_options(init_p)
+
+    # -------------------------------------------------------------
+    # INGEST COMMANDS
+    # -------------------------------------------------------------
+    ingest_parser = subparsers.add_parser("ingest", help="Data ingestion commands.")
+    ingest_subp = ingest_parser.add_subparsers(dest="ingest_cmd", required=True)
+
+    # Single concept
+    oa_parser = ingest_subp.add_parser("openalex", help="Ingest a single OpenAlex concept.")
+    oa_parser.add_argument(
+        "--concept-id",
         required=True,
+        help="OpenAlex concept ID, e.g., C41008148.",
+    )
+    oa_parser.add_argument(
+        "--pages",
+        type=int,
+        default=1,
+        help="How many pages of results to fetch (~200 papers per page).",
     )
 
-    # db init
-    init_parser = db_subparsers.add_parser(
-        "init",
-        help="Initialize or reinstall the LitScout database schema from schema.sql.",
+    # Multi: by fields
+    oa_multi_parser = ingest_subp.add_parser(
+        "openalex-multi",
+        help="Fetch concepts by field(s) and ingest them in parallel.",
     )
-    init_parser.add_argument(
-        "-F",
-        "--force",
+    oa_multi_parser.add_argument(
+        "--fields",
+        nargs="+",
+        required=True,
+        help=(
+            "One or more field names to search concepts for, e.g.: "
+            "--fields 'computer science' 'economics'."
+        ),
+    )
+    oa_multi_parser.add_argument(
+        "--pages",
+        type=int,
+        default=1,
+        help="How many pages per concept to fetch (~200 papers per page).",
+    )
+    oa_multi_parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=None,
+        help=(
+            "Maximum number of worker threads. "
+            "Defaults to min(#concepts, cpu_cores*2)."
+        ),
+    )
+    oa_multi_parser.add_argument(
+        "--skip-existing",
         action="store_true",
-        help="Force: drop and recreate the database before applying schema.",
+        help=(
+            "Skip concepts already recorded in openalex_ingested_concepts."
+        ),
     )
-    add_db_options(init_parser)
-
-    # db start
-    db_subparsers.add_parser(
-        "start",
-        help="Start local PostgreSQL instance (PGDATA under server/database/pgdata by default).",
-    )
-
-    # db stop
-    db_subparsers.add_parser(
-        "stop",
-        help="Stop local PostgreSQL instance.",
+    oa_multi_parser.add_argument(
+        "--per-field-limit",
+        type=int,
+        default=500,
+        help="Maximum number of concepts to fetch per field (default: 500).",
     )
 
     return parser
 
 
 def main():
-    cli_log.banner(title="LitScout", subtitle="Server CLI")
+    cli_log.banner("LitScout", subtitle="Universal CLI")
 
     parser = build_parser()
     args = parser.parse_args()
 
-    # Handle DB-related commands ("db" or "database")
-    if args.component in ("db", "database"):
-        if args.db_command == "init":
-            cli_log.info("Initializing database schema...")
-            init_database(
-                force=args.force,
-                db_name=args.db_name,
-                db_user=args.db_user,
-                db_host=args.db_host,
-                db_port=args.db_port,
-            )
-        elif args.db_command == "start":
-            cli_log.info("Starting PostgreSQL...")
-            start_postgres()
-        elif args.db_command == "stop":
-            cli_log.info("Stopping PostgreSQL...")
-            stop_postgres()
+    try:
+
+        # -------------------------------------------------------------
+        # DB COMMANDS
+        # -------------------------------------------------------------
+        if args.category in ("db", "database"):
+            if args.db_cmd == "start":
+                cli_log.info("Starting PostgreSQL...")
+                start_postgres()
+
+            elif args.db_cmd == "stop":
+                cli_log.info("Stopping PostgreSQL...")
+                stop_postgres()
+
+            elif args.db_cmd == "init":
+                cli_log.info("Initializing database schema...")
+                init_database(
+                    force=args.force,
+                    db_name=args.db_name,
+                    db_user=args.db_user,
+                    db_host=args.db_host,
+                    db_port=args.db_port,
+                )
+
+        # -------------------------------------------------------------
+        # INGEST COMMANDS
+        # -------------------------------------------------------------
+        elif args.category == "ingest":
+            if args.ingest_cmd == "openalex":
+                cli_log.info(
+                    f"Starting OpenAlex ingestion for concept {args.concept_id} "
+                    f"({args.pages} pages)..."
+                )
+                ingest_openalex_concept(
+                    concept_id=args.concept_id,
+                    pages=args.pages,
+                )
+                cli_log.success("OpenAlex ingestion completed successfully.")
+
+            elif args.ingest_cmd == "openalex-multi":
+                fields = [f.strip() for f in (args.fields or []) if f.strip()]
+                if not fields:
+                    cli_log.error(
+                        "No valid fields provided. Use --fields 'computer science' 'economics' ..."
+                    )
+                    return
+
+                cli_log.info(
+                    "Starting OpenAlex multi-field ingestion for "
+                    f"fields={fields}, pages={args.pages}, "
+                    f"max_workers={args.max_workers}, "
+                    f"skip_existing={args.skip_existing}, "
+                    f"per_field_limit={args.per_field_limit}..."
+                )
+
+                ingest_openalex_from_fields(
+                    fields=fields,
+                    pages=args.pages,
+                    max_workers=args.max_workers,
+                    skip_existing=args.skip_existing,
+                    per_field_limit=args.per_field_limit,
+                )
+
+                cli_log.success("OpenAlex multi-field ingestion completed.")
+
         else:
-            cli_log.error(f"Unknown db command: {args.db_command}")
-    else:
-        cli_log.error(f"Unknown component: {args.component}")
+            cli_log.error("Unknown command.")
+
+    except KeyboardInterrupt:
+        cli_log.warn("Interrupted by user (Ctrl+C). Exiting immediately.")
+        os._exit(130)  # hard exit, kills all threads
 
 
 if __name__ == "__main__":

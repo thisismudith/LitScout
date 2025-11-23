@@ -59,15 +59,11 @@ CREATE TABLE papers (
     doi                     TEXT UNIQUE,
     field                   TEXT,
     language                TEXT,
+    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+    related_works           TEXT[] NOT NULL DEFAULT '{}',
     venue_id                BIGINT REFERENCES venues(id),
     venue_instance_id       BIGINT REFERENCES venue_instances(id),
-    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
-    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
-    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    CONSTRAINT papers_clusters_same_length
-        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+    external_ids            JSONB NOT NULL
 );
 
 -- Many-to-many: which authors wrote which papers, in what order
@@ -77,24 +73,7 @@ CREATE TABLE paper_authors (
     author_order    INTEGER NOT NULL, -- Starts from 1
     is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
 
-    PRIMARY KEY (paper_id, author_id),
-    UNIQUE (paper_id, author_order)
-);
-
--- Paper Sources
-CREATE TABLE sources (
-    id      SMALLSERIAL PRIMARY KEY,
-    name    TEXT NOT NULL UNIQUE 
-);
-
-CREATE TABLE paper_sources (
-    paper_id    BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
-    source_id   SMALLINT NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
-    external_id TEXT NOT NULL,
-    url         TEXT,
-
-    PRIMARY KEY (paper_id, source_id),
-    UNIQUE (source_id, external_id)
+    PRIMARY KEY (paper_id, author_id)
 );
 
 -- Author Specialties / Research Areas
@@ -136,18 +115,14 @@ CREATE INDEX IF NOT EXISTS idx_paper_authors_author
 CREATE INDEX IF NOT EXISTS idx_papers_year
     ON papers(year);
 
--- Source-based filtering
-CREATE INDEX IF NOT EXISTS idx_paper_sources_source
-    ON paper_sources(source_id);
-
 -- Deadline-based queries for conferences
 CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
     ON venue_instances(submission_deadline);
 
 -- Fast "papers in cluster X" queries
-CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
-    ON papers USING GIN (cluster_ids);
+-- CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+--     ON papers USING GIN (cluster_ids);
 
--- Fast "authors in cluster X" queries
-CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
-    ON authors USING GIN (cluster_ids);
+-- -- Fast "authors in cluster X" queries
+-- CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+--     ON authors USING GIN (cluster_ids);
