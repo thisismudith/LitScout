@@ -2337,3 +2337,8 @@
 2025-11-24 05:15:15.961 IST [38612] LOG:  background worker "logical replication launcher" (PID 3864) exited with exit code 1
 2025-11-24 05:15:15.961 IST [16464] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.004 s, total=0.032 s; sync files=2, longest=0.003 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/1DE7DFF8, redo lsn=0/1DE7DFF8
 2025-11-24 05:15:16.038 IST [38612] LOG:  database system is shut down
+2025-11-24 05:20:24.711 IST [14808] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:20:24.715 IST [14808] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:20:24.715 IST [14808] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:20:24.759 IST [21828] LOG:  database system was shut down at 2025-11-24 05:15:15 IST
+2025-11-24 05:20:24.766 IST [14808] LOG:  database system is ready to accept connections
