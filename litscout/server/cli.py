@@ -127,78 +127,85 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    try:
+    # -------------------------------------------------------------
+    # DB COMMANDS
+    # -------------------------------------------------------------
+    if args.category in ("db", "database"):
+        if args.db_cmd == "start":
+            cli_log.info("Starting PostgreSQL...")
+            start_postgres()
 
-        # -------------------------------------------------------------
-        # DB COMMANDS
-        # -------------------------------------------------------------
-        if args.category in ("db", "database"):
-            if args.db_cmd == "start":
-                cli_log.info("Starting PostgreSQL...")
-                start_postgres()
+        elif args.db_cmd == "stop":
+            cli_log.info("Stopping PostgreSQL...")
+            stop_postgres()
 
-            elif args.db_cmd == "stop":
-                cli_log.info("Stopping PostgreSQL...")
-                stop_postgres()
+        elif args.db_cmd == "init":
+            cli_log.info("Initializing database schema...")
+            init_database(
+                force=args.force,
+                db_name=args.db_name,
+                db_user=args.db_user,
+                db_host=args.db_host,
+                db_port=args.db_port,
+            )
 
-            elif args.db_cmd == "init":
-                cli_log.info("Initializing database schema...")
-                init_database(
-                    force=args.force,
-                    db_name=args.db_name,
-                    db_user=args.db_user,
-                    db_host=args.db_host,
-                    db_port=args.db_port,
+    # -------------------------------------------------------------
+    # INGEST COMMANDS
+    # -------------------------------------------------------------
+    elif args.category == "ingest":
+        if args.ingest_cmd == "openalex":
+            cli_log.info(
+                f"Starting OpenAlex ingestion for concept {args.concept_id} "
+                f"({args.pages} pages)..."
+            )
+            ingest_openalex_concept(
+                concept_id=args.concept_id,
+                pages=args.pages,
+            )
+            cli_log.success("OpenAlex ingestion completed successfully.")
+
+        elif args.ingest_cmd == "openalex-multi":
+            fields = [f.strip() for f in (args.fields or []) if f.strip()]
+            if not fields:
+                cli_log.error(
+                    "No valid fields provided. Use --fields 'computer science' 'economics' ..."
                 )
+                return
 
-        # -------------------------------------------------------------
-        # INGEST COMMANDS
-        # -------------------------------------------------------------
-        elif args.category == "ingest":
-            if args.ingest_cmd == "openalex":
-                cli_log.info(
-                    f"Starting OpenAlex ingestion for concept {args.concept_id} "
-                    f"({args.pages} pages)..."
-                )
-                ingest_openalex_concept(
-                    concept_id=args.concept_id,
-                    pages=args.pages,
-                )
-                cli_log.success("OpenAlex ingestion completed successfully.")
+            cli_log.info(
+                "Starting OpenAlex multi-field ingestion for "
+                f"fields={fields}, pages={args.pages}, "
+                f"max_workers={args.max_workers}, "
+                f"skip_existing={args.skip_existing}, "
+                f"per_field_limit={args.per_field_limit}..."
+            )
 
-            elif args.ingest_cmd == "openalex-multi":
-                fields = [f.strip() for f in (args.fields or []) if f.strip()]
-                if not fields:
-                    cli_log.error(
-                        "No valid fields provided. Use --fields 'computer science' 'economics' ..."
-                    )
-                    return
+            ingest_openalex_from_fields(
+                fields=fields,
+                pages=args.pages,
+                max_workers=args.max_workers,
+                skip_existing=args.skip_existing,
+                per_field_limit=args.per_field_limit,
+            )
 
-                cli_log.info(
-                    "Starting OpenAlex multi-field ingestion for "
-                    f"fields={fields}, pages={args.pages}, "
-                    f"max_workers={args.max_workers}, "
-                    f"skip_existing={args.skip_existing}, "
-                    f"per_field_limit={args.per_field_limit}..."
-                )
+            cli_log.success("OpenAlex multi-field ingestion completed.")
 
-                ingest_openalex_from_fields(
-                    fields=fields,
-                    pages=args.pages,
-                    max_workers=args.max_workers,
-                    skip_existing=args.skip_existing,
-                    per_field_limit=args.per_field_limit,
-                )
-
-                cli_log.success("OpenAlex multi-field ingestion completed.")
-
-        else:
-            cli_log.error("Unknown command.")
-
-    except KeyboardInterrupt:
-        cli_log.warn("Interrupted by user (Ctrl+C). Exiting immediately.")
-        os._exit(130)  # hard exit, kills all threads
+    else:
+        cli_log.error("Unknown command.")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        from colorama import Fore
+        from server.logger import ColorLogger  # or however you import it
+
+        # Create a minimal logger here if cli_log isn't in scope, or just print:
+        try:
+            cli_log.warn("Interrupted by user (Ctrl+C). Exiting immediately.")
+        except NameError:
+            print(Fore.YELLOW + "[CLI - WARN] Interrupted by user (Ctrl+C). Exiting immediately.")
+
+        import os
+        os._exit(130)  # hard exit, kills all worker threads

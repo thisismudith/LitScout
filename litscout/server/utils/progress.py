@@ -1,5 +1,6 @@
 # server/utils/progress.py
 
+import sys
 from typing import Optional
 from tqdm import tqdm
 
@@ -29,6 +30,8 @@ class ProgressBar:
             desc=desc,
             unit=unit,
             dynamic_ncols=dynamic_ncols,
+            leave=True,
+            file=sys.stdout,
         )
 
     def update(self, n: int = 1) -> None:

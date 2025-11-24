@@ -43,8 +43,6 @@ def get_conn():
         host = ENV_DB_HOST
         port = ENV_DB_PORT
 
-        log.info(f"[INGEST] Connecting to database '{dbname}' as '{user}'...")
-
         conn, _ = _connect_with_optional_prompt(
             dbname=dbname,
             user=user,
@@ -190,6 +188,37 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
 
     # match by DOI
     if doi:
+        cur.execute(
+            """
+            INSERT INTO papers
+                (title, abstract, conclusion, year, publication_date,
+                doi, field, language, referenced_works, related_works, 
+                venue_id, venue_instance_id, external_ids)
+            VALUES
+                (%s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s,
+                %s, %s, %s)
+            ON CONFLICT (doi) DO UPDATE
+               SET title            = EXCLUDED.title,
+                   abstract         = EXCLUDED.abstract,
+                   conclusion       = EXCLUDED.conclusion,
+                   year             = EXCLUDED.year,
+                   publication_date = EXCLUDED.publication_date,
+                   field            = EXCLUDED.field,
+                   language         = EXCLUDED.language,
+                   referenced_works = EXCLUDED.referenced_works,
+                   related_works    = EXCLUDED.related_works,
+                   venue_id         = EXCLUDED.venue_id,
+                   venue_instance_id= EXCLUDED.venue_instance_id,
+                   external_ids     = EXCLUDED.external_ids
+            RETURNING id;
+            """,
+            (
+                p.title, p.abstract, p.conclusion, p.year, p.publication_date,
+                p.doi, p.field, p.language, p.referenced_works, p.related_works,
+                venue_id, venue_instance_id, Json(p.external_ids),
+            ),
+        )
         cur.execute("SELECT id FROM papers WHERE doi=%s;", (doi,))
         row = cur.fetchone()
         if row:

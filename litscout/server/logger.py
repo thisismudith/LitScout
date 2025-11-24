@@ -2,6 +2,8 @@
 
 from colorama import Fore, Style, init as colorama_init
 from datetime import datetime
+import sys
+from tqdm import tqdm
 
 # Initialize once for whole project
 colorama_init(autoreset=True)
@@ -49,7 +51,12 @@ class ColorLogger:
             return f"{self.tag_color}[{name_part}{color}{label}{self.tag_color}]{Style.RESET_ALL}"
 
     def _print(self, tag: str, message: str, color: str = Fore.RESET):
-        print(f"{tag} {color}{message}{Fore.RESET}{Style.RESET_ALL}")
+        # print to stderr so we don't fight with tqdm/progress bars on stdout
+        tqdm.write(
+            f"{tag} {color}{message}{Style.RESET_ALL}",
+            # file=sys.stderr,
+            # flush=True,
+        )
 
 
     # Public Logging Method

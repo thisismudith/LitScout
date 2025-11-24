@@ -2342,3 +2342,285 @@
 2025-11-24 05:20:24.715 IST [14808] LOG:  listening on IPv4 address "127.0.0.1", port 5432
 2025-11-24 05:20:24.759 IST [21828] LOG:  database system was shut down at 2025-11-24 05:15:15 IST
 2025-11-24 05:20:24.766 IST [14808] LOG:  database system is ready to accept connections
+2025-11-24 05:23:23.184 IST [30496] ERROR:  canceling statement due to user request
+2025-11-24 05:23:23.184 IST [30496] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5005349213';
+2025-11-24 05:23:23.184 IST [31068] ERROR:  canceling statement due to user request
+2025-11-24 05:23:23.184 IST [31068] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5073920970';
+2025-11-24 05:23:23.184 IST [34100] ERROR:  canceling statement due to user request
+2025-11-24 05:23:23.184 IST [34100] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5110579565';
+2025-11-24 05:23:23.185 IST [28880] ERROR:  canceling statement due to user request
+2025-11-24 05:23:23.185 IST [14808] LOG:  received fast shutdown request
+2025-11-24 05:23:23.185 IST [15368] LOG:  shutting down
+2025-11-24 05:23:23.187 IST [15368] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:23:23.187 IST [14808] LOG:  aborting any active transactions
+2025-11-24 05:23:23.187 IST [34100] FATAL:  terminating connection due to administrator command
+2025-11-24 05:23:23.187 IST [31068] FATAL:  terminating connection due to administrator command
+2025-11-24 05:23:23.187 IST [30496] FATAL:  terminating connection due to administrator command
+2025-11-24 05:23:23.187 IST [27520] FATAL:  terminating connection due to administrator command
+2025-11-24 05:23:23.191 IST [14808] LOG:  background worker "logical replication launcher" (PID 28880) exited with exit code 1
+2025-11-24 05:23:23.231 IST [27948] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.234 IST [6888] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.238 IST [13840] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.254 IST [544] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.257 IST [13664] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.264 IST [28368] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.278 IST [38580] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.283 IST [28716] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.289 IST [32896] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.302 IST [9244] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.306 IST [21972] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.314 IST [23736] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.326 IST [38096] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.329 IST [30436] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.337 IST [34460] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.352 IST [8724] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.352 IST [6752] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.361 IST [33132] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.375 IST [27956] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.377 IST [33920] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.386 IST [18836] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.398 IST [25540] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.401 IST [16372] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.409 IST [18144] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.421 IST [32472] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.423 IST [24596] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.451 IST [16580] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.452 IST [18728] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.452 IST [33028] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.476 IST [35712] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.478 IST [15368] LOG:  checkpoint complete: wrote 6039 buffers (36.9%), wrote 6 SLRU buffers; 0 WAL file(s) added, 4 removed, 0 recycled; write=0.093 s, sync=0.166 s, total=0.294 s; sync files=33, longest=0.085 s, average=0.006 s; distance=56995 kB, estimate=56995 kB; lsn=0/21626D68, redo lsn=0/21626D68
+2025-11-24 05:23:23.481 IST [36960] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.481 IST [5688] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.500 IST [33784] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.506 IST [34072] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.511 IST [32952] FATAL:  the database system is shutting down
+2025-11-24 05:23:23.548 IST [14808] LOG:  database system is shut down
+2025-11-24 05:23:49.388 IST [36844] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:23:49.392 IST [36844] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:23:49.393 IST [36844] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:23:49.452 IST [28940] LOG:  database system was shut down at 2025-11-24 05:23:23 IST
+2025-11-24 05:23:49.463 IST [36844] LOG:  database system is ready to accept connections
+2025-11-24 05:23:55.786 IST [32000] LOG:  checkpoint starting: immediate force wait
+2025-11-24 05:23:55.798 IST [32000] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.004 s, total=0.012 s; sync files=5, longest=0.001 s, average=0.001 s; distance=6 kB, estimate=6 kB; lsn=0/216285E8, redo lsn=0/21628590
+2025-11-24 05:24:06.059 IST [35772] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:24:06.059 IST [35772] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 33338) already exists.
+2025-11-24 05:24:06.059 IST [35772] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:24:06.059 IST [18720] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:24:06.059 IST [18720] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 33338) already exists.
+2025-11-24 05:24:06.059 IST [18720] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:24:06.059 IST [33160] ERROR:  duplicate key value violates unique constraint "pg_type_typname_nsp_index"
+2025-11-24 05:24:06.059 IST [33160] DETAIL:  Key (typname, typnamespace)=(openalex_ingested_concepts, 33338) already exists.
+2025-11-24 05:24:06.059 IST [33160] STATEMENT:  
+	        CREATE TABLE IF NOT EXISTS openalex_ingested_concepts (
+	            concept_id       TEXT PRIMARY KEY,
+	            pages_ingested   INTEGER,
+	            last_ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	        );
+	        
+2025-11-24 05:28:55.710 IST [32000] LOG:  checkpoint starting: time
+2025-11-24 05:31:24.816 IST [30276] ERROR:  canceling statement due to user request
+2025-11-24 05:31:24.816 IST [30276] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5059438590';
+2025-11-24 05:31:24.817 IST [26940] ERROR:  canceling statement due to user request
+2025-11-24 05:31:24.817 IST [26940] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5046950240';
+2025-11-24 05:31:24.817 IST [13728] ERROR:  canceling statement due to user request
+2025-11-24 05:31:24.817 IST [36844] LOG:  received fast shutdown request
+2025-11-24 05:31:24.819 IST [36844] LOG:  aborting any active transactions
+2025-11-24 05:31:24.819 IST [30276] FATAL:  terminating connection due to administrator command
+2025-11-24 05:31:24.819 IST [26940] FATAL:  terminating connection due to administrator command
+2025-11-24 05:31:24.819 IST [28952] FATAL:  terminating connection due to administrator command
+2025-11-24 05:31:24.820 IST [21772] FATAL:  terminating connection due to administrator command
+2025-11-24 05:31:24.829 IST [36844] LOG:  background worker "logical replication launcher" (PID 13728) exited with exit code 1
+2025-11-24 05:31:24.863 IST [10648] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.869 IST [32148] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.869 IST [36176] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.875 IST [6384] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.890 IST [24296] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.894 IST [20328] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.898 IST [18172] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.903 IST [30220] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.917 IST [7916] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.920 IST [22372] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.925 IST [34632] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.931 IST [22580] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.944 IST [33008] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.947 IST [25992] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.952 IST [28456] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.959 IST [38732] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.973 IST [34016] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.974 IST [30968] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.980 IST [12292] FATAL:  the database system is shutting down
+2025-11-24 05:31:24.985 IST [20844] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.000 IST [37192] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.004 IST [8912] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.008 IST [36432] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.013 IST [30084] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.027 IST [16248] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.032 IST [38852] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.032 IST [37564] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.039 IST [5536] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.053 IST [29492] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.057 IST [20768] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.060 IST [32900] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.063 IST [33100] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.079 IST [14216] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.082 IST [7664] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.084 IST [36908] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.088 IST [29100] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.103 IST [25144] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.108 IST [30288] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.110 IST [6348] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.113 IST [34584] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.129 IST [16308] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.130 IST [32000] LOG:  checkpoint complete: wrote 9465 buffers (57.8%), wrote 13 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=149.161 s, sync=0.224 s, total=149.421 s; sync files=366, longest=0.013 s, average=0.001 s; distance=103675 kB, estimate=103675 kB; lsn=0/2A9CEA28, redo lsn=0/27B67510
+2025-11-24 05:31:25.135 IST [32992] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.139 IST [32000] LOG:  shutting down
+2025-11-24 05:31:25.140 IST [32000] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:31:25.141 IST [15312] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.141 IST [36776] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.157 IST [38712] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.159 IST [22712] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.166 IST [29088] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.168 IST [37956] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.184 IST [5780] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.186 IST [16848] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.191 IST [5256] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.193 IST [13308] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.208 IST [31224] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.210 IST [2260] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.217 IST [36472] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.218 IST [34824] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.233 IST [11280] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.235 IST [10940] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.241 IST [28816] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.244 IST [32020] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.259 IST [12428] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.260 IST [14568] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.266 IST [32896] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.269 IST [35452] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.273 IST [32000] LOG:  checkpoint complete: wrote 3583 buffers (21.9%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=0.056 s, sync=0.057 s, total=0.135 s; sync files=27, longest=0.025 s, average=0.003 s; distance=47517 kB, estimate=98060 kB; lsn=0/2A9CEAA0, redo lsn=0/2A9CEAA0
+2025-11-24 05:31:25.284 IST [26636] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.288 IST [30688] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.290 IST [33868] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.294 IST [24080] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.310 IST [30732] FATAL:  the database system is shutting down
+2025-11-24 05:31:25.333 IST [36844] LOG:  database system is shut down
+2025-11-24 05:31:32.422 IST [37440] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 05:31:32.426 IST [37440] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 05:31:32.426 IST [37440] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 05:31:32.469 IST [32532] LOG:  database system was shut down at 2025-11-24 05:31:25 IST
+2025-11-24 05:31:32.478 IST [37440] LOG:  database system is ready to accept connections
+2025-11-24 05:31:34.044 IST [36664] LOG:  checkpoint starting: immediate force wait
+2025-11-24 05:31:34.058 IST [36664] LOG:  checkpoint complete: wrote 3 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.004 s, total=0.014 s; sync files=5, longest=0.001 s, average=0.001 s; distance=7 kB, estimate=7 kB; lsn=0/2A9D09B0, redo lsn=0/2A9D0958
+2025-11-24 05:31:42.618 IST [35356] ERROR:  duplicate key value violates unique constraint "papers_doi_key"
+2025-11-24 05:31:42.618 IST [35356] DETAIL:  Key (doi)=(https://doi.org/10.1109/cvpr.2016.90) already exists.
+2025-11-24 05:31:42.618 IST [35356] STATEMENT:  
+	        INSERT INTO papers
+	            (title, abstract, conclusion, year, publication_date,
+	             doi, field, language, referenced_works, related_works, 
+	             venue_id, venue_instance_id, external_ids)
+	        VALUES
+	            ('Deep Residual Learning for Image Recognition', 'Actualmente diversas investigaciones se han enfocado en analizar a partir de videos de alta velocidad, características de las descargas eléctricas atmosféricas con el fin de adquirir mejor comprensión del fenómeno, que conlleva entre otros aspectos el desarrollo de sistemas de protección robustos. La mayoría de las investigaciones han requerido de un observador que ante el suceso del evento provea un disparo manual a la cámara permitiendo almacenar la información visual del fenómeno. Por tanto, este trabajo se orientó en proponer una metodología para la detección de las descargas utilizando dos implementaciones basadas en procesamiento de señales y visión computacional, con el propósito que el sistema autónomamente sea el que suministre el disparo, apartando al observador de la realización de esta tarea. El sistema de detección basado en técnicas de procesamiento de imágenes requirió la adecuación de métodos de segmentación, representación, descripción y clasificación. El algoritmo de reconocimiento con visión computacional se implementó mediante la red neuronal convolucional EfficientNetB4. Fuera de línea, las técnicas basadas en procesamiento de imágenes suministraron una precisión del 81.81%, mientras que haciendo uso de visión computacional la precisión fue de 71.63%. Con el objeto de evaluar el desempeño en tiempo real, las técnicas de procesamiento se adaptaron en un ordenador de placa reducida correspondiente a la Raspberry Pi 3 modelo B+ obteniéndose una precisión de 86.95%. Adicionalmente, se evaluó la característica de multiplicidad la cual corresponde al número de descargas subsecuentes presentes en el canal de la descarga logrando una precisión de 66.66%. (Texto tomado de la fuente)', NULL, 2016, '2016-06-01',
+	             'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en', ARRAY['https://openalex.org/W6629368666','https://openalex.org/W4212915314','https://openalex.org/W2117812871','https://openalex.org/W6620707391','https://openalex.org/W6682359208','https://openalex.org/W2147238549','https://openalex.org/W6680555419','https://openalex.org/W6637551013','https://openalex.org/W2161388792','https://openalex.org/W1903029394','https://openalex.org/W6637242042','https://openalex.org/W4388297464','https://openalex.org/W2107878631','https://openalex.org/W6787972765','https://openalex.org/W2147800946','https://openalex.org/W6684191040','https://openalex.org/W4238404964','https://openalex.org/W6639102338','https://openalex.org/W1932847118','https://openalex.org/W6676338569','https://openalex.org/W6637373629','https://openalex.org/W1677182931','https://openalex.org/W6640036494','https://openalex.org/W2064675550','https://openalex.org/W6638667902','https://openalex.org/W2124509324','https://openalex.org/W1984309565','https://openalex.org/W1976921161','https://openalex.org/W1997542937','https://openalex.org/W1536680647','https://openalex.org/W2031489346','https://openalex.org/W6631943919','https://openalex.org/W2102605133','https://openalex.org/W6688059459','https://openalex.org/W2964103341','https://openalex.org/W4231990273','https://openalex.org/W4242212377','https://openalex.org/W6626481562','https://openalex.org/W2159979951','https://openalex.org/W2097117768','https://openalex.org/W1665214252','https://openalex.org/W2613718673','https://openalex.org/W2962835968','https://openalex.org/W2914484425','https://openalex.org/W194249466','https://openalex.org/W2022532533','https://openalex.org/W2328425223','https://openalex.org/W1530872699','https://openalex.org/W2139398462','https://openalex.org/W1533861849','https://openalex.org/W1811843574','https://openalex.org/W1686810756','https://openalex.org/W2964118293','https://openalex.org/W2951603627','https://openalex.org/W2963542991','https://openalex.org/W1836465849','https://openalex.org/W2952009708','https://openalex.org/W2206858481','https://openalex.org/W1904365287','https://openalex.org/W1554663460','https://openalex.org/W639708223','https://openalex.org/W2117539524','https://openalex.org/W2125930537','https://openalex.org/W2950621961','https://openalex.org/W1932624639','https://openalex.org/W1799366690','https://openalex.org/W4285719527','https://openalex.org/W2168894214','https://openalex.org/W2025357764','https://openalex.org/W2179352600','https://openalex.org/W2963504252','https://openalex.org/W3038058348','https://openalex.org/W3118608800','https://openalex.org/W2155893237','https://openalex.org/W1861492603','https://openalex.org/W2950094539','https://openalex.org/W2066941820','https://openalex.org/W3037950864','https://openalex.org/W2152424459','https://openalex.org/W1690739335','https://openalex.org/W2163605009'], ARRAY['https://openalex.org/W4380075502','https://openalex.org/W2790662084','https://openalex.org/W4223943233','https://openalex.org/W4312200629','https://openalex.org/W4360585206','https://openalex.org/W4364306694','https://openalex.org/W2970686063','https://openalex.org/W2915754718','https://openalex.org/W2194775991','https://openalex.org/W2563602643'],
+	             NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	        RETURNING id;
+	        
+2025-11-24 05:36:34.061 IST [36664] LOG:  checkpoint starting: time
+2025-11-24 05:39:02.065 IST [30464] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-11-24 05:39:17.823 IST [1860] ERROR:  syntax error at or near "RETURNING" at character 6129
+2025-11-24 05:39:17.823 IST [1860] STATEMENT:  
+	            INSERT INTO papers
+	                (title, abstract, conclusion, year, publication_date,
+	                doi, field, language, referenced_works, related_works, 
+	                venue_id, venue_instance_id, external_ids)
+	            VALUES
+	                ('Deep Residual Learning for Image Recognition', 'Actualmente diversas investigaciones se han enfocado en analizar a partir de videos de alta velocidad, características de las descargas eléctricas atmosféricas con el fin de adquirir mejor comprensión del fenómeno, que conlleva entre otros aspectos el desarrollo de sistemas de protección robustos. La mayoría de las investigaciones han requerido de un observador que ante el suceso del evento provea un disparo manual a la cámara permitiendo almacenar la información visual del fenómeno. Por tanto, este trabajo se orientó en proponer una metodología para la detección de las descargas utilizando dos implementaciones basadas en procesamiento de señales y visión computacional, con el propósito que el sistema autónomamente sea el que suministre el disparo, apartando al observador de la realización de esta tarea. El sistema de detección basado en técnicas de procesamiento de imágenes requirió la adecuación de métodos de segmentación, representación, descripción y clasificación. El algoritmo de reconocimiento con visión computacional se implementó mediante la red neuronal convolucional EfficientNetB4. Fuera de línea, las técnicas basadas en procesamiento de imágenes suministraron una precisión del 81.81%, mientras que haciendo uso de visión computacional la precisión fue de 71.63%. Con el objeto de evaluar el desempeño en tiempo real, las técnicas de procesamiento se adaptaron en un ordenador de placa reducida correspondiente a la Raspberry Pi 3 modelo B+ obteniéndose una precisión de 86.95%. Adicionalmente, se evaluó la característica de multiplicidad la cual corresponde al número de descargas subsecuentes presentes en el canal de la descarga logrando una precisión de 66.66%. (Texto tomado de la fuente)', NULL, 2016, '2016-06-01',
+	                'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en', ARRAY['https://openalex.org/W6629368666','https://openalex.org/W4212915314','https://openalex.org/W2117812871','https://openalex.org/W6620707391','https://openalex.org/W6682359208','https://openalex.org/W2147238549','https://openalex.org/W6680555419','https://openalex.org/W6637551013','https://openalex.org/W2161388792','https://openalex.org/W1903029394','https://openalex.org/W6637242042','https://openalex.org/W4388297464','https://openalex.org/W2107878631','https://openalex.org/W6787972765','https://openalex.org/W2147800946','https://openalex.org/W6684191040','https://openalex.org/W4238404964','https://openalex.org/W6639102338','https://openalex.org/W1932847118','https://openalex.org/W6676338569','https://openalex.org/W6637373629','https://openalex.org/W1677182931','https://openalex.org/W6640036494','https://openalex.org/W2064675550','https://openalex.org/W6638667902','https://openalex.org/W2124509324','https://openalex.org/W1984309565','https://openalex.org/W1976921161','https://openalex.org/W1997542937','https://openalex.org/W1536680647','https://openalex.org/W2031489346','https://openalex.org/W6631943919','https://openalex.org/W2102605133','https://openalex.org/W6688059459','https://openalex.org/W2964103341','https://openalex.org/W4231990273','https://openalex.org/W4242212377','https://openalex.org/W6626481562','https://openalex.org/W2159979951','https://openalex.org/W2097117768','https://openalex.org/W1665214252','https://openalex.org/W2613718673','https://openalex.org/W2962835968','https://openalex.org/W2914484425','https://openalex.org/W194249466','https://openalex.org/W2022532533','https://openalex.org/W2328425223','https://openalex.org/W1530872699','https://openalex.org/W2139398462','https://openalex.org/W1533861849','https://openalex.org/W1811843574','https://openalex.org/W1686810756','https://openalex.org/W2964118293','https://openalex.org/W2951603627','https://openalex.org/W2963542991','https://openalex.org/W1836465849','https://openalex.org/W2952009708','https://openalex.org/W2206858481','https://openalex.org/W1904365287','https://openalex.org/W1554663460','https://openalex.org/W639708223','https://openalex.org/W2117539524','https://openalex.org/W2125930537','https://openalex.org/W2950621961','https://openalex.org/W1932624639','https://openalex.org/W1799366690','https://openalex.org/W4285719527','https://openalex.org/W2168894214','https://openalex.org/W2025357764','https://openalex.org/W2179352600','https://openalex.org/W2963504252','https://openalex.org/W3038058348','https://openalex.org/W3118608800','https://openalex.org/W2155893237','https://openalex.org/W1861492603','https://openalex.org/W2950094539','https://openalex.org/W2066941820','https://openalex.org/W3037950864','https://openalex.org/W2152424459','https://openalex.org/W1690739335','https://openalex.org/W2163605009'], ARRAY['https://openalex.org/W4380075502','https://openalex.org/W2790662084','https://openalex.org/W4223943233','https://openalex.org/W4312200629','https://openalex.org/W4360585206','https://openalex.org/W4364306694','https://openalex.org/W2970686063','https://openalex.org/W2915754718','https://openalex.org/W2194775991','https://openalex.org/W2563602643'],
+	                NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	            ON CONFLICT (doi) DO UPDATE
+	               SET title            = EXCLUDED.title,
+	                   abstract         = EXCLUDED.abstract,
+	                   conclusion       = EXCLUDED.conclusion,
+	                   year             = EXCLUDED.year,
+	                   publication_date = EXCLUDED.publication_date,
+	                   field            = EXCLUDED.field,
+	                   language         = EXCLUDED.language,
+	                   venue_id         = EXCLUDED.venue_id,
+	                   venue_instance_id= EXCLUDED.venue_instance_id,
+	                   external_ids     = EXCLUDED.external_ids,
+	                   updated_at       = NOW()
+	            RETURNING id;
+	            RETURNING id;
+	            
+2025-11-24 05:39:49.762 IST [36664] LOG:  checkpoint complete: wrote 1789 buffers (10.9%), wrote 1 SLRU buffers; 0 WAL file(s) added, 1 removed, 0 recycled; write=195.491 s, sync=0.188 s, total=195.701 s; sync files=360, longest=0.005 s, average=0.001 s; distance=13783 kB, estimate=13783 kB; lsn=0/2B7486D8, redo lsn=0/2B746878
+2025-11-24 05:39:52.054 IST [30296] ERROR:  column "updated_at" of relation "papers" does not exist at character 6066
+2025-11-24 05:39:52.054 IST [30296] STATEMENT:  
+	            INSERT INTO papers
+	                (title, abstract, conclusion, year, publication_date,
+	                doi, field, language, referenced_works, related_works, 
+	                venue_id, venue_instance_id, external_ids)
+	            VALUES
+	                ('Deep Residual Learning for Image Recognition', 'Actualmente diversas investigaciones se han enfocado en analizar a partir de videos de alta velocidad, características de las descargas eléctricas atmosféricas con el fin de adquirir mejor comprensión del fenómeno, que conlleva entre otros aspectos el desarrollo de sistemas de protección robustos. La mayoría de las investigaciones han requerido de un observador que ante el suceso del evento provea un disparo manual a la cámara permitiendo almacenar la información visual del fenómeno. Por tanto, este trabajo se orientó en proponer una metodología para la detección de las descargas utilizando dos implementaciones basadas en procesamiento de señales y visión computacional, con el propósito que el sistema autónomamente sea el que suministre el disparo, apartando al observador de la realización de esta tarea. El sistema de detección basado en técnicas de procesamiento de imágenes requirió la adecuación de métodos de segmentación, representación, descripción y clasificación. El algoritmo de reconocimiento con visión computacional se implementó mediante la red neuronal convolucional EfficientNetB4. Fuera de línea, las técnicas basadas en procesamiento de imágenes suministraron una precisión del 81.81%, mientras que haciendo uso de visión computacional la precisión fue de 71.63%. Con el objeto de evaluar el desempeño en tiempo real, las técnicas de procesamiento se adaptaron en un ordenador de placa reducida correspondiente a la Raspberry Pi 3 modelo B+ obteniéndose una precisión de 86.95%. Adicionalmente, se evaluó la característica de multiplicidad la cual corresponde al número de descargas subsecuentes presentes en el canal de la descarga logrando una precisión de 66.66%. (Texto tomado de la fuente)', NULL, 2016, '2016-06-01',
+	                'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en', ARRAY['https://openalex.org/W6629368666','https://openalex.org/W4212915314','https://openalex.org/W2117812871','https://openalex.org/W6620707391','https://openalex.org/W6682359208','https://openalex.org/W2147238549','https://openalex.org/W6680555419','https://openalex.org/W6637551013','https://openalex.org/W2161388792','https://openalex.org/W1903029394','https://openalex.org/W6637242042','https://openalex.org/W4388297464','https://openalex.org/W2107878631','https://openalex.org/W6787972765','https://openalex.org/W2147800946','https://openalex.org/W6684191040','https://openalex.org/W4238404964','https://openalex.org/W6639102338','https://openalex.org/W1932847118','https://openalex.org/W6676338569','https://openalex.org/W6637373629','https://openalex.org/W1677182931','https://openalex.org/W6640036494','https://openalex.org/W2064675550','https://openalex.org/W6638667902','https://openalex.org/W2124509324','https://openalex.org/W1984309565','https://openalex.org/W1976921161','https://openalex.org/W1997542937','https://openalex.org/W1536680647','https://openalex.org/W2031489346','https://openalex.org/W6631943919','https://openalex.org/W2102605133','https://openalex.org/W6688059459','https://openalex.org/W2964103341','https://openalex.org/W4231990273','https://openalex.org/W4242212377','https://openalex.org/W6626481562','https://openalex.org/W2159979951','https://openalex.org/W2097117768','https://openalex.org/W1665214252','https://openalex.org/W2613718673','https://openalex.org/W2962835968','https://openalex.org/W2914484425','https://openalex.org/W194249466','https://openalex.org/W2022532533','https://openalex.org/W2328425223','https://openalex.org/W1530872699','https://openalex.org/W2139398462','https://openalex.org/W1533861849','https://openalex.org/W1811843574','https://openalex.org/W1686810756','https://openalex.org/W2964118293','https://openalex.org/W2951603627','https://openalex.org/W2963542991','https://openalex.org/W1836465849','https://openalex.org/W2952009708','https://openalex.org/W2206858481','https://openalex.org/W1904365287','https://openalex.org/W1554663460','https://openalex.org/W639708223','https://openalex.org/W2117539524','https://openalex.org/W2125930537','https://openalex.org/W2950621961','https://openalex.org/W1932624639','https://openalex.org/W1799366690','https://openalex.org/W4285719527','https://openalex.org/W2168894214','https://openalex.org/W2025357764','https://openalex.org/W2179352600','https://openalex.org/W2963504252','https://openalex.org/W3038058348','https://openalex.org/W3118608800','https://openalex.org/W2155893237','https://openalex.org/W1861492603','https://openalex.org/W2950094539','https://openalex.org/W2066941820','https://openalex.org/W3037950864','https://openalex.org/W2152424459','https://openalex.org/W1690739335','https://openalex.org/W2163605009'], ARRAY['https://openalex.org/W4380075502','https://openalex.org/W2790662084','https://openalex.org/W4223943233','https://openalex.org/W4312200629','https://openalex.org/W4360585206','https://openalex.org/W4364306694','https://openalex.org/W2970686063','https://openalex.org/W2915754718','https://openalex.org/W2194775991','https://openalex.org/W2563602643'],
+	                NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	            ON CONFLICT (doi) DO UPDATE
+	               SET title            = EXCLUDED.title,
+	                   abstract         = EXCLUDED.abstract,
+	                   conclusion       = EXCLUDED.conclusion,
+	                   year             = EXCLUDED.year,
+	                   publication_date = EXCLUDED.publication_date,
+	                   field            = EXCLUDED.field,
+	                   language         = EXCLUDED.language,
+	                   venue_id         = EXCLUDED.venue_id,
+	                   venue_instance_id= EXCLUDED.venue_instance_id,
+	                   external_ids     = EXCLUDED.external_ids,
+	                   updated_at       = NOW()
+	            RETURNING id;
+	            
+2025-11-24 05:40:47.449 IST [38896] ERROR:  syntax error at or near "RETURNING" at character 6186
+2025-11-24 05:40:47.449 IST [38896] STATEMENT:  
+	            INSERT INTO papers
+	                (title, abstract, conclusion, year, publication_date,
+	                doi, field, language, referenced_works, related_works, 
+	                venue_id, venue_instance_id, external_ids)
+	            VALUES
+	                ('Deep Residual Learning for Image Recognition', 'Actualmente diversas investigaciones se han enfocado en analizar a partir de videos de alta velocidad, características de las descargas eléctricas atmosféricas con el fin de adquirir mejor comprensión del fenómeno, que conlleva entre otros aspectos el desarrollo de sistemas de protección robustos. La mayoría de las investigaciones han requerido de un observador que ante el suceso del evento provea un disparo manual a la cámara permitiendo almacenar la información visual del fenómeno. Por tanto, este trabajo se orientó en proponer una metodología para la detección de las descargas utilizando dos implementaciones basadas en procesamiento de señales y visión computacional, con el propósito que el sistema autónomamente sea el que suministre el disparo, apartando al observador de la realización de esta tarea. El sistema de detección basado en técnicas de procesamiento de imágenes requirió la adecuación de métodos de segmentación, representación, descripción y clasificación. El algoritmo de reconocimiento con visión computacional se implementó mediante la red neuronal convolucional EfficientNetB4. Fuera de línea, las técnicas basadas en procesamiento de imágenes suministraron una precisión del 81.81%, mientras que haciendo uso de visión computacional la precisión fue de 71.63%. Con el objeto de evaluar el desempeño en tiempo real, las técnicas de procesamiento se adaptaron en un ordenador de placa reducida correspondiente a la Raspberry Pi 3 modelo B+ obteniéndose una precisión de 86.95%. Adicionalmente, se evaluó la característica de multiplicidad la cual corresponde al número de descargas subsecuentes presentes en el canal de la descarga logrando una precisión de 66.66%. (Texto tomado de la fuente)', NULL, 2016, '2016-06-01',
+	                'https://doi.org/10.1109/cvpr.2016.90', 'Residual', 'en', ARRAY['https://openalex.org/W6629368666','https://openalex.org/W4212915314','https://openalex.org/W2117812871','https://openalex.org/W6620707391','https://openalex.org/W6682359208','https://openalex.org/W2147238549','https://openalex.org/W6680555419','https://openalex.org/W6637551013','https://openalex.org/W2161388792','https://openalex.org/W1903029394','https://openalex.org/W6637242042','https://openalex.org/W4388297464','https://openalex.org/W2107878631','https://openalex.org/W6787972765','https://openalex.org/W2147800946','https://openalex.org/W6684191040','https://openalex.org/W4238404964','https://openalex.org/W6639102338','https://openalex.org/W1932847118','https://openalex.org/W6676338569','https://openalex.org/W6637373629','https://openalex.org/W1677182931','https://openalex.org/W6640036494','https://openalex.org/W2064675550','https://openalex.org/W6638667902','https://openalex.org/W2124509324','https://openalex.org/W1984309565','https://openalex.org/W1976921161','https://openalex.org/W1997542937','https://openalex.org/W1536680647','https://openalex.org/W2031489346','https://openalex.org/W6631943919','https://openalex.org/W2102605133','https://openalex.org/W6688059459','https://openalex.org/W2964103341','https://openalex.org/W4231990273','https://openalex.org/W4242212377','https://openalex.org/W6626481562','https://openalex.org/W2159979951','https://openalex.org/W2097117768','https://openalex.org/W1665214252','https://openalex.org/W2613718673','https://openalex.org/W2962835968','https://openalex.org/W2914484425','https://openalex.org/W194249466','https://openalex.org/W2022532533','https://openalex.org/W2328425223','https://openalex.org/W1530872699','https://openalex.org/W2139398462','https://openalex.org/W1533861849','https://openalex.org/W1811843574','https://openalex.org/W1686810756','https://openalex.org/W2964118293','https://openalex.org/W2951603627','https://openalex.org/W2963542991','https://openalex.org/W1836465849','https://openalex.org/W2952009708','https://openalex.org/W2206858481','https://openalex.org/W1904365287','https://openalex.org/W1554663460','https://openalex.org/W639708223','https://openalex.org/W2117539524','https://openalex.org/W2125930537','https://openalex.org/W2950621961','https://openalex.org/W1932624639','https://openalex.org/W1799366690','https://openalex.org/W4285719527','https://openalex.org/W2168894214','https://openalex.org/W2025357764','https://openalex.org/W2179352600','https://openalex.org/W2963504252','https://openalex.org/W3038058348','https://openalex.org/W3118608800','https://openalex.org/W2155893237','https://openalex.org/W1861492603','https://openalex.org/W2950094539','https://openalex.org/W2066941820','https://openalex.org/W3037950864','https://openalex.org/W2152424459','https://openalex.org/W1690739335','https://openalex.org/W2163605009'], ARRAY['https://openalex.org/W4380075502','https://openalex.org/W2790662084','https://openalex.org/W4223943233','https://openalex.org/W4312200629','https://openalex.org/W4360585206','https://openalex.org/W4364306694','https://openalex.org/W2970686063','https://openalex.org/W2915754718','https://openalex.org/W2194775991','https://openalex.org/W2563602643'],
+	                NULL, NULL, '{"openalex": "https://openalex.org/W2194775991"}')
+	            ON CONFLICT (doi) DO UPDATE
+	               SET title            = EXCLUDED.title,
+	                   abstract         = EXCLUDED.abstract,
+	                   conclusion       = EXCLUDED.conclusion,
+	                   year             = EXCLUDED.year,
+	                   publication_date = EXCLUDED.publication_date,
+	                   field            = EXCLUDED.field,
+	                   language         = EXCLUDED.language,
+	                   referenced_works = EXCLUDED.referenced_works,
+	                   related_works    = EXCLUDED.related_works,
+	                   venue_id         = EXCLUDED.venue_id,
+	                   venue_instance_id= EXCLUDED.venue_instance_id,
+	                   external_ids     = EXCLUDED.external_ids,
+	            RETURNING id;
+	            
+2025-11-24 05:41:34.780 IST [36664] LOG:  checkpoint starting: time
+2025-11-24 05:42:12.725 IST [36664] LOG:  checkpoint complete: wrote 348 buffers (2.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=37.893 s, sync=0.028 s, total=37.945 s; sync files=31, longest=0.003 s, average=0.001 s; distance=2835 kB, estimate=12688 kB; lsn=0/2BA0B758, redo lsn=0/2BA0B6C8
+2025-11-24 05:42:14.607 IST [30748] ERROR:  canceling statement due to user request
+2025-11-24 05:42:14.608 IST [36664] LOG:  shutting down
+2025-11-24 05:42:14.608 IST [37440] LOG:  received fast shutdown request
+2025-11-24 05:42:14.612 IST [36664] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 05:42:14.613 IST [37440] LOG:  aborting any active transactions
+2025-11-24 05:42:14.619 IST [37440] LOG:  background worker "logical replication launcher" (PID 30748) exited with exit code 1
+2025-11-24 05:42:14.621 IST [36664] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.013 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=11420 kB; lsn=0/2BA0B7D0, redo lsn=0/2BA0B7D0
+2025-11-24 05:42:14.658 IST [37440] LOG:  database system is shut down

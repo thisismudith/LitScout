@@ -4,7 +4,10 @@ from typing import List, Dict, Any
 import requests
 import time
 from server.database.db_utils import log
-from server.ingestion.openalex.ingest import ingest_openalex_concepts
+from server.ingestion.openalex.ingest import (
+    ingest_openalex_concepts,
+    ensure_openalex_tracking_table_global,
+)
 
 OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
 PER_PAGE_CONCEPTS = 200  # max per OpenAlex docs
@@ -147,6 +150,7 @@ def ingest_openalex_from_fields(
     log.info(
         f"[INGEST-OA] Resolved {len(concept_ids)} unique concept IDs from fields={fields}."
     )
+    ensure_openalex_tracking_table_global()
 
     ingest_openalex_concepts(
         concept_ids=concept_ids,

@@ -28,6 +28,21 @@ OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
 # -------------------------------------------------------------------
 # Tracking table for "which concepts have already been ingested"
 # -------------------------------------------------------------------
+def ensure_openalex_tracking_table_global() -> None:
+    """
+    Ensure the tracking table exists once, before threaded ingestion.
+
+    This avoids concurrent CREATE TABLE races from multiple threads.
+    """
+    conn = get_conn()
+    cur = conn.cursor()
+    try:
+        ensure_openalex_tracking_table(cur)
+        conn.commit()
+    finally:
+        cur.close()
+        conn.close()
+
 def ensure_openalex_tracking_table(cur) -> None:
     """
     Ensure the tracking table for ingested OpenAlex concepts exists.
@@ -94,6 +109,7 @@ def ingest_openalex_concept(
     concept_id: str,
     pages: int = 1,
     show_progress: bool = True,
+    log_output: bool = True,
 ) -> None:
     """
     Ingest OpenAlex works for a single concept into the litscout database.
@@ -106,11 +122,6 @@ def ingest_openalex_concept(
 
     progress = None
     try:
-        # Ensure 'openalex' source exists
-        conn.commit()
-
-        # Ensure tracking table exists (for this connection)
-        ensure_openalex_tracking_table(cur)
         conn.commit()
 
         # Rough estimate: ~200 works per page from OpenAlex
@@ -166,11 +177,11 @@ def ingest_openalex_concept(
 
         if progress is not None:
             progress.close()
-        log.success(
-            f"[INGEST-OA] Concept {concept_id}: ingestion completed. "
-            f"Processed {count} works."
-        )
-
+        if log_output:
+            log.success(
+                f"[INGEST-OA] Concept {concept_id}: ingestion completed. "
+                f"Processed {count} works."
+            )
     except Exception as e:
         conn.rollback()
         if progress is not None:
@@ -202,13 +213,6 @@ def ingest_openalex_concepts(
     Ingest multiple OpenAlex concepts in parallel using threads.
 
     Each concept is ingested with its own DB connection via ingest_openalex_concept.
-
-    Args:
-        concept_ids: list of OpenAlex concept IDs.
-        pages: number of pages per concept.
-        max_workers: maximum number of worker threads to use.
-        skip_existing: if True, skips concepts already present
-                       in openalex_ingested_concepts.
     """
     if not concept_ids:
         log.warn("[INGEST-OA] No concept IDs provided; nothing to ingest.")
@@ -230,8 +234,9 @@ def ingest_openalex_concepts(
             log.info("[INGEST-OA] All provided concepts are already ingested; nothing to do.")
             return
 
-    # Cap max workers to avoid 429s
+    # Cap concurrency to avoid OpenAlex 429s
     MAX_OPENALEX_WORKERS = 4
+    CONCEPT_COUNT = len(concept_ids)
 
     if max_workers is None or max_workers <= 0:
         cpu = os.cpu_count() or 4
@@ -245,7 +250,7 @@ def ingest_openalex_concepts(
             max_workers = MAX_OPENALEX_WORKERS
 
     log.info(
-        f"[INGEST-OA] Starting parallel ingestion for {len(concept_ids)} concepts "
+        f"[INGEST-OA] Starting parallel ingestion for {CONCEPT_COUNT} concepts "
         f"using up to {max_workers} threads (pages={pages} each)..."
     )
 
@@ -254,33 +259,43 @@ def ingest_openalex_concepts(
     def worker(cid: str) -> tuple[str, bool, str | None]:
         try:
             # Disable per-paper progress in multi mode to avoid messy output
-            ingest_openalex_concept(cid, pages=pages, show_progress=False)
+            ingest_openalex_concept(cid, pages=pages, show_progress=False, log_output=False)
             return cid, True, None
         except Exception as e:
             return cid, False, str(e)
 
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_map = {executor.submit(worker, cid): cid for cid in concept_ids}
+    # concept-level progress bar
+    progress = create_progress_bar(
+        total=len(concept_ids),
+        desc="Concepts",
+        unit="concept",
+    )
 
-        for future in as_completed(future_map):
-            cid = future_map[future]
-            try:
-                concept_id, ok, err = future.result()
-                if ok:
-                    log.success(
-                        f"[INGEST-OA] Concept {concept_id} finished successfully."
-                    )
-                else:
-                    log.error(
-                        f"[INGEST-OA] Concept {concept_id} failed: {err}"
-                    )
-                results.append((concept_id, ok, err))
-            except Exception as e:
-                log.error(
-                    f"[INGEST-OA] Concept {cid} raised an unexpected error: {e}"
-                )
-                traceback.print_exc()
-                results.append((cid, False, str(e)))
+    try:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            future_map = {executor.submit(worker, cid): cid for cid in concept_ids}
+
+            from concurrent.futures import as_completed
+
+            for future in as_completed(future_map):
+                cid = future_map[future]
+
+                try:
+                    concept_id, ok, err = future.result()
+                    if ok:
+                        log.success(f"[INGEST-OA] Concept {concept_id} finished successfully.")
+                    else:
+                        log.error(f"[INGEST-OA] Concept {concept_id} failed: {err}")
+                    results.append((concept_id, ok, err))
+                except Exception as e:
+                    log.error(f"[INGEST-OA] Concept {cid} raised an unexpected error: {e}")
+                    traceback.print_exc()
+                    results.append((cid, False, str(e)))
+                finally:
+                    # update bar for each finished concept
+                    progress.update(1)
+    finally:
+        progress.close()
 
     # Summary
     success_count = sum(1 for _, ok, _ in results if ok)
