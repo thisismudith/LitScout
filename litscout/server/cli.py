@@ -13,9 +13,11 @@ from server.database.db_manager import (
 )
 from server.ingestion.openalex.ingest import ingest_openalex_concept
 from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
+from server.ingestion.openalex.enrich import enrich_openalex
+from server.embeddings.papers import embed_missing_papers
 
 
-cli_log = ColorLogger("CLI", tag_color=Fore.CYAN, include_timestamps=False)
+cli_log = ColorLogger("CLI", include_timestamps=False)
 
 
 def add_db_options(parser: argparse.ArgumentParser):
@@ -33,47 +35,27 @@ def build_parser():
     )
     subparsers = parser.add_subparsers(dest="category", required=True)
 
-    # -------------------------------------------------------------
     # DB COMMANDS
-    # aliases: db, database
-    # -------------------------------------------------------------
     for db_alias in ("db", "database"):
         db_parser = subparsers.add_parser(db_alias, help="Database operations")
         db_subp = db_parser.add_subparsers(dest="db_cmd", required=True)
 
-        # db start
         db_subp.add_parser("start", help="Start PostgreSQL server.")
 
-        # db stop
         db_subp.add_parser("stop", help="Stop PostgreSQL server.")
 
-        # db init [-F]
         init_p = db_subp.add_parser("init", help="Initialize or reinitialize DB schema.")
-        init_p.add_argument(
-            "-F", "--force", action="store_true",
-            help="Force: drop and recreate database before applying schema."
-        )
+        init_p.add_argument("-F", "--force", action="store_true", help="Force: drop and recreate database before applying schema.")
         add_db_options(init_p)
 
-    # -------------------------------------------------------------
     # INGEST COMMANDS
-    # -------------------------------------------------------------
     ingest_parser = subparsers.add_parser("ingest", help="Data ingestion commands.")
     ingest_subp = ingest_parser.add_subparsers(dest="ingest_cmd", required=True)
 
     # Single concept
     oa_parser = ingest_subp.add_parser("openalex", help="Ingest a single OpenAlex concept.")
-    oa_parser.add_argument(
-        "--concept",
-        required=True,
-        help="OpenAlex concept ID, e.g., C41008148.",
-    )
-    oa_parser.add_argument(
-        "--pages",
-        type=int,
-        default=1,
-        help="How many pages of results to fetch (~200 papers per page).",
-    )
+    oa_parser.add_argument("--concept_id", required=True, help="OpenAlex concept ID, e.g., C41008148.")
+    oa_parser.add_argument("--pages", type=int, default=1, help="How many pages of results to fetch (~200 papers per page).")
     oa_parser.add_argument("--verify", action="store_true", help="Re-enrich existing papers for this concept.")
 
     # Multi: by fields
@@ -81,72 +63,41 @@ def build_parser():
         "openalex-multi",
         help="Fetch concepts by field(s) and ingest them in parallel.",
     )
-    oa_multi_parser.add_argument(
-        "--fields",
-        nargs="+",
-        required=True,
-        help=(
-            "One or more field names to search concepts for, e.g.: "
-            "--fields 'computer science' 'economics'."
-        ),
+    oa_multi_parser.add_argument("--fields", nargs="+", required=True,
+        help="One or more field names to search concepts for, e.g.: --fields 'computer science' 'economics'."
     )
-    oa_multi_parser.add_argument(
-        "--pages",
-        type=int,
-        default=1,
-        help="How many pages per concept to fetch (~200 papers per page).",
+    oa_multi_parser.add_argument("--pages", type=int, default=1, help="How many pages per concept to fetch (~200 papers per page).")
+    oa_multi_parser.add_argument("--max-workers", type=int, default=None,
+        help="Maximum number of worker threads. Defaults to min(#concepts, cpu_cores*2)."
     )
-    oa_multi_parser.add_argument(
-        "--max-workers",
-        type=int,
-        default=None,
-        help=(
-            "Maximum number of worker threads. "
-            "Defaults to min(#concepts, cpu_cores*2)."
-        ),
+    oa_multi_parser.add_argument("--skip-existing", action="store_true",
+        help="Skip concepts already recorded in openalex_ingested_concepts."
     )
-    oa_multi_parser.add_argument(
-        "--skip-existing",
-        action="store_true",
-        help=(
-            "Skip concepts already recorded in openalex_ingested_concepts."
-        ),
-    )
-    oa_multi_parser.add_argument(
-        "--per-field-limit",
-        type=int,
-        default=500,
-        help="Maximum number of concepts to fetch per field (default: 500).",
+    oa_multi_parser.add_argument("--per-field-limit", type=int, default=500,
+        help="Maximum number of concepts to fetch per field (default: 500)."
     )
     oa_multi_parser.add_argument("--verify", action="store_true", help="Run verify/enrich pass instead of fresh ingest.")
 
-    # Enrich authors
-    
-    oa_enrich = ingest_subp.add_parser(
-        "enrich",
-        help="Enrich existing papers/authors with missing data from OpenAlex.",
+    # Enrich authors/papers/concepts
+    oa_enrich = ingest_subp.add_parser("enrich", help="Enrich existing papers/authors with missing data from OpenAlex.")
+    oa_enrich.add_argument("--authors", action="store_true", help="Enrich authors.")
+    oa_enrich.add_argument("--papers", action="store_true", help="Enrich papers.")
+    oa_enrich.add_argument("--concepts", action="store_true", help="Enrich concepts.")
+    oa_enrich.add_argument("--concept-ids", nargs="*", help="List of concept IDs to limit paper enrichment to (CXXXX format).")
+    oa_enrich.add_argument("--max-workers", type=int, default=None, help="Maximum number of worker threads. ")
+
+    # Embedding papers
+    embed_parser = subparsers.add_parser("embed", help="Embedding utilities (papers, authors, etc.).")
+    embed_sub = embed_parser.add_subparsers(dest="embed_command", required=True)
+
+    embed_papers_parser = embed_sub.add_parser("papers", help="Embed papers into vectors using an embedding model.")
+    embed_papers_parser.add_argument("--api-key", default=None, help="OpenAI API key. If not provided, will use OPENAI_API_KEY env variable.")
+    embed_papers_parser.add_argument("--model", default="text-embedding-3-large",
+        help="Embedding model name (default: text-embedding-3-large)."
     )
-    oa_enrich.add_argument(
-        "--authors",
-        action="store_true",
-        help="Enrich authors.",
-    )
-    oa_enrich.add_argument(
-        "--papers",
-        action="store_true",
-        help="Enrich papers.",
-    )
-    oa_enrich.add_argument(
-        "--concepts",
-        nargs="*",
-        help="Optionally limit enrichment of papers linked to these OpenAlex concept IDs.",
-    )
-    oa_enrich.add_argument(
-        "--max-workers",
-        type=int,
-        default=None,
-        help="Maximum number of worker threads. ",
-    )
+    embed_papers_parser.add_argument("--batch-size", type=int, default=64, help="Embedding batch size per API call.")
+    embed_papers_parser.add_argument("--limit", type=int, default=None, help="Optional max number of papers to embed (for testing).")
+    embed_papers_parser.add_argument("--max-workers", type=int, default=None, help="Maximum number of worker threads. ")
 
     return parser
 
@@ -157,9 +108,7 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    # -------------------------------------------------------------
     # DB COMMANDS
-    # -------------------------------------------------------------
     if args.category in ("db", "database"):
         if args.db_cmd == "start":
             cli_log.info("Starting PostgreSQL...")
@@ -172,73 +121,69 @@ def main():
         elif args.db_cmd == "init":
             cli_log.info("Initializing database schema...")
             init_database(
-                force=args.force,
+                # force=args.force,
                 db_name=args.db_name,
                 db_user=args.db_user,
                 db_host=args.db_host,
                 db_port=args.db_port,
             )
 
-    # -------------------------------------------------------------
     # INGEST COMMANDS
-    # -------------------------------------------------------------
     elif args.category == "ingest":
         if args.ingest_cmd == "openalex":
-            cli_log.info(
-                f"Starting OpenAlex ingestion for concept {args.concept_id} "
-                f"({args.pages} pages)..."
-            )
-            ingest_openalex_concept(
-                concept_id=args.concept_id,
-                pages=args.pages,
-            )
-            cli_log.success("OpenAlex ingestion completed successfully.")
+            cli_log.info(f"Starting OpenAlex ingestion for concept {args.concept_id} ({args.pages} pages)...")
+            ingest_openalex_concept(concept_id=args.concept_id, pages=args.pages)
+
         elif args.ingest_cmd == "enrich":
-            if not args.authors and not args.papers:
-                cli_log.error("No enrichment target specified. Use --authors and/or --papers.")
+            if not args.authors and not args.papers and not args.concepts:
+                cli_log.error("No enrichment target specified. Use at least one of --authors, --papers and --concepts.")
                 return
 
-            from server.ingestion.openalex.enrich import enrich_openalex
-
-            cli_log.info(
-                f"Starting OpenAlex enrichment "
-                f"({'authors' if args.authors else ''}{' and ' if args.authors and args.papers else ''}"
-                f"{'papers' if args.papers else ''})..."
-            )
+            msg = []
+            if args.authors: msg.append("authors")
+            if args.papers:
+                papers_msg = "papers"
+                if args.concept_ids:
+                    papers_msg += f" with concepts: {' '.join(args.concept_ids)}"
+                msg.append(papers_msg)
+            if args.concepts: msg.append("concepts")
+            
+            cli_log.info(f"Starting OpenAlex enrichment for {', '.join(msg)}...")
+            max_workers = min(os.cpu_count() or 4, max_workers or 4)
             
             enrich_openalex(
-                enrich_authors=args.authors,
-                enrich_papers=args.papers,
-                concept_ids=args.concept_ids or [],
-                max_workers=args.max_workers,
+                enrich_authors=args.authors, enrich_papers=args.papers, enrich_concepts=args.concepts,
+                concept_ids=[c.strip() for c in (args.concept_ids or []) if c.strip()], max_workers=max_workers
             )
-            cli_log.success("OpenAlex enrichment completed.")
 
         elif args.ingest_cmd == "openalex-multi":
             fields = [f.strip() for f in (args.fields or []) if f.strip()]
             if not fields:
-                cli_log.error(
-                    "No valid fields provided. Use --fields 'computer science' 'economics' ..."
-                )
+                cli_log.error("No valid fields provided. Use --fields 'computer science' 'economics' ...")
                 return
 
+            max_workers = min(os.cpu_count() or 4, args.max_workers or 4)
             cli_log.info(
-                "Starting OpenAlex multi-field ingestion for "
-                f"fields={fields}, pages={args.pages}, "
-                f"max_workers={args.max_workers}, "
-                f"skip_existing={args.skip_existing}, "
-                f"per_field_limit={args.per_field_limit}..."
+                "Starting OpenAlex multi-field ingestion for fields={fields}, pages={args.pages}, max_workers={max_workers}, "
+                f"skip_existing={args.skip_existing}, per_field_limit={args.per_field_limit}..."
             )
 
             ingest_openalex_from_fields(
-                fields=fields,
-                pages=args.pages,
-                max_workers=args.max_workers,
-                skip_existing=args.skip_existing,
-                per_field_limit=args.per_field_limit,
+                fields=fields, max_workers=max_workers, pages=args.pages, 
+                skip_existing=args.skip_existing, per_field_limit=args.per_field_limit,
             )
 
-            cli_log.success("OpenAlex multi-field ingestion completed.")
+    # EMBEDDING COMMANDS
+    elif args.category == "embed":
+        if args.embed_command == "papers":
+
+            max_workers = min(os.cpu_count() or 4, args.max_workers or 4)
+            cli_log.info(f"Embedding papers using model '{args.model}'...")
+
+            embed_missing_papers(
+                api_key=args.api_key, model_name=args.model, batch_size=args.batch_size, 
+                limit=args.limit, max_workers=max_workers,
+            )
 
     else:
         cli_log.error("Unknown command.")

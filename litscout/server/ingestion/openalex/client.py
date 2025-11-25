@@ -1,9 +1,9 @@
 # server/ingestion/openalex/client.py
 
 import time
+from colorama import Fore
 import requests
-
-from server.database.db_utils import log  # reuse the DB logger
+from litscout.server.logger import ColorLogger
 
 BASE_URL = "https://api.openalex.org"
 WORKS_URL = f"{BASE_URL}/works"
@@ -12,6 +12,7 @@ MAX_RETRIES = 5
 BACKOFF_BASE = 1.5
 INITIAL_DELAY = 1.0  # seconds
 
+log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True, include_threading_id=False)
 
 def _get(url: str, params: dict | None = None) -> dict:
     """

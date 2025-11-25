@@ -1,13 +1,16 @@
 # server/ingestion/openalex/fetch_concepts.py
 
 from typing import List, Dict, Any
+from colorama import Fore
 import requests
 import time
-from server.database.db_utils import log
+from litscout.server.logger import ColorLogger
 from server.ingestion.openalex.ingest import (
     ingest_openalex_concepts,
     ensure_openalex_tracking_table_global,
 )
+
+log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True)
 
 OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
 PER_PAGE_CONCEPTS = 200  # max per OpenAlex docs
@@ -31,7 +34,7 @@ def fetch_concepts_for_field(field_name: str, limit: int = 500) -> List[Dict[str
     concepts: List[Dict[str, Any]] = []
     page = 1
 
-    log.info(f"[INGEST-OA] Fetching up to {limit} concepts for field '{field_name}'")
+    log.info(f"Fetching up to {limit} concepts for field '{field_name}'")
 
     while len(concepts) < limit:
         params = {
@@ -48,7 +51,7 @@ def fetch_concepts_for_field(field_name: str, limit: int = 500) -> List[Dict[str
         results = data.get("results", [])
         if not results:
             log.warn(
-                f"[INGEST-OA] No more concept results for field '{field_name}' at page {page}."
+                f"No more concept results for field '{field_name}' at page {page}."
             )
             break
 
@@ -58,7 +61,7 @@ def fetch_concepts_for_field(field_name: str, limit: int = 500) -> List[Dict[str
                 break
 
         log.info(
-            f"[INGEST-OA] Field '{field_name}': collected {len(concepts)} concepts so far..."
+            f"Field '{field_name}': collected {len(concepts)} concepts so far..."
         )
         page += 1
         time.sleep(0.2)  # be nice to the API
@@ -66,10 +69,7 @@ def fetch_concepts_for_field(field_name: str, limit: int = 500) -> List[Dict[str
     return concepts
 
 
-def fetch_openalex_concept_ids_for_fields(
-    fields: List[str],
-    per_field_limit: int = 500,
-) -> List[str]:
+def fetch_openalex_concept_ids_for_fields(fields: List[str], per_field_limit: int = 500) -> List[str]:
     """
     For each field in `fields`, fetch up to per_field_limit concepts from OpenAlex,
     then return a deduplicated list of concept IDs (CXXXX format), sorted by works_count desc.
@@ -92,34 +92,17 @@ def fetch_openalex_concept_ids_for_fields(
             if cid not in all_concepts or works_count > all_concepts[cid].get("works_count", 0):
                 all_concepts[cid] = c
 
-    log.info(
-        f"[INGEST-OA] Total unique concepts collected for fields {fields}: "
-        f"{len(all_concepts)}"
-    )
+    log.info(f"Total unique concepts collected for fields {fields}: {len(all_concepts)}")
 
     # Sort by works_count descending and return just IDs
-    sorted_concepts = sorted(
-        all_concepts.values(),
-        key=lambda c: c.get("works_count", 0),
-        reverse=True,
-    )
+    sorted_concepts = sorted(all_concepts.values(), key=lambda c: c.get("works_count", 0), reverse=True)
 
-    concept_ids = [
-        _extract_concept_id(c.get("id"))
-        for c in sorted_concepts
-        if _extract_concept_id(c.get("id")) is not None
-    ]
+    concept_ids = [_extract_concept_id(c.get("id")) for c in sorted_concepts if _extract_concept_id(c.get("id")) is not None]
 
     return concept_ids
 
 
-def ingest_openalex_from_fields(
-    fields: List[str],
-    pages: int = 1,
-    max_workers: int | None = None,
-    skip_existing: bool = False,
-    per_field_limit: int = 500,
-) -> None:
+def ingest_openalex_from_fields(fields: List[str], max_workers: int, pages: int = 1, skip_existing: bool = False, per_field_limit: int = 500) -> None:
     """
     High-level helper:
 
@@ -128,33 +111,20 @@ def ingest_openalex_from_fields(
     3) Call ingest_openalex_concepts to ingest them in parallel.
     """
     if not fields:
-        log.warn("[INGEST-OA] No fields provided; nothing to ingest.")
+        log.warn("No fields provided; nothing to ingest.")
         return
 
-    log.info(
-        f"[INGEST-OA] Resolving concepts for fields={fields}, "
-        f"per_field_limit={per_field_limit}..."
-    )
+    log.info(f"Resolving concepts for fields={fields}, per_field_limit={per_field_limit}...")
 
-    concept_ids = fetch_openalex_concept_ids_for_fields(
-        fields=fields,
-        per_field_limit=per_field_limit,
-    )
+    concept_ids = fetch_openalex_concept_ids_for_fields(fields=fields, per_field_limit=per_field_limit)
 
     if not concept_ids:
         log.warn(
-            f"[INGEST-OA] No concepts found for fields={fields}; nothing to ingest."
+            f"No concepts found for fields={fields}; nothing to ingest."
         )
         return
 
-    log.info(
-        f"[INGEST-OA] Resolved {len(concept_ids)} unique concept IDs from fields={fields}."
-    )
-    ensure_openalex_tracking_table_global()
+    log.info(f"Resolved {len(concept_ids)} unique concept IDs from fields: {', '.join(fields)}.")
 
-    ingest_openalex_concepts(
-        concept_ids=concept_ids,
-        pages=pages,
-        max_workers=max_workers,
-        skip_existing=skip_existing,
-    )
+    ensure_openalex_tracking_table_global()
+    ingest_openalex_concepts(concept_ids=concept_ids, max_workers=max_workers, pages=pages, skip_existing=skip_existing)

@@ -1,5 +1,16 @@
 CREATE TYPE venue_type AS ENUM ('conference', 'journal');
 
+-- Concepts
+CREATE TABLE concepts (
+    id                  TEXT PRIMARY KEY,  -- OpenAlex concept ID
+    name                TEXT NOT NULL,
+    level               INTEGER,
+    description         TEXT,
+    works_count         INTEGER,
+    cited_by_count      INTEGER,
+    related_concepts    JSONB
+);
+
 -- Authors
 CREATE TABLE authors (
     id                      BIGSERIAL PRIMARY KEY,
@@ -85,6 +96,14 @@ CREATE TABLE paper_authors (
     PRIMARY KEY (paper_id, author_id)
 );
 
+-- Embeddings for papers (one row per paper, per model)
+CREATE TABLE paper_embeddings (
+    paper_id    BIGINT PRIMARY KEY REFERENCES papers(id) ON DELETE CASCADE,
+    embedding   DOUBLE PRECISION[] NOT NULL,
+    model_name  TEXT NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- Author Specialties / Research Areas
 CREATE TABLE specialties (
     id          BIGSERIAL PRIMARY KEY,
@@ -111,6 +130,10 @@ CREATE TABLE clusters (
 );
 
 -- Indexing for faster lookups
+
+-- Lookup embeddings by model name
+CREATE INDEX idx_paper_embeddings_model
+    ON paper_embeddings(model_name);
 
 -- Lookup all papers for an author
 CREATE INDEX IF NOT EXISTS idx_paper_authors_paper

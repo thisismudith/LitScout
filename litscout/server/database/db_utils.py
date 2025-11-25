@@ -10,7 +10,6 @@ from colorama import Fore
 
 from server.logger import ColorLogger
 
-# Shared logger for DB utilities
 log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
 
 # Shared env-based configuration

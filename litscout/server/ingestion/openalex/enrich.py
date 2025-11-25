@@ -1,7 +1,8 @@
 # server/ingestion/openalex/enrich.py
 
+import os
 from typing import Dict
-import psycopg2
+from colorama import Fore
 from psycopg2.extras import RealDictCursor
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
@@ -11,32 +12,67 @@ from server.ingestion.db_writer import get_conn
 from server.ingestion.openalex.client import _get
 from server.logger import ColorLogger
 
-log = ColorLogger("INGEST-OA", include_timestamps=True)
+log = ColorLogger("ENRICH", Fore.YELLOW, include_timestamps=True)
 
 
 # Fetch helpers
-def fetch_openalex_author(openalex_id: str):
-    """Fetch full author object from OpenAlex."""
-    time.sleep(0.3)  # rate-limit safety
-    url = f"https://api.openalex.org/{openalex_id}"
-    return _get(url)
-
-
-# Same for papers
-def fetch_openalex_paper(openalex_id: str):
+def fetcher(openalex_id: str):
     time.sleep(0.3)
     url = f"https://api.openalex.org/{openalex_id}"
     return _get(url)
 
+# Concept Enrichment
+def enrich_single_concept(cur, concept_id: str):
+    """Update a single concept entry in the DB."""
+    data = fetcher(concept_id)
+
+    # Update concept entry
+    cur.execute("""
+        UPDATE openalex_concepts
+        SET
+            description = %s,
+            works_count = %s,
+            cited_by_count = %s,
+            related_concepts = %s
+        WHERE concept_id = %s;
+    """, (
+        data.get("description"),
+        data.get("works_count"),
+        data.get("cited_by_count"),
+        data.get("related_concepts"),
+        concept_id
+    ))
+
+    return True
+
+
+def enrich_concepts_chunked(max_workers: int):
+    conn = get_conn()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("SELECT * FROM concepts ORDER BY id;")
+    concepts = cur.fetchall()
+
+    log.info(f"Enriching {len(concepts)} concepts")
+
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        futures = {
+            ex.submit(enrich_single_concept, cur, concept): concept["id"]
+            for concept in concepts
+        }
+
+        for f in tqdm(as_completed(futures), total=len(futures), desc="Concepts"):
+            _ok, _err = f.result()
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
 
 # Author Enrichment
-def enrich_single_author(cur, author_row):
+def enrich_single_author(cur, author_id: str):
     """Update a single author entry in the DB."""
-    openalex_id = author_row["external_ids"]["openalex"]
-    if not openalex_id:
-        return False, "no_openalex_id"
-
-    data = fetch_openalex_author(openalex_id)
+    data = fetcher(author_id)
 
     # Parse details
     full_name = data.get("display_name")
@@ -90,14 +126,14 @@ def enrich_single_author(cur, author_row):
         topic_shares,
         orcid,
         ids,
-        author_row["id"]
+        author_id
     ))
 
     return True, None
 
 
 def enrich_authors_chunked(max_workers: int):
-    conn = get_conn("ENRICH-AUTHORS")
+    conn = get_conn()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute("SELECT * FROM authors ORDER BY id;")
@@ -120,27 +156,28 @@ def enrich_authors_chunked(max_workers: int):
 
 
 # Paper Enrichment
-def enrich_single_paper(cur, paper_row):
-    openalex_id = paper_row["external_ids"]["openalex"]
-    if not openalex_id:
-        return False
-
-    data = fetch_openalex_paper(openalex_id)
+def enrich_single_paper(cur, paper_id: str):
+    data = fetcher(paper_id)
 
     # paper update fields
     abstract = data.get("abstract_inverted_index")
     title = data.get("title")
-    
+  
+    # Concepts
     concepts_map: Dict[str, float] = {}
     for c in data.get("concepts", []):
-        name = c.get("display_name")
+        id = c.get("id").split("/")[-1]
         score = c.get("score")
-        if not name or score is None or score <= 0.0:
+        if not id or score is None or score <= 0.0:
             continue
         # If same name appears multiple times, keep max score
-        prev = concepts_map.get(name, 0.0)
+        prev = concepts_map.get(id, {"score": 0.0})["score"]
         if score > prev:
-            concepts_map[name] = float(score)
+            concepts_map[id] = {
+                "name": c.get("display_name"),
+                "level": c.get("level"),
+                "score": float(score)
+            }
 
     cur.execute("""
         UPDATE papers
@@ -153,20 +190,20 @@ def enrich_single_paper(cur, paper_row):
         title,
         abstract,
         concepts_map,
-        paper_row["id"]
+        paper_id
     ))
 
     return True
 
 
-def enrich_papers_chunked(max_workers: int, concept_ids=None):
-    conn = get_conn("ENRICH-PAPERS")
+def enrich_papers_chunked(max_workers: int, concept_ids: list = None):
+    conn = get_conn()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     if concept_ids:
         cur.execute("""
             SELECT * FROM papers
-            WHERE concepts ?| %s
+            WHERE concepts ?| %s::text[]
             ORDER BY id;
         """, (concept_ids,))
     else:
@@ -189,9 +226,17 @@ def enrich_papers_chunked(max_workers: int, concept_ids=None):
     conn.close()
 
 
-def enrich_openalex(enrich_authors: bool, enrich_papers: bool, concept_ids, max_workers: int):
+def enrich_openalex(enrich_authors: bool, enrich_papers: bool, enrich_concepts: bool, concept_ids: list, max_workers: int):
     if enrich_authors:
         enrich_authors_chunked(max_workers=max_workers)
+        log.success("Author enrichment completed.")
 
     if enrich_papers:
         enrich_papers_chunked(max_workers=max_workers, concept_ids=concept_ids)
+        log.success("Paper enrichment completed.")
+    
+    if enrich_concepts:
+        enrich_concepts_chunked(max_workers=max_workers)
+        log.success("Concept enrichment completed.")
+
+    log.success("OpenAlex enrichment process finished.")

@@ -75,14 +75,18 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
     # Concepts
     concepts_map: Dict[str, float] = {}
     for c in work.get("concepts", []):
-        name = c.get("display_name")
+        id = c.get("id").split("/")[-1]
         score = c.get("score")
-        if not name or score is None or score <= 0.0:
+        if not id or score is None or score <= 0.0:
             continue
         # If same name appears multiple times, keep max score
-        prev = concepts_map.get(name, 0.0)
+        prev = concepts_map.get(id, {"score": 0.0})["score"]
         if score > prev:
-            concepts_map[name] = float(score)
+            concepts_map[id] = {
+                "name": c.get("display_name"),
+                "level": c.get("level"),
+                "score": float(score)
+            }
 
     # Authors
     authorships = work.get("authorships") or []
@@ -97,20 +101,24 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         if not name:
             continue
 
+        try:
+            na = NormalizedAuthor(
+                full_name=name,
+                works_counted=0,
+                cited_by_count=0,
+                orcid=author_obj.get("orcid"),
+                affiliations=[],
+                last_known_institutions=[],
+                topics=[],
+                topic_shares=[],
+                external_ids={
+                    "openalex": author_obj.get("id").split("/")[-1],
+                },
+            )
+        except AttributeError:
+            # Skip authors with no id
+            continue
 
-        na = NormalizedAuthor(
-            full_name=name,
-            works_counted=0,
-            cited_by_count=0,
-            orcid=author_obj.get("orcid"),
-            affiliations=[],
-            last_known_institutions=[],
-            topics=[],
-            topic_shares=[],
-            external_ids={
-                "openalex": author_obj.get("id").split("/")[-1],
-            },
-        )
         authors.append(na)
         author_order.append(idx)
         is_corr.append(False)  # still no explicit “corresponding author” flag

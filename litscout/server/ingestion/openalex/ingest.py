@@ -1,15 +1,16 @@
 # server/ingestion/openalex/ingest.py
 
 import os
-import time
 import traceback
-from typing import List, Set, Dict, Any
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import List, Set
+from concurrent.futures import ThreadPoolExecutor
 
-import requests
+from colorama import Fore
 
+from litscout.server.logger import ColorLogger
 from server.ingestion.db_writer import (
     get_conn,
+    upsert_concept,
     upsert_venue,
     get_or_create_venue_instance,
     upsert_author,
@@ -18,16 +19,14 @@ from server.ingestion.db_writer import (
 )
 from server.ingestion.openalex.client import iter_works_for_concept
 from server.ingestion.openalex.normalizer import normalize_openalex_work
-from server.database.db_utils import log
 from server.utils.progress import create_progress_bar
 
+log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True)
 
 OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
 
 
-# -------------------------------------------------------------------
 # Tracking table for "which concepts have already been ingested"
-# -------------------------------------------------------------------
 def ensure_openalex_tracking_table_global() -> None:
     """
     Ensure the tracking table exists once, before threaded ingestion.
@@ -101,16 +100,8 @@ def get_existing_openalex_concepts(concept_ids: List[str]) -> Set[str]:
         conn.close()
 
 
-# -------------------------------------------------------------------
 # Single-concept ingestion
-# -------------------------------------------------------------------
-
-def ingest_openalex_concept(
-    concept_id: str,
-    pages: int = 1,
-    show_progress: bool = True,
-    log_output: bool = True,
-) -> None:
+def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool = True, log_output: bool = True) -> None:
     """
     Ingest OpenAlex works for a single concept into the litscout database.
 
@@ -129,7 +120,7 @@ def ingest_openalex_concept(
         total_estimated = pages * per_page_estimate
 
         log.info(
-            f"[INGEST-OA] Fetching works for concept {concept_id} "
+            f"Fetching works for concept {concept_id} "
             f"(pages={pages}, ~{total_estimated} works estimated)..."
         )
 
@@ -156,6 +147,10 @@ def ingest_openalex_concept(
                     cur, venue_id, year
                 )
 
+            # Concepts
+            for cid, info in p.concepts.items():
+                upsert_concept(cur, cid, info["name"], info["level"])
+
             # Authors
             author_ids = [upsert_author(cur, a) for a in p.authors]
 
@@ -178,18 +173,12 @@ def ingest_openalex_concept(
         if progress is not None:
             progress.close()
         if log_output:
-            log.success(
-                f"[INGEST-OA] Concept {concept_id}: ingestion completed. "
-                f"Processed {count} works."
-            )
+            log.success(f"Concept {concept_id}: ingestion completed. Processed {count} works.")
     except Exception as e:
         conn.rollback()
         if progress is not None:
             progress.close()
-        log.error(
-            f"[INGEST-OA] Concept {concept_id}: ingestion failed; "
-            f"transaction rolled back."
-        )
+        log.error(f"Concept {concept_id}: ingestion failed; transaction rolled back.")
         log.error(str(e))
         traceback.print_exc()
         raise
@@ -199,25 +188,19 @@ def ingest_openalex_concept(
             progress.close()
         cur.close()
         conn.close()
+    
+    log.success(f"Concept {concept_id}: ingestion completed. Processed {count} works.")
 
 
-# -------------------------------------------------------------------
 # Multi-concept, threaded ingestion (concept IDs already known)
-# -------------------------------------------------------------------
-
-def ingest_openalex_concepts(
-    concept_ids: List[str],
-    pages: int = 1,
-    max_workers: int | None = None,
-    skip_existing: bool = False,
-) -> None:
+def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: int = 1, skip_existing: bool = False) -> None:
     """
     Ingest multiple OpenAlex concepts in parallel using threads.
 
     Each concept is ingested with its own DB connection via ingest_openalex_concept.
     """
     if not concept_ids:
-        log.warn("[INGEST-OA] No concept IDs provided; nothing to ingest.")
+        log.warn("No concept IDs provided; nothing to ingest.")
         return
 
     # Deduplicate while preserving order
@@ -228,25 +211,19 @@ def ingest_openalex_concepts(
         existing = get_existing_openalex_concepts(concept_ids)
         if existing:
             log.info(
-                f"[INGEST-OA] Skipping {len(existing)} concepts that are already ingested."
+                f"Skipping {len(existing)} concepts that are already ingested."
             )
         concept_ids = [cid for cid in concept_ids if cid not in existing]
 
         if not concept_ids:
-            log.info("[INGEST-OA] All provided concepts are already ingested; nothing to do.")
+            log.info("All provided concepts are already ingested; nothing to do.")
             return
 
-    # Cap concurrency to avoid OpenAlex 429s
     CONCEPT_COUNT = len(concept_ids)
-
-    cpu = os.cpu_count() or 4
-    if max_workers is None:
-        max_workers = min(CONCEPT_COUNT, cpu)
-    else:
-        max_workers = min(CONCEPT_COUNT, cpu, max_workers)
+    max_workers = min(CONCEPT_COUNT, max_workers)
 
     log.info(
-        f"[INGEST-OA] Starting parallel ingestion for {CONCEPT_COUNT} concepts "
+        f"Starting parallel ingestion for {CONCEPT_COUNT} concepts "
         f"using up to {max_workers} threads (pages={pages} each)..."
     )
 
@@ -279,12 +256,12 @@ def ingest_openalex_concepts(
                 try:
                     concept_id, ok, err = future.result()
                     if ok:
-                        log.success(f"[INGEST-OA] Concept {concept_id} finished successfully.")
+                        log.success(f"Concept {concept_id} finished successfully.")
                     else:
-                        log.error(f"[INGEST-OA] Concept {concept_id} failed: {err}")
+                        log.error(f"Concept {concept_id} failed: {err}")
                     results.append((concept_id, ok, err))
                 except Exception as e:
-                    log.error(f"[INGEST-OA] Concept {cid} raised an unexpected error: {e}")
+                    log.error(f"Concept {cid} raised an unexpected error: {e}")
                     traceback.print_exc()
                     results.append((cid, False, str(e)))
                 finally:
@@ -297,12 +274,4 @@ def ingest_openalex_concepts(
     success_count = sum(1 for _, ok, _ in results if ok)
     failure_count = len(results) - success_count
 
-    log.info(
-        f"[INGEST-OA] Parallel ingestion completed: "
-        f"{success_count} succeeded, {failure_count} failed."
-    )
-
-
-# -------------------------------------------------------------------
-# Fetch concepts from OpenAlex by field name
-# -------------------------------------------------------------------
+    log.success(f"Parallel ingestion completed: {success_count} succeeded, {failure_count} failed.")

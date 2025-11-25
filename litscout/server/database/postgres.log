@@ -4320,3 +4320,448 @@
 2025-11-25 12:59:44.954 IST [19364] FATAL:  the database system is shutting down
 2025-11-25 12:59:44.956 IST [8416] LOG:  checkpoint complete: wrote 320 buffers (2.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.016 s, sync=0.034 s, total=0.059 s; sync files=38, longest=0.003 s, average=0.001 s; distance=2636 kB, estimate=5241 kB; lsn=0/43B4C08, redo lsn=0/43B4C08
 2025-11-25 12:59:44.980 IST [31148] LOG:  database system is shut down
+2025-11-25 14:32:35.416 IST [24888] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:32:35.419 IST [24888] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:32:35.419 IST [24888] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:32:35.454 IST [31572] LOG:  database system was shut down at 2025-11-25 12:59:44 IST
+2025-11-25 14:32:35.463 IST [24888] LOG:  database system is ready to accept connections
+2025-11-25 14:32:38.284 IST [27084] LOG:  checkpoint starting: immediate force wait
+2025-11-25 14:32:38.294 IST [27084] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.003 s, total=0.011 s; sync files=4, longest=0.001 s, average=0.001 s; distance=3 kB, estimate=3 kB; lsn=0/43B58A0, redo lsn=0/43B5848
+2025-11-25 14:32:38.613 IST [28812] ERROR:  syntax error at or near ")" at character 361
+2025-11-25 14:32:38.613 IST [28812] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Concepts
+	CREATE TABLE concepts (
+	    id                  TEXT PRIMARY KEY,  -- OpenAlex concept ID
+	    name                TEXT NOT NULL,
+	    level               INTEGER,
+	    description         TEXT,
+	    works_count         INTEGER,
+	    cited_by_count      INTEGER,
+	    related_concepts    JSONB,
+	);
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    works_counted           INTEGER,
+	    cited_by_count          INTEGER,
+	    orcid                   TEXT UNIQUE,
+	    affiliations            JSONB,
+	    last_known_institutions JSONB,
+	    topics                  JSONB,
+	    topic_shares            JSONB,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+	    related_works           TEXT[] NOT NULL DEFAULT '{}',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    concepts                JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
+	    external_ids            JSONB NOT NULL
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-25 14:32:49.015 IST [27084] LOG:  checkpoint starting: immediate force wait
+2025-11-25 14:32:49.028 IST [27084] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.005 s, total=0.013 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4676 kB, estimate=4676 kB; lsn=0/4846980, redo lsn=0/4846928
+2025-11-25 14:33:16.377 IST [23000] ERROR:  canceling statement due to user request
+2025-11-25 14:33:16.377 IST [27084] LOG:  shutting down
+2025-11-25 14:33:16.377 IST [24888] LOG:  received fast shutdown request
+2025-11-25 14:33:16.382 IST [27084] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:33:16.383 IST [24888] LOG:  aborting any active transactions
+2025-11-25 14:33:16.390 IST [24888] LOG:  background worker "logical replication launcher" (PID 23000) exited with exit code 1
+2025-11-25 14:33:16.585 IST [27084] LOG:  checkpoint complete: wrote 1033 buffers (6.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.053 s, sync=0.146 s, total=0.209 s; sync files=353, longest=0.001 s, average=0.001 s; distance=4961 kB, estimate=4961 kB; lsn=0/4D1EE00, redo lsn=0/4D1EE00
+2025-11-25 14:33:16.629 IST [24888] LOG:  database system is shut down
+2025-11-25 14:33:18.348 IST [8736] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:33:18.351 IST [8736] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:33:18.351 IST [8736] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:33:18.382 IST [33660] LOG:  database system was shut down at 2025-11-25 14:33:16 IST
+2025-11-25 14:33:18.389 IST [8736] LOG:  database system is ready to accept connections
+2025-11-25 14:33:31.913 IST [27464] ERROR:  duplicate key value violates unique constraint "concepts_pkey"
+2025-11-25 14:33:31.913 IST [27464] DETAIL:  Key (id)=(C41008148) already exists.
+2025-11-25 14:33:31.913 IST [27464] STATEMENT:  
+	        INSERT INTO concepts (id, name, level)
+	        VALUES ('C41008148', 'Computer science', 0)
+	        RETURNING id;
+	        
+2025-11-25 14:33:31.913 IST [13932] ERROR:  duplicate key value violates unique constraint "concepts_pkey"
+2025-11-25 14:33:31.913 IST [13932] DETAIL:  Key (id)=(C41008148) already exists.
+2025-11-25 14:33:31.913 IST [13932] STATEMENT:  
+	        INSERT INTO concepts (id, name, level)
+	        VALUES ('C41008148', 'Computer science', 0)
+	        RETURNING id;
+	        
+2025-11-25 14:33:32.104 IST [2672] ERROR:  duplicate key value violates unique constraint "concepts_pkey"
+2025-11-25 14:33:32.104 IST [2672] DETAIL:  Key (id)=(C73555534) already exists.
+2025-11-25 14:33:32.104 IST [2672] STATEMENT:  
+	        INSERT INTO concepts (id, name, level)
+	        VALUES ('C73555534', 'Cluster analysis', 2)
+	        RETURNING id;
+	        
+2025-11-25 14:33:32.143 IST [31156] ERROR:  duplicate key value violates unique constraint "concepts_pkey"
+2025-11-25 14:33:32.143 IST [31156] DETAIL:  Key (id)=(C193252679) already exists.
+2025-11-25 14:33:32.143 IST [31156] STATEMENT:  
+	        INSERT INTO concepts (id, name, level)
+	        VALUES ('C193252679', 'Phylogenetic tree', 3)
+	        RETURNING id;
+	        
+2025-11-25 14:33:36.672 IST [27616] ERROR:  duplicate key value violates unique constraint "concepts_pkey"
+2025-11-25 14:33:36.672 IST [27616] DETAIL:  Key (id)=(C61696701) already exists.
+2025-11-25 14:33:36.672 IST [27616] STATEMENT:  
+	        INSERT INTO concepts (id, name, level)
+	        VALUES ('C61696701', 'Engineering physics', 1)
+	        RETURNING id;
+	        
+2025-11-25 14:33:40.166 IST [25336] LOG:  shutting down
+2025-11-25 14:33:40.166 IST [8736] LOG:  received fast shutdown request
+2025-11-25 14:33:40.166 IST [24644] ERROR:  canceling statement due to user request
+2025-11-25 14:33:40.168 IST [25336] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:33:40.168 IST [8736] LOG:  aborting any active transactions
+2025-11-25 14:33:40.168 IST [26060] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.168 IST [26060] STATEMENT:  SELECT id FROM concepts WHERE id = 'C144133560';
+2025-11-25 14:33:40.168 IST [31868] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.168 IST [23280] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.168 IST [32160] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.169 IST [11972] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.169 IST [20960] FATAL:  terminating connection due to administrator command
+2025-11-25 14:33:40.179 IST [8736] LOG:  background worker "logical replication launcher" (PID 24644) exited with exit code 1
+2025-11-25 14:33:40.198 IST [33284] FATAL:  the database system is shutting down
+2025-11-25 14:33:40.224 IST [31488] FATAL:  the database system is shutting down
+2025-11-25 14:33:40.243 IST [31768] FATAL:  the database system is shutting down
+2025-11-25 14:33:40.245 IST [25336] LOG:  checkpoint complete: wrote 989 buffers (6.0%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.028 s, sync=0.038 s, total=0.079 s; sync files=62, longest=0.003 s, average=0.001 s; distance=10235 kB, estimate=10235 kB; lsn=0/571DA48, redo lsn=0/571DA48
+2025-11-25 14:33:40.262 IST [28952] FATAL:  the database system is shutting down
+2025-11-25 14:33:40.268 IST [8736] LOG:  database system is shut down
+2025-11-25 14:35:34.584 IST [19260] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:35:34.587 IST [19260] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:35:34.587 IST [19260] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:35:34.620 IST [25520] LOG:  database system was shut down at 2025-11-25 14:33:40 IST
+2025-11-25 14:35:34.626 IST [19260] LOG:  database system is ready to accept connections
+2025-11-25 14:35:50.086 IST [20672] ERROR:  canceling statement due to user request
+2025-11-25 14:35:50.087 IST [19260] LOG:  received fast shutdown request
+2025-11-25 14:35:50.088 IST [30456] LOG:  shutting down
+2025-11-25 14:35:50.089 IST [19260] LOG:  aborting any active transactions
+2025-11-25 14:35:50.089 IST [20428] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.090 IST [4648] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.090 IST [15776] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.090 IST [20660] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.091 IST [13440] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.091 IST [30456] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:35:50.091 IST [26028] FATAL:  terminating connection due to administrator command
+2025-11-25 14:35:50.095 IST [19260] LOG:  background worker "logical replication launcher" (PID 20672) exited with exit code 1
+2025-11-25 14:35:50.139 IST [30456] LOG:  checkpoint complete: wrote 1015 buffers (6.2%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.020 s, sync=0.021 s, total=0.051 s; sync files=26, longest=0.004 s, average=0.001 s; distance=8938 kB, estimate=8938 kB; lsn=0/5FD8348, redo lsn=0/5FD8348
+2025-11-25 14:35:50.155 IST [19260] LOG:  database system is shut down
+2025-11-25 14:37:23.059 IST [30124] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:37:23.062 IST [30124] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:37:23.062 IST [30124] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:37:23.095 IST [19436] LOG:  database system was shut down at 2025-11-25 14:35:50 IST
+2025-11-25 14:37:23.101 IST [30124] LOG:  database system is ready to accept connections
+2025-11-25 14:37:42.716 IST [26408] ERROR:  canceling statement due to user request
+2025-11-25 14:37:42.716 IST [26408] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5068032683';
+2025-11-25 14:37:42.716 IST [19520] ERROR:  canceling statement due to user request
+2025-11-25 14:37:42.716 IST [30124] LOG:  received fast shutdown request
+2025-11-25 14:37:42.716 IST [27860] LOG:  shutting down
+2025-11-25 14:37:42.718 IST [30124] LOG:  aborting any active transactions
+2025-11-25 14:37:42.719 IST [27860] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:37:42.727 IST [33176] FATAL:  terminating connection due to administrator command
+2025-11-25 14:37:42.727 IST [28688] FATAL:  terminating connection due to administrator command
+2025-11-25 14:37:42.728 IST [30792] FATAL:  terminating connection due to administrator command
+2025-11-25 14:37:42.728 IST [12560] FATAL:  terminating connection due to administrator command
+2025-11-25 14:37:42.731 IST [30124] LOG:  background worker "logical replication launcher" (PID 19520) exited with exit code 1
+2025-11-25 14:37:42.757 IST [24404] FATAL:  the database system is shutting down
+2025-11-25 14:37:42.758 IST [30676] FATAL:  the database system is shutting down
+2025-11-25 14:37:42.777 IST [27860] LOG:  checkpoint complete: wrote 1352 buffers (8.3%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.023 s, sync=0.026 s, total=0.061 s; sync files=25, longest=0.006 s, average=0.002 s; distance=10969 kB, estimate=10969 kB; lsn=0/6A8EA68, redo lsn=0/6A8EA68
+2025-11-25 14:37:42.777 IST [32692] FATAL:  the database system is shutting down
+2025-11-25 14:37:42.779 IST [16984] FATAL:  the database system is shutting down
+2025-11-25 14:37:42.793 IST [30124] LOG:  database system is shut down
+2025-11-25 14:39:44.079 IST [30036] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:39:44.081 IST [30036] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:39:44.082 IST [30036] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:39:44.114 IST [6532] LOG:  database system was shut down at 2025-11-25 14:39:40 IST
+2025-11-25 14:39:44.118 IST [30036] LOG:  database system is ready to accept connections
+2025-11-25 14:44:44.428 IST [28256] LOG:  checkpoint starting: time
+2025-11-25 14:46:50.478 IST [4188] ERROR:  canceling statement due to user request
+2025-11-25 14:46:50.478 IST [4188] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5015228993';
+2025-11-25 14:46:50.478 IST [26812] ERROR:  canceling statement due to user request
+2025-11-25 14:46:50.479 IST [30036] LOG:  received fast shutdown request
+2025-11-25 14:46:50.482 IST [30036] LOG:  aborting any active transactions
+2025-11-25 14:46:50.482 IST [4188] FATAL:  terminating connection due to administrator command
+2025-11-25 14:46:50.484 IST [30036] LOG:  background worker "logical replication launcher" (PID 26812) exited with exit code 1
+2025-11-25 14:46:50.725 IST [28256] LOG:  checkpoint complete: wrote 10693 buffers (65.3%), wrote 21 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=126.095 s, sync=0.171 s, total=126.298 s; sync files=383, longest=0.019 s, average=0.001 s; distance=224697 kB, estimate=224697 kB; lsn=0/1646D470, redo lsn=0/F35F8B8
+2025-11-25 14:46:50.727 IST [28256] LOG:  shutting down
+2025-11-25 14:46:50.729 IST [28256] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:46:50.859 IST [28256] LOG:  checkpoint complete: wrote 4628 buffers (28.2%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=0.040 s, sync=0.072 s, total=0.132 s; sync files=35, longest=0.016 s, average=0.003 s; distance=115767 kB, estimate=213804 kB; lsn=0/1646D4E8, redo lsn=0/1646D4E8
+2025-11-25 14:46:50.878 IST [30036] LOG:  database system is shut down
+2025-11-25 14:47:02.680 IST [32460] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 14:47:02.683 IST [32460] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 14:47:02.683 IST [32460] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 14:47:02.715 IST [30812] LOG:  database system was shut down at 2025-11-25 14:46:59 IST
+2025-11-25 14:47:02.719 IST [32460] LOG:  database system is ready to accept connections
+2025-11-25 14:52:02.961 IST [26028] LOG:  checkpoint starting: time
+2025-11-25 14:53:15.397 IST [29028] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [29028] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5109980925';
+2025-11-25 14:53:15.397 IST [15796] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [15796] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5082365625';
+2025-11-25 14:53:15.397 IST [30808] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [30808] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5025710690';
+2025-11-25 14:53:15.397 IST [7792] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [7792] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5100352054';
+2025-11-25 14:53:15.397 IST [16232] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [16232] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5103335726';
+2025-11-25 14:53:15.397 IST [10832] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.397 IST [10832] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'A5079193731';
+2025-11-25 14:53:15.398 IST [29936] ERROR:  canceling statement due to user request
+2025-11-25 14:53:15.398 IST [32460] LOG:  received fast shutdown request
+2025-11-25 14:53:15.400 IST [32460] LOG:  aborting any active transactions
+2025-11-25 14:53:15.400 IST [29028] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.400 IST [15796] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.400 IST [7792] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.400 IST [30808] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.400 IST [16232] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.400 IST [10832] FATAL:  terminating connection due to administrator command
+2025-11-25 14:53:15.404 IST [32460] LOG:  background worker "logical replication launcher" (PID 29936) exited with exit code 1
+2025-11-25 14:53:15.451 IST [28332] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.457 IST [5568] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.459 IST [28536] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.461 IST [28836] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.467 IST [3696] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.470 IST [33736] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.481 IST [31520] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.487 IST [16788] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.492 IST [32604] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.494 IST [14200] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.497 IST [25844] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.501 IST [16996] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.508 IST [28728] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.516 IST [32416] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.520 IST [11112] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.524 IST [16816] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.529 IST [30304] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.532 IST [23176] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.537 IST [584] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.545 IST [21244] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.546 IST [1312] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.553 IST [32684] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.554 IST [24724] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.558 IST [31272] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.564 IST [33508] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.573 IST [28000] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.578 IST [29268] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.580 IST [33616] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.584 IST [14252] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.587 IST [2352] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.591 IST [32036] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.601 IST [32164] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.605 IST [9088] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.610 IST [5448] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.613 IST [33068] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.617 IST [31516] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.620 IST [33732] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.632 IST [33772] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.634 IST [11256] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.637 IST [31040] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.641 IST [26968] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.646 IST [30188] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.649 IST [33024] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.661 IST [29808] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.662 IST [33492] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.667 IST [33420] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.672 IST [33480] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.674 IST [14312] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.676 IST [22180] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.690 IST [4200] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.693 IST [32852] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.696 IST [32648] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.702 IST [27796] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.709 IST [28868] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.710 IST [19348] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.718 IST [33168] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.723 IST [33048] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.728 IST [18728] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.732 IST [20460] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.740 IST [19292] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.743 IST [32688] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.749 IST [26172] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.750 IST [26028] LOG:  checkpoint complete: wrote 9459 buffers (57.7%), wrote 20 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=72.506 s, sync=0.233 s, total=72.789 s; sync files=383, longest=0.028 s, average=0.001 s; distance=222748 kB, estimate=222748 kB; lsn=0/15842AC0, redo lsn=0/F178420
+2025-11-25 14:53:15.753 IST [32908] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.755 IST [26028] LOG:  shutting down
+2025-11-25 14:53:15.756 IST [26028] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 14:53:15.757 IST [28104] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.760 IST [29208] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.768 IST [33008] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.775 IST [24848] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.779 IST [28688] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.782 IST [10756] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.789 IST [9964] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.790 IST [20736] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.798 IST [20776] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.802 IST [33076] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.807 IST [24964] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.811 IST [32808] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.818 IST [33668] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.823 IST [27084] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.827 IST [25532] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.831 IST [5324] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.836 IST [31588] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.839 IST [20056] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.846 IST [33164] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.850 IST [14476] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.856 IST [32872] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.858 IST [3992] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.864 IST [4252] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.867 IST [21436] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.876 IST [15432] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.878 IST [10832] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.887 IST [32492] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.888 IST [17232] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.895 IST [6276] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.896 IST [30956] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.905 IST [33536] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.910 IST [23576] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.919 IST [33548] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.921 IST [15884] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.926 IST [21264] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.929 IST [4852] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.938 IST [30492] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.942 IST [32604] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.949 IST [23708] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.953 IST [19244] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.955 IST [25528] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.960 IST [1732] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.968 IST [20980] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.973 IST [31188] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.980 IST [31640] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.984 IST [20640] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.988 IST [31792] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.992 IST [13968] FATAL:  the database system is shutting down
+2025-11-25 14:53:15.998 IST [2440] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.004 IST [28256] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.010 IST [27120] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.016 IST [20376] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.019 IST [26028] LOG:  checkpoint complete: wrote 7546 buffers (46.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=0.102 s, sync=0.130 s, total=0.264 s; sync files=34, longest=0.040 s, average=0.004 s; distance=105257 kB, estimate=210999 kB; lsn=0/15842B38, redo lsn=0/15842B38
+2025-11-25 14:53:16.020 IST [32364] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.024 IST [28552] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.029 IST [33616] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.035 IST [33368] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.041 IST [22808] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.048 IST [17524] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.051 IST [33608] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.056 IST [27132] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.060 IST [26100] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.066 IST [33236] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.070 IST [21924] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.094 IST [3056] FATAL:  the database system is shutting down
+2025-11-25 14:53:16.100 IST [32460] LOG:  database system is shut down
