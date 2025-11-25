@@ -9,6 +9,7 @@ CREATE TABLE authors (
     orcid                   TEXT UNIQUE,
     affiliations            JSONB,
     last_known_institutions JSONB,
+    topics                  JSONB,
     topic_shares            JSONB,
     external_ids            JSONB,
     cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
@@ -66,7 +67,7 @@ CREATE TABLE papers (
     venue_id                BIGINT REFERENCES venues(id),
     venue_instance_id       BIGINT REFERENCES venue_instances(id),
     concepts                JSONB,
-    cluster_ids            BIGINT[] NOT NULL DEFAULT '{}',
+    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
     cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
     external_ids            JSONB NOT NULL
 

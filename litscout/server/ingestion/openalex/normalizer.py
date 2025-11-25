@@ -8,7 +8,6 @@ from server.ingestion.models import (
     NormalizedVenue,
     NormalizedVenueInstance,
 )
-from server.ingestion.openalex.client import _get
 
 def _reconstruct_abstract(inverted_index: Dict[str, List[int]]) -> str:
     """
@@ -87,59 +86,35 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
 
     # Authors
     authorships = work.get("authorships") or []
-    authors = []
-    author_order = []
-    is_corr = []
+    authors: List[NormalizedAuthor] = []
+    author_order: List[int] = []
+    is_corr: List[bool] = []
 
     for idx, auth in enumerate(authorships, start=1):
-        author = _get(f"https://api.openalex.org/{auth.get('author').get('id').split('/')[-1]}")
+        author_obj = auth.get("author") or {}
+        name = author_obj.get("display_name")
 
-        name = author.get("display_name")
         if not name:
             continue
 
-        institutions = author.get("affiliations") or []
-        affiliations = []
-        last_known_institutions = []
-
-        for institution in institutions:
-            inst = institution.get("institution") or {}
-            affiliations.append({
-                "name": inst.get("display_name"),
-                "country_code": inst.get("country_code"),
-                "type": inst.get("type"),
-                "id": inst.get("id"),
-                "years": institution.get("years"),
-            })
-
-        for last_inst in author.get("last_known_institutions", []):
-            last_known_institutions.append({
-                "name": last_inst.get("display_name"),
-                "country_code": last_inst.get("country_code"),
-                "type": last_inst.get("type"),
-                "id": last_inst.get("id"),
-            })
-
-        ids = author.get("ids") or {}
 
         na = NormalizedAuthor(
             full_name=name,
-            affiliations=affiliations,
-            last_known_institutions=last_known_institutions,
-            works_counted=author.get("works_count"),
-            cited_by_count=author.get("cited_by_count"),
-            topic_shares=auth.get("topic_share"),
-            orcid=ids.get("orcid"),
+            works_counted=0,
+            cited_by_count=0,
+            orcid=author_obj.get("orcid"),
+            affiliations=[],
+            last_known_institutions=[],
+            topics=[],
+            topic_shares=[],
             external_ids={
-                "openalex": author.get("id"),
-                "orcid": ids.get("orcid"),
-                "scopus": ids.get("scopus"),
-                "semantic_scholar": ids.get("semantic_scholar"),
+                "openalex": author_obj.get("id").split("/")[-1],
             },
         )
         authors.append(na)
         author_order.append(idx)
-        is_corr.append(False)  # OpenAlex doesn't expose this cleanly
+        is_corr.append(False)  # still no explicit “corresponding author” flag
+    
 
     return NormalizedPaper(
         title=title,
@@ -157,5 +132,59 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         referenced_works=work.get("referenced_works", []),
         related_works=work.get("related_works", []),
         concepts=concepts_map,
-        external_ids={"openalex": work.get("id")},
+        external_ids={"openalex": work.get("id").split("/")[-1]},
+        is_corresponding_flags=is_corr,
     )
+
+# for idx, auth in enumerate(authorships, start=1):
+#         try:
+#             author = _get(f"https://api.openalex.org/{auth.get('author').get('id').split('/')[-1]}")
+#         except AttributeError:
+#             continue
+
+#         name = author.get("display_name")
+#         if not name:
+#             continue
+
+#         institutions = author.get("affiliations") or []
+#         affiliations = []
+#         last_known_institutions = []
+
+#         for institution in institutions:
+#             inst = institution.get("institution") or {}
+#             affiliations.append({
+#                 "name": inst.get("display_name"),
+#                 "country_code": inst.get("country_code"),
+#                 "type": inst.get("type"),
+#                 "id": inst.get("id"),
+#                 "years": institution.get("years"),
+#             })
+
+#         for last_inst in author.get("last_known_institutions", []):
+#             last_known_institutions.append({
+#                 "name": last_inst.get("display_name"),
+#                 "country_code": last_inst.get("country_code"),
+#                 "type": last_inst.get("type"),
+#                 "id": last_inst.get("id"),
+#             })
+
+#         ids = author.get("ids") or {}
+
+#         na = NormalizedAuthor(
+#             full_name=name,
+#             affiliations=affiliations,
+#             last_known_institutions=last_known_institutions,
+#             works_counted=author.get("works_count"),
+#             cited_by_count=author.get("cited_by_count"),
+#             topic_shares=auth.get("topic_share"),
+#             orcid=ids.get("orcid"),
+#             external_ids={
+#                 "openalex": author.get("id"),
+#                 "orcid": ids.get("orcid"),
+#                 "scopus": ids.get("scopus"),
+#                 "semantic_scholar": ids.get("semantic_scholar"),
+#             },
+#         )
+#         authors.append(na)
+#         author_order.append(idx)
+#         is_corr.append(False)  # OpenAlex doesn't expose this cleanly

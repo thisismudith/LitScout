@@ -237,19 +237,13 @@ def ingest_openalex_concepts(
             return
 
     # Cap concurrency to avoid OpenAlex 429s
-    MAX_OPENALEX_WORKERS = 8
     CONCEPT_COUNT = len(concept_ids)
 
-    if max_workers is None or max_workers <= 0:
-        cpu = os.cpu_count() or 4
-        max_workers = min(len(concept_ids), cpu, MAX_OPENALEX_WORKERS)
+    cpu = os.cpu_count() or 4
+    if max_workers is None:
+        max_workers = min(CONCEPT_COUNT, cpu)
     else:
-        if max_workers > MAX_OPENALEX_WORKERS:
-            log.warn(
-                f"[INGEST-OA] Requested {max_workers} workers, "
-                f"capping to {MAX_OPENALEX_WORKERS} to respect OpenAlex rate limits."
-            )
-            max_workers = MAX_OPENALEX_WORKERS
+        max_workers = min(CONCEPT_COUNT, cpu, max_workers)
 
     log.info(
         f"[INGEST-OA] Starting parallel ingestion for {CONCEPT_COUNT} concepts "

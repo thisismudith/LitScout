@@ -64,7 +64,7 @@ def build_parser():
     # Single concept
     oa_parser = ingest_subp.add_parser("openalex", help="Ingest a single OpenAlex concept.")
     oa_parser.add_argument(
-        "--concept-id",
+        "--concept",
         required=True,
         help="OpenAlex concept ID, e.g., C41008148.",
     )
@@ -120,6 +120,34 @@ def build_parser():
     )
     oa_multi_parser.add_argument("--verify", action="store_true", help="Run verify/enrich pass instead of fresh ingest.")
 
+    # Enrich authors
+    
+    oa_enrich = ingest_subp.add_parser(
+        "enrich",
+        help="Enrich existing papers/authors with missing data from OpenAlex.",
+    )
+    oa_enrich.add_argument(
+        "--authors",
+        action="store_true",
+        help="Enrich authors.",
+    )
+    oa_enrich.add_argument(
+        "--papers",
+        action="store_true",
+        help="Enrich papers.",
+    )
+    oa_enrich.add_argument(
+        "--concepts",
+        nargs="*",
+        help="Optionally limit enrichment of papers linked to these OpenAlex concept IDs.",
+    )
+    oa_enrich.add_argument(
+        "--max-workers",
+        type=int,
+        default=None,
+        help="Maximum number of worker threads. ",
+    )
+
     return parser
 
 
@@ -165,47 +193,52 @@ def main():
                 pages=args.pages,
             )
             cli_log.success("OpenAlex ingestion completed successfully.")
+        elif args.ingest_cmd == "enrich":
+            if not args.authors and not args.papers:
+                cli_log.error("No enrichment target specified. Use --authors and/or --papers.")
+                return
+
+            from server.ingestion.openalex.enrich import enrich_openalex
+
+            cli_log.info(
+                f"Starting OpenAlex enrichment "
+                f"({'authors' if args.authors else ''}{' and ' if args.authors and args.papers else ''}"
+                f"{'papers' if args.papers else ''})..."
+            )
+            
+            enrich_openalex(
+                enrich_authors=args.authors,
+                enrich_papers=args.papers,
+                concept_ids=args.concept_ids or [],
+                max_workers=args.max_workers,
+            )
+            cli_log.success("OpenAlex enrichment completed.")
 
         elif args.ingest_cmd == "openalex-multi":
             fields = [f.strip() for f in (args.fields or []) if f.strip()]
-            if args.verify:
-                cli_log.info("Starting OpenAlex verification pass from DB...")
-                verify_and_enrich_papers()
-            else:
-                if not fields:
-                    cli_log.error(
-                        "No valid fields provided. Use --fields 'computer science' 'economics' ..."
-                    )
-                    return
-
-                    ingest_openalex_from_fields(
-                        fields=fields,
-                        pages=args.pages,
-                        max_workers=args.max_workers,
-                        skip_existing=args.skip_existing,
-                        per_field_limit=args.per_field_limit,
-                        verify=True,
-                    )
-
-                    cli_log.success("OpenAlex multi-field verification/enrichment completed.")
-
-                cli_log.info(
-                    "Starting OpenAlex multi-field ingestion for "
-                    f"fields={fields}, pages={args.pages}, "
-                    f"max_workers={args.max_workers}, "
-                    f"skip_existing={args.skip_existing}, "
-                    f"per_field_limit={args.per_field_limit}..."
+            if not fields:
+                cli_log.error(
+                    "No valid fields provided. Use --fields 'computer science' 'economics' ..."
                 )
+                return
 
-                ingest_openalex_from_fields(
-                    fields=fields,
-                    pages=args.pages,
-                    max_workers=args.max_workers,
-                    skip_existing=args.skip_existing,
-                    per_field_limit=args.per_field_limit,
-                )
+            cli_log.info(
+                "Starting OpenAlex multi-field ingestion for "
+                f"fields={fields}, pages={args.pages}, "
+                f"max_workers={args.max_workers}, "
+                f"skip_existing={args.skip_existing}, "
+                f"per_field_limit={args.per_field_limit}..."
+            )
 
-                cli_log.success("OpenAlex multi-field ingestion completed.")
+            ingest_openalex_from_fields(
+                fields=fields,
+                pages=args.pages,
+                max_workers=args.max_workers,
+                skip_existing=args.skip_existing,
+                per_field_limit=args.per_field_limit,
+            )
+
+            cli_log.success("OpenAlex multi-field ingestion completed.")
 
     else:
         cli_log.error("Unknown command.")

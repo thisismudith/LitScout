@@ -167,6 +167,13 @@ def upsert_author(cur, author: NormalizedAuthor) -> int:
         VALUES 
             (%s, %s, %s,
             %s, %s, %s)
+        ON CONFLICT (orcid) DO UPDATE
+          SET full_name   = EXCLUDED.full_name,
+              affiliations = EXCLUDED.affiliations,
+              last_known_institutions = EXCLUDED.last_known_institutions,
+              topic_shares = EXCLUDED.topic_shares,
+              orcid       = EXCLUDED.orcid,
+              external_ids = EXCLUDED.external_ids
         RETURNING id;
         """,
         (author.full_name, Json(author.affiliations), Json(author.last_known_institutions),

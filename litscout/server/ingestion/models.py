@@ -29,6 +29,7 @@ class NormalizedAuthor:
     orcid: Optional[str]
     affiliations: List[Dict[str, Any]] = field(default_factory=list)
     last_known_institutions: List[Dict[str, Any]] = field(default_factory=list)
+    topics: List[Dict[str, Any]] = field(default_factory=list)
     topic_shares: List[Dict[str, Any]] = field(default_factory=list)
     external_ids: Dict[str, Any] = field(default_factory=dict)
 

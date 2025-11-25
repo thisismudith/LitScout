@@ -3,6 +3,7 @@
 from colorama import Fore, Style, init as colorama_init
 from datetime import datetime
 import sys
+import threading
 from tqdm import tqdm
 
 # Initialize once for whole project
@@ -28,10 +29,11 @@ class ColorLogger:
     COLOR_CMD = Fore.MAGENTA
 
 
-    def __init__(self, name: str = "", tag_color: str = Fore.CYAN, include_timestamps: bool = False):
+    def __init__(self, name: str = "", tag_color: str = Fore.CYAN, include_timestamps: bool = False, include_threading_id: bool = True):
         self.name = name.upper()
         self.include_name = bool(name)
         self.include_timestamps = include_timestamps
+        self.include_threading_id = include_threading_id
         self.tag_color = tag_color
 
     def _tag(self, label: str, color: str) -> str:
@@ -52,12 +54,10 @@ class ColorLogger:
 
     def _print(self, tag: str, message: str, color: str = Fore.RESET):
         # print to stderr so we don't fight with tqdm/progress bars on stdout
-        tqdm.write(
-            f"{tag} {color}{message}{Style.RESET_ALL}",
-            # file=sys.stderr,
-            # flush=True,
-        )
-
+        if self.include_threading_id:
+            tqdm.write(f"{tag} {color}{message}{Style.RESET_ALL} [{threading.get_ident()}]")
+        else:
+            tqdm.write(f"{tag} {color}{message}{Style.RESET_ALL}")
 
     # Public Logging Method
     def info(self, message: str, use_color: bool = True):
