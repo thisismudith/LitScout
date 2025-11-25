@@ -10,7 +10,7 @@ from colorama import Fore
 
 from server.logger import ColorLogger
 
-log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
+log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False, include_threading_id=False)
 
 # Shared env-based configuration
 ENV_DB_NAME = os.getenv("LITSCOUT_DB_NAME", "litscout")

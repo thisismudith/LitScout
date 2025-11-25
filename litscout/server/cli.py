@@ -17,7 +17,7 @@ from server.ingestion.openalex.enrich import enrich_openalex
 from server.embeddings.papers import embed_missing_papers
 
 
-cli_log = ColorLogger("CLI", include_timestamps=False)
+cli_log = ColorLogger("CLI", include_timestamps=False, include_threading_id=False)
 
 
 def add_db_options(parser: argparse.ArgumentParser):
@@ -79,7 +79,7 @@ def build_parser():
     oa_multi_parser.add_argument("--verify", action="store_true", help="Run verify/enrich pass instead of fresh ingest.")
 
     # Enrich authors/papers/concepts
-    oa_enrich = ingest_subp.add_parser("enrich", help="Enrich existing papers/authors with missing data from OpenAlex.")
+    oa_enrich = subparsers.add_parser("enrich", help="Enrich existing papers/authors with missing data from OpenAlex.")
     oa_enrich.add_argument("--authors", action="store_true", help="Enrich authors.")
     oa_enrich.add_argument("--papers", action="store_true", help="Enrich papers.")
     oa_enrich.add_argument("--concepts", action="store_true", help="Enrich concepts.")
@@ -91,13 +91,11 @@ def build_parser():
     embed_sub = embed_parser.add_subparsers(dest="embed_command", required=True)
 
     embed_papers_parser = embed_sub.add_parser("papers", help="Embed papers into vectors using an embedding model.")
-    embed_papers_parser.add_argument("--api-key", default=None, help="OpenAI API key. If not provided, will use OPENAI_API_KEY env variable.")
-    embed_papers_parser.add_argument("--model", default="text-embedding-3-large",
-        help="Embedding model name (default: text-embedding-3-large)."
+    embed_papers_parser.add_argument("--model", default="bge-small-en-v1.5-local", 
+        help="Embedding model name (default: bge-small-en-v1.5-local)."
     )
     embed_papers_parser.add_argument("--batch-size", type=int, default=64, help="Embedding batch size per API call.")
     embed_papers_parser.add_argument("--limit", type=int, default=None, help="Optional max number of papers to embed (for testing).")
-    embed_papers_parser.add_argument("--max-workers", type=int, default=None, help="Maximum number of worker threads. ")
 
     return parser
 
@@ -134,28 +132,6 @@ def main():
             cli_log.info(f"Starting OpenAlex ingestion for concept {args.concept_id} ({args.pages} pages)...")
             ingest_openalex_concept(concept_id=args.concept_id, pages=args.pages)
 
-        elif args.ingest_cmd == "enrich":
-            if not args.authors and not args.papers and not args.concepts:
-                cli_log.error("No enrichment target specified. Use at least one of --authors, --papers and --concepts.")
-                return
-
-            msg = []
-            if args.authors: msg.append("authors")
-            if args.papers:
-                papers_msg = "papers"
-                if args.concept_ids:
-                    papers_msg += f" with concepts: {' '.join(args.concept_ids)}"
-                msg.append(papers_msg)
-            if args.concepts: msg.append("concepts")
-            
-            cli_log.info(f"Starting OpenAlex enrichment for {', '.join(msg)}...")
-            max_workers = min(os.cpu_count() or 4, max_workers or 4)
-            
-            enrich_openalex(
-                enrich_authors=args.authors, enrich_papers=args.papers, enrich_concepts=args.concepts,
-                concept_ids=[c.strip() for c in (args.concept_ids or []) if c.strip()], max_workers=max_workers
-            )
-
         elif args.ingest_cmd == "openalex-multi":
             fields = [f.strip() for f in (args.fields or []) if f.strip()]
             if not fields:
@@ -173,17 +149,34 @@ def main():
                 skip_existing=args.skip_existing, per_field_limit=args.per_field_limit,
             )
 
+    # ENRICH COMMAND
+    elif args.category == "enrich":
+        if not args.authors and not args.papers and not args.concepts:
+            cli_log.error("No enrichment target specified. Use at least one of --authors, --papers and --concepts.")
+            return
+
+        msg = []
+        if args.authors: msg.append("authors")
+        if args.papers:
+            papers_msg = "papers"
+            if args.concept_ids:
+                papers_msg += f" with concepts: {' '.join(args.concept_ids)}"
+            msg.append(papers_msg)
+        if args.concepts: msg.append("concepts")
+        
+        max_workers = min(os.cpu_count() or 4, args.max_workers or 4)
+        cli_log.info(f"Starting OpenAlex enrichment for {', '.join(msg)} with {max_workers} workers...")
+        
+        enrich_openalex(
+            enrich_authors=args.authors, enrich_papers=args.papers, enrich_concepts=args.concepts,
+            concept_ids=[c.strip() for c in (args.concept_ids or []) if c.strip()], max_workers=max_workers
+        )
+
     # EMBEDDING COMMANDS
     elif args.category == "embed":
         if args.embed_command == "papers":
-
-            max_workers = min(os.cpu_count() or 4, args.max_workers or 4)
             cli_log.info(f"Embedding papers using model '{args.model}'...")
-
-            embed_missing_papers(
-                api_key=args.api_key, model_name=args.model, batch_size=args.batch_size, 
-                limit=args.limit, max_workers=max_workers,
-            )
+            embed_missing_papers(model_name=args.model, batch_size=args.batch_size, limit=args.limit)
 
     else:
         cli_log.error("Unknown command.")

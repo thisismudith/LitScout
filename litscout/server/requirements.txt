@@ -1,5 +1,9 @@
-colorama
-openai
-psycopg2-binary
-requests
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch
+torchvision
+torchaudio
 tqdm
+sentence-transformers
+requests
+psycopg2-binary
+colorama

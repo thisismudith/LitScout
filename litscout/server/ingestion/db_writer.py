@@ -36,7 +36,7 @@ def get_conn():
             port=port,
             purpose=f"ingestion connection to '{dbname}'",
         )
-        conn.autocommit = False
+        conn.autocommit = True
         return conn
     except OperationalError as e:
         # Only log on real failure
@@ -46,9 +46,7 @@ def get_conn():
         log.error(str(e))
         raise
 
-# ---------------------------------------------------------
 # VENUE + VENUE INSTANCES
-# ---------------------------------------------------------
 def upsert_venue(cur, venue: NormalizedVenue) -> int:
     """
     Insert or reuse a venue.
@@ -72,12 +70,12 @@ def upsert_venue(cur, venue: NormalizedVenue) -> int:
                             location, rank_label, external_ids)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (name) DO UPDATE
-          SET short_name   = EXCLUDED.short_name,
-              venue_type   = EXCLUDED.venue_type,
-              homepage_url = EXCLUDED.homepage_url,
-              location     = EXCLUDED.location,
-              rank_label   = EXCLUDED.rank_label,
-              external_ids = EXCLUDED.external_ids
+        SET short_name   = EXCLUDED.short_name,
+            venue_type   = EXCLUDED.venue_type,
+            homepage_url = EXCLUDED.homepage_url,
+            location     = EXCLUDED.location,
+            rank_label   = EXCLUDED.rank_label,
+            external_ids = EXCLUDED.external_ids
         RETURNING id;
         """,
         (
@@ -100,7 +98,7 @@ def get_or_create_venue_instance(cur, venue_id: int, year: int | None):
     """
     if year is None:
         return None
-
+    
     cur.execute(
         """
         SELECT id FROM venue_instances
@@ -180,15 +178,15 @@ def upsert_author(cur, author: NormalizedAuthor) -> int:
             %s, %s, %s)
         ON CONFLICT (orcid) DO UPDATE
             SET full_name               = EXCLUDED.full_name,
-              affiliations              = EXCLUDED.affiliations,
-              last_known_institutions   = EXCLUDED.last_known_institutions,
-              topic_shares              = EXCLUDED.topic_shares,
-              orcid                     = EXCLUDED.orcid,
-              external_ids              = EXCLUDED.external_ids
+            affiliations              = EXCLUDED.affiliations,
+            last_known_institutions   = EXCLUDED.last_known_institutions,
+            topic_shares              = EXCLUDED.topic_shares,
+            orcid                     = EXCLUDED.orcid,
+            external_ids              = EXCLUDED.external_ids
         RETURNING id;
         """,
         (author.full_name, Json(author.affiliations), Json(author.last_known_institutions),
-         Json(author.topic_shares), author.orcid, Json(ext)
+        Json(author.topic_shares), author.orcid, Json(ext)
         ),
     )
     (author_id,) = cur.fetchone()
@@ -221,19 +219,19 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
                 %s, %s, %s, %s, %s,
                 %s, %s, %s, %s)
             ON CONFLICT (doi) DO UPDATE
-               SET title            = EXCLUDED.title,
-                   abstract         = EXCLUDED.abstract,
-                   conclusion       = EXCLUDED.conclusion,
-                   year             = EXCLUDED.year,
-                   publication_date = EXCLUDED.publication_date,
-                   field            = EXCLUDED.field,
-                   language         = EXCLUDED.language,
-                   referenced_works = EXCLUDED.referenced_works,
-                   related_works    = EXCLUDED.related_works,
-                   venue_id         = EXCLUDED.venue_id,
-                   venue_instance_id= EXCLUDED.venue_instance_id,
-                   concepts         = EXCLUDED.concepts,
-                   external_ids     = EXCLUDED.external_ids
+            SET title            = EXCLUDED.title,
+                abstract         = EXCLUDED.abstract,
+                conclusion       = EXCLUDED.conclusion,
+                year             = EXCLUDED.year,
+                publication_date = EXCLUDED.publication_date,
+                field            = EXCLUDED.field,
+                language         = EXCLUDED.language,
+                referenced_works = EXCLUDED.referenced_works,
+                related_works    = EXCLUDED.related_works,
+                venue_id         = EXCLUDED.venue_id,
+                venue_instance_id= EXCLUDED.venue_instance_id,
+                concepts         = EXCLUDED.concepts,
+                external_ids     = EXCLUDED.external_ids
             RETURNING id;
             """,
             (
@@ -312,6 +310,7 @@ def insert_paper_authors(cur, paper_id, p: NormalizedPaper, author_ids: List[int
         author_id = author_ids[idx]
         order = p.author_order[idx] if idx < len(p.author_order) else idx + 1
         corr = p.is_corresponding_flags[idx] if idx < len(p.is_corresponding_flags) else False
+
 
         cur.execute(
             """

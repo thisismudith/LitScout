@@ -12,7 +12,7 @@ MAX_RETRIES = 5
 BACKOFF_BASE = 1.5
 INITIAL_DELAY = 1.0  # seconds
 
-log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True, include_threading_id=False)
+log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True)
 
 def _get(url: str, params: dict | None = None) -> dict:
     """

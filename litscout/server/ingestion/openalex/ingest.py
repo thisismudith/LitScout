@@ -21,7 +21,7 @@ from server.ingestion.openalex.client import iter_works_for_concept
 from server.ingestion.openalex.normalizer import normalize_openalex_work
 from server.utils.progress import create_progress_bar
 
-log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True)
+log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True, include_threading_id=False)
 
 OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
 
