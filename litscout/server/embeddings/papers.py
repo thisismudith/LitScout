@@ -27,24 +27,18 @@ HF_MODEL_NAME = os.getenv("LITSCOUT_EMBED_MODEL", "BAAI/bge-small-en-v1.5")
 
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
-# log.info(f"Loading local embedding model '{HF_MODEL_NAME}' on device '{DEVICE}'...")
-_model = SentenceTransformer(HF_MODEL_NAME, device=DEVICE)
 
+# Embedding helpers
+def embed_texts_local(texts: List[str], batch_size: int = 64) -> List[List[float]]:
 
-# -------------------------------------------------------------------
-# Low-level: embedding helpers
-# -------------------------------------------------------------------
-
-def embed_texts_local(
-    texts: List[str],
-    batch_size: int = 64,
-) -> List[List[float]]:
     """
     Embed a list of texts using the local sentence-transformers model.
     Runs fully locally on CPU/GPU (no network, no API keys).
     Returns a list of embedding vectors (lists of floats).
     """
     all_vectors: List[List[float]] = []
+    log.info(f"Loading local embedding model '{HF_MODEL_NAME}' on device '{DEVICE}'...")
+    _model = SentenceTransformer(HF_MODEL_NAME, device=DEVICE)
 
     # We could just call encode(texts, batch_size=batch_size), but
     # this loop gives us an easy place to add retries if needed.
@@ -54,10 +48,8 @@ def embed_texts_local(
         for attempt in range(3):
             try:
                 vecs = _model.encode(
-                    batch,
-                    batch_size=len(batch),
-                    show_progress_bar=False,
-                    convert_to_numpy=True,
+                    batch, batch_size=len(batch),
+                    show_progress_bar=False, convert_to_numpy=True,
                     normalize_embeddings=True,  # good for cosine similarity / vector search
                 )
                 all_vectors.extend(vecs.tolist())
@@ -105,11 +97,7 @@ def _build_paper_text(row: dict) -> Optional[str]:
     return "\n\n".join(parts)
 
 
-def _select_papers_needing_embeddings(
-    cur,
-    model_name: str,
-    limit: Optional[int] = None,
-):
+def _select_papers_needing_embeddings(cur, model_name: str, limit: Optional[int] = None):
     """
     Select papers that don't yet have an embedding for the given model_name.
     (model_name here is just the label you store in paper_embeddings.model_name)
@@ -132,12 +120,7 @@ def _select_papers_needing_embeddings(
     return cur.fetchall()
 
 
-def _insert_embeddings_batch(
-    cur,
-    model_name: str,
-    paper_ids: List[int],
-    embeddings: List[List[float]],
-):
+def _insert_embeddings_batch(cur, model_name: str, paper_ids: List[int], embeddings: List[List[float]]):
     """
     Insert (or upsert) a batch of embeddings into paper_embeddings.
     """
@@ -154,10 +137,6 @@ def _insert_embeddings_batch(
             (pid, vec, model_name),
         )
 
-
-# -------------------------------------------------------------------
-# Public API (single-process, GPU/CPU parallelism inside the model)
-# -------------------------------------------------------------------
 
 def embed_missing_papers(model_name: str = "bge-small-en-v1.5-local", batch_size: int = 64, limit: Optional[int] = None) -> None:
     """
