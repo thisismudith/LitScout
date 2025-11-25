@@ -195,6 +195,8 @@ def ingest_openalex_concept(
         raise
 
     finally:
+        if progress is not None:
+            progress.close()
         cur.close()
         conn.close()
 
@@ -235,7 +237,7 @@ def ingest_openalex_concepts(
             return
 
     # Cap concurrency to avoid OpenAlex 429s
-    MAX_OPENALEX_WORKERS = 4
+    MAX_OPENALEX_WORKERS = 8
     CONCEPT_COUNT = len(concept_ids)
 
     if max_workers is None or max_workers <= 0:
@@ -264,8 +266,8 @@ def ingest_openalex_concepts(
         except Exception as e:
             return cid, False, str(e)
 
-    # concept-level progress bar
-    progress = create_progress_bar(
+    # Progress bars
+    concept_bar = create_progress_bar(
         total=len(concept_ids),
         desc="Concepts",
         unit="concept",
@@ -293,9 +295,9 @@ def ingest_openalex_concepts(
                     results.append((cid, False, str(e)))
                 finally:
                     # update bar for each finished concept
-                    progress.update(1)
+                    concept_bar.update(1)
     finally:
-        progress.close()
+        concept_bar.close()
 
     # Summary
     success_count = sum(1 for _, ok, _ in results if ok)

@@ -24,8 +24,12 @@ class NormalizedVenueInstance:
 @dataclass
 class NormalizedAuthor:
     full_name: str
-    affiliation: Optional[str]
+    works_counted: Optional[int]
+    cited_by_count: Optional[int]
     orcid: Optional[str]
+    affiliations: List[Dict[str, Any]] = field(default_factory=list)
+    last_known_institutions: List[Dict[str, Any]] = field(default_factory=list)
+    topic_shares: List[Dict[str, Any]] = field(default_factory=list)
     external_ids: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -45,5 +49,6 @@ class NormalizedPaper:
     author_order: List[int] = field(default_factory=list)
     referenced_works: List[str] = field(default_factory=list)
     related_works: List[str] = field(default_factory=list)
-    is_corresponding_flags: List[bool] = field(default_factory=list)
+    concepts: Dict[str, Any] = field(default_factory=dict)
     external_ids: Dict[str, Any] = field(default_factory=dict)
+    is_corresponding_flags: List[bool] = field(default_factory=list)

@@ -92,7 +92,7 @@ def iter_works_for_concept(concept_id: str, pages: int = 1):
             "cursor": cursor,
         }
 
-        data = _get(url, params=params)   # ✅ now returns dict
+        data = _get(url, params=params)
         results = data.get("results", [])
         if not results:
             break

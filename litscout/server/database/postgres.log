@@ -2637,3 +2637,1007 @@
 2025-11-24 05:48:35.139 IST [8112] LOG:  could not reserve shared memory region (addr=0000017B03B10000) for child 00000000000015E4: error code 487
 2025-11-24 05:51:53.326 IST [2268] LOG:  checkpoint complete: wrote 2090 buffers (12.8%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=229.824 s, sync=0.244 s, total=230.091 s; sync files=373, longest=0.003 s, average=0.001 s; distance=15920 kB, estimate=15920 kB; lsn=0/411D7A8, redo lsn=0/277D3D0
 2025-11-24 05:58:03.373 IST [2268] LOG:  checkpoint starting: time
+2025-11-24 06:01:58.205 IST [8112] LOG:  received fast shutdown request
+2025-11-24 06:01:58.208 IST [8112] LOG:  aborting any active transactions
+2025-11-24 06:01:58.213 IST [8112] LOG:  background worker "logical replication launcher" (PID 29808) exited with exit code 1
+2025-11-24 06:01:58.256 IST [2268] LOG:  checkpoint complete: wrote 3485 buffers (21.3%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=234.839 s, sync=0.025 s, total=234.884 s; sync files=34, longest=0.004 s, average=0.001 s; distance=47248 kB, estimate=47248 kB; lsn=0/55C4F70, redo lsn=0/55A14A8
+2025-11-24 06:01:58.258 IST [2268] LOG:  shutting down
+2025-11-24 06:01:58.260 IST [2268] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 06:01:58.266 IST [2268] LOG:  checkpoint complete: wrote 1 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.009 s; sync files=1, longest=0.001 s, average=0.001 s; distance=142 kB, estimate=42537 kB; lsn=0/55C4FE8, redo lsn=0/55C4FE8
+2025-11-24 06:01:58.292 IST [8112] LOG:  database system is shut down
+2025-11-24 06:03:27.834 IST [33492] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:03:27.838 IST [33492] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:03:27.838 IST [33492] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:03:27.888 IST [29004] LOG:  database system was shut down at 2025-11-24 06:03:17 IST
+2025-11-24 06:03:27.894 IST [33492] LOG:  database system is ready to accept connections
+2025-11-24 06:06:06.799 IST [33872] ERROR:  canceling statement due to user request
+2025-11-24 06:06:06.799 IST [33492] LOG:  received fast shutdown request
+2025-11-24 06:06:06.799 IST [15984] LOG:  shutting down
+2025-11-24 06:06:06.801 IST [33492] LOG:  aborting any active transactions
+2025-11-24 06:06:06.801 IST [34412] FATAL:  terminating connection due to administrator command
+2025-11-24 06:06:06.801 IST [22188] FATAL:  terminating connection due to administrator command
+2025-11-24 06:06:06.801 IST [2652] FATAL:  terminating connection due to administrator command
+2025-11-24 06:06:06.801 IST [37412] FATAL:  terminating connection due to administrator command
+2025-11-24 06:06:06.802 IST [15984] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 06:06:06.806 IST [33492] LOG:  background worker "logical replication launcher" (PID 33872) exited with exit code 1
+2025-11-24 06:06:06.870 IST [22592] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.874 IST [33732] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.878 IST [25540] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.880 IST [31472] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.899 IST [14092] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.900 IST [33044] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.905 IST [26788] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.908 IST [32216] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.927 IST [16208] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.933 IST [19348] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.935 IST [33916] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.938 IST [3356] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.956 IST [17604] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.961 IST [35940] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.966 IST [38412] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.970 IST [3672] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.986 IST [37088] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.988 IST [29848] FATAL:  the database system is shutting down
+2025-11-24 06:06:06.996 IST [16180] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.000 IST [33128] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.013 IST [12368] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.018 IST [30408] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.023 IST [25252] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.030 IST [32444] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.041 IST [7160] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.045 IST [35300] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.052 IST [38244] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.058 IST [37328] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.068 IST [11668] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.073 IST [35748] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.080 IST [33012] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.085 IST [30464] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.094 IST [30768] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.100 IST [30332] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.108 IST [24664] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.114 IST [32316] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.121 IST [16464] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.128 IST [18628] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.137 IST [33484] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.144 IST [22192] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.149 IST [29880] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.158 IST [18172] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.167 IST [22136] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.174 IST [34740] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.176 IST [12452] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.185 IST [1848] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.197 IST [27052] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.204 IST [29324] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.204 IST [14872] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.212 IST [29064] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.224 IST [29516] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.232 IST [36452] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.236 IST [36884] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.239 IST [30832] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.254 IST [31940] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.263 IST [15220] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.265 IST [324] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.268 IST [37508] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.282 IST [28468] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.291 IST [27368] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.292 IST [28540] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.297 IST [31096] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.311 IST [29544] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.314 IST [15984] LOG:  checkpoint complete: wrote 4944 buffers (30.2%), wrote 8 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=0.198 s, sync=0.293 s, total=0.515 s; sync files=373, longest=0.011 s, average=0.001 s; distance=52878 kB, estimate=52878 kB; lsn=0/4B94D70, redo lsn=0/4B94D70
+2025-11-24 06:06:07.320 IST [22452] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.323 IST [33856] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.327 IST [10056] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.340 IST [22024] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.349 IST [8560] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.353 IST [33504] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.356 IST [38808] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.367 IST [17692] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.378 IST [33692] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.381 IST [32760] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.384 IST [19192] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.396 IST [2592] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.404 IST [23456] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.408 IST [38584] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.411 IST [35468] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.425 IST [9304] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.432 IST [37584] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.434 IST [34980] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.438 IST [29552] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.472 IST [11844] FATAL:  the database system is shutting down
+2025-11-24 06:06:07.484 IST [33492] LOG:  database system is shut down
+2025-11-24 06:13:43.519 IST [15600] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:13:43.523 IST [15600] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:13:43.523 IST [15600] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:13:43.574 IST [37112] LOG:  database system was shut down at 2025-11-24 06:13:34 IST
+2025-11-24 06:13:43.580 IST [15600] LOG:  database system is ready to accept connections
+2025-11-24 06:16:40.356 IST [35468] ERROR:  canceling statement due to user request
+2025-11-24 06:16:40.356 IST [35468] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5012983278';
+2025-11-24 06:16:40.357 IST [22028] ERROR:  canceling statement due to user request
+2025-11-24 06:16:40.357 IST [15600] LOG:  received fast shutdown request
+2025-11-24 06:16:40.357 IST [36144] LOG:  shutting down
+2025-11-24 06:16:40.361 IST [15600] LOG:  aborting any active transactions
+2025-11-24 06:16:40.361 IST [35468] FATAL:  terminating connection due to administrator command
+2025-11-24 06:16:40.361 IST [12500] FATAL:  terminating connection due to administrator command
+2025-11-24 06:16:40.361 IST [37996] FATAL:  terminating connection due to administrator command
+2025-11-24 06:16:40.362 IST [6836] FATAL:  terminating connection due to administrator command
+2025-11-24 06:16:40.362 IST [15600] LOG:  background worker "logical replication launcher" (PID 22028) exited with exit code 1
+2025-11-24 06:16:40.362 IST [36144] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 06:16:40.397 IST [14784] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.425 IST [33764] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.451 IST [37396] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.475 IST [23228] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.502 IST [24080] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.530 IST [21136] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.555 IST [33572] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.580 IST [20072] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.606 IST [36584] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.630 IST [35760] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.656 IST [32424] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.682 IST [37260] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.708 IST [29384] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.734 IST [37148] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.759 IST [29328] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.783 IST [8000] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.804 IST [36144] LOG:  checkpoint complete: wrote 7666 buffers (46.8%), wrote 11 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=0.191 s, sync=0.230 s, total=0.447 s; sync files=373, longest=0.016 s, average=0.001 s; distance=88435 kB, estimate=88435 kB; lsn=0/6E4DDE8, redo lsn=0/6E4DDE8
+2025-11-24 06:16:40.808 IST [26812] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.835 IST [29136] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.860 IST [38244] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.885 IST [31240] FATAL:  the database system is shutting down
+2025-11-24 06:16:40.897 IST [15600] LOG:  database system is shut down
+2025-11-24 06:17:13.706 IST [196] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:17:13.710 IST [196] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:17:13.710 IST [196] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:17:13.755 IST [15968] LOG:  database system was shut down at 2025-11-24 06:16:40 IST
+2025-11-24 06:17:13.764 IST [196] LOG:  database system is ready to accept connections
+2025-11-24 06:18:11.809 IST [196] LOG:  client backend (PID 33064) was terminated by exception 0xC000013A
+2025-11-24 06:18:11.809 IST [196] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 06:18:11.809 IST [196] LOG:  terminating any other active server processes
+2025-11-24 06:18:11.820 IST [196] LOG:  all server processes terminated; reinitializing
+^C2025-11-24 06:18:16.323 IST [30284] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:18:16.327 IST [30284] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:18:16.327 IST [30284] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:18:16.377 IST [27956] LOG:  database system was interrupted; last known up at 2025-11-24 06:17:13 IST
+2025-11-24 06:18:16.600 IST [27956] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-24 06:18:16.603 IST [27956] LOG:  redo starts at 0/6E4DE60
+2025-11-24 06:18:16.754 IST [27956] LOG:  invalid record length at 0/A2F9BF0: expected at least 24, got 0
+2025-11-24 06:18:16.754 IST [27956] LOG:  redo done at 0/A2F9BC8 system usage: CPU: user: 0.01 s, system: 0.10 s, elapsed: 0.15 s
+2025-11-24 06:18:16.760 IST [31424] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-24 06:18:16.934 IST [31424] LOG:  checkpoint complete: wrote 6744 buffers (41.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=0.091 s, sync=0.068 s, total=0.177 s; sync files=35, longest=0.021 s, average=0.002 s; distance=53935 kB, estimate=53935 kB; lsn=0/A2F9BF0, redo lsn=0/A2F9BF0
+2025-11-24 06:18:16.943 IST [30284] LOG:  database system is ready to accept connections
+2025-11-24 06:18:46.136 IST [30284] LOG:  client backend (PID 28872) was terminated by exception 0xC000013A
+2025-11-24 06:18:46.136 IST [30284] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 06:18:46.136 IST [30284] LOG:  terminating any other active server processes
+2025-11-24 06:18:46.151 IST [30284] LOG:  all server processes terminated; reinitializing
+^C2025-11-24 06:22:07.409 IST [36172] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:22:07.415 IST [36172] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:22:07.415 IST [36172] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:22:07.459 IST [14724] LOG:  database system was shut down at 2025-11-24 06:21:57 IST
+2025-11-24 06:22:07.465 IST [36172] LOG:  database system is ready to accept connections
+2025-11-24 06:23:03.970 IST [6812] ERROR:  canceling statement due to user request
+2025-11-24 06:23:03.970 IST [7288] LOG:  shutting down
+2025-11-24 06:23:03.970 IST [36172] LOG:  received fast shutdown request
+2025-11-24 06:23:03.974 IST [7288] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 06:23:03.974 IST [36172] LOG:  aborting any active transactions
+2025-11-24 06:23:03.974 IST [20328] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [12512] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [5876] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [17100] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [35420] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [18628] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [25752] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.975 IST [27424] FATAL:  terminating connection due to administrator command
+2025-11-24 06:23:03.983 IST [36172] LOG:  background worker "logical replication launcher" (PID 6812) exited with exit code 1
+2025-11-24 06:23:04.283 IST [7288] LOG:  checkpoint complete: wrote 1859 buffers (11.3%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.107 s, sync=0.191 s, total=0.313 s; sync files=360, longest=0.002 s, average=0.001 s; distance=13116 kB, estimate=13116 kB; lsn=0/24C02F0, redo lsn=0/24C02F0
+2025-11-24 06:23:04.352 IST [36172] LOG:  database system is shut down
+2025-11-24 06:23:45.234 IST [30416] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:23:45.238 IST [30416] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:23:45.238 IST [30416] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:23:45.289 IST [9772] LOG:  database system was shut down at 2025-11-24 06:23:36 IST
+2025-11-24 06:23:45.296 IST [30416] LOG:  database system is ready to accept connections
+2025-11-24 06:28:45.908 IST [20092] LOG:  checkpoint starting: time
+2025-11-24 06:52:57.459 IST [20092] LOG:  checkpoint complete: wrote 7521 buffers (45.9%), wrote 24 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=1451.278 s, sync=0.215 s, total=1451.552 s; sync files=373, longest=0.015 s, average=0.001 s; distance=224900 kB, estimate=224900 kB; lsn=0/188391D8, redo lsn=0/F392380
+2025-11-24 06:52:57.461 IST [20092] LOG:  checkpoint starting: time
+2025-11-24 06:53:42.684 IST [30416] LOG:  background worker "parallel worker" (PID 30956) was terminated by exception 0xC000013A
+2025-11-24 06:53:42.684 IST [30416] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 06:53:42.684 IST [30416] LOG:  terminating any other active server processes
+2025-11-24 06:53:42.751 IST [6716] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-11-24 06:53:42.757 IST [30416] LOG:  all server processes terminated; reinitializing
+^C2025-11-24 06:54:11.144 IST [29724] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 06:54:11.149 IST [29724] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 06:54:11.149 IST [29724] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 06:54:11.198 IST [34708] LOG:  database system was interrupted; last known up at 2025-11-24 06:52:57 IST
+2025-11-24 06:54:11.419 IST [34708] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-24 06:54:11.423 IST [34708] LOG:  redo starts at 0/F392380
+2025-11-24 06:54:11.962 IST [34708] LOG:  invalid record length at 0/1AB8E970: expected at least 24, got 0
+2025-11-24 06:54:11.962 IST [34708] LOG:  redo done at 0/1AB8E948 system usage: CPU: user: 0.31 s, system: 0.21 s, elapsed: 0.53 s
+2025-11-24 06:54:11.966 IST [31852] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-24 06:54:12.417 IST [31852] LOG:  checkpoint complete: wrote 16283 buffers (99.4%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 11 recycled; write=0.190 s, sync=0.225 s, total=0.453 s; sync files=33, longest=0.107 s, average=0.007 s; distance=188401 kB, estimate=188401 kB; lsn=0/1AB8E970, redo lsn=0/1AB8E970
+2025-11-24 06:54:12.430 IST [29724] LOG:  database system is ready to accept connections
+2025-11-24 06:56:33.139 IST [29724] LOG:  could not reserve shared memory region (addr=00000295CEEF0000) for child 000000000000175C: error code 487
+2025-11-24 06:59:11.889 IST [31852] LOG:  checkpoint starting: time
+2025-11-24 07:02:27.722 IST [29724] LOG:  background worker "parallel worker" (PID 35432) was terminated by exception 0xC000013A
+2025-11-24 07:02:27.722 IST [29724] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 07:02:27.722 IST [29724] LOG:  terminating any other active server processes
+2025-11-24 07:02:27.759 IST [35860] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2025-11-24 07:02:27.763 IST [29724] LOG:  all server processes terminated; reinitializing
+^C2025-11-24 07:02:53.313 IST [36528] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 07:02:53.317 IST [36528] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 07:02:53.317 IST [36528] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 07:02:53.382 IST [39988] LOG:  database system was shut down at 2025-11-24 07:02:47 IST
+2025-11-24 07:02:53.388 IST [36528] LOG:  database system is ready to accept connections
+2025-11-24 07:07:53.744 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:12:23.405 IST [5580] LOG:  checkpoint complete: wrote 7929 buffers (48.4%), wrote 25 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=269.355 s, sync=0.247 s, total=269.662 s; sync files=373, longest=0.014 s, average=0.001 s; distance=225249 kB, estimate=225249 kB; lsn=0/1C0AEF68, redo lsn=0/F3E9820
+2025-11-24 07:12:53.388 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:17:23.197 IST [5580] LOG:  checkpoint complete: wrote 3316 buffers (20.2%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 13 recycled; write=269.678 s, sync=0.061 s, total=269.810 s; sync files=33, longest=0.008 s, average=0.002 s; distance=217552 kB, estimate=224479 kB; lsn=0/262A3A98, redo lsn=0/1C85DB58
+2025-11-24 07:17:53.213 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:22:23.116 IST [5580] LOG:  checkpoint complete: wrote 1658 buffers (10.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 10 recycled; write=269.805 s, sync=0.041 s, total=269.904 s; sync files=33, longest=0.008 s, average=0.002 s; distance=165420 kB, estimate=218574 kB; lsn=0/32D5DB78, redo lsn=0/269E8DC0
+2025-11-24 07:22:53.122 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:27:23.337 IST [5580] LOG:  checkpoint complete: wrote 2351 buffers (14.3%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 13 recycled; write=269.917 s, sync=0.205 s, total=270.215 s; sync files=34, longest=0.075 s, average=0.007 s; distance=207622 kB, estimate=217478 kB; lsn=0/3D2916C8, redo lsn=0/334AA6C8
+2025-11-24 07:27:53.339 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:32:23.154 IST [5580] LOG:  checkpoint complete: wrote 2474 buffers (15.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 10 recycled; write=269.689 s, sync=0.058 s, total=269.815 s; sync files=34, longest=0.014 s, average=0.002 s; distance=170025 kB, estimate=212733 kB; lsn=0/49AAA390, redo lsn=0/3DAB4E68
+2025-11-24 07:32:53.585 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:37:23.145 IST [5580] LOG:  checkpoint complete: wrote 2966 buffers (18.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=269.430 s, sync=0.032 s, total=269.561 s; sync files=34, longest=0.003 s, average=0.001 s; distance=219371 kB, estimate=219371 kB; lsn=0/567A9058, redo lsn=0/4B0EFC98
+2025-11-24 07:37:53.157 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:42:23.144 IST [5580] LOG:  checkpoint complete: wrote 2067 buffers (12.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 12 recycled; write=269.850 s, sync=0.050 s, total=269.987 s; sync files=32, longest=0.006 s, average=0.002 s; distance=198643 kB, estimate=217298 kB; lsn=0/5ECE3DC0, redo lsn=0/572EC8E8
+2025-11-24 07:42:53.147 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:47:23.098 IST [5580] LOG:  checkpoint complete: wrote 2228 buffers (13.6%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 8 recycled; write=269.844 s, sync=0.044 s, total=269.951 s; sync files=32, longest=0.005 s, average=0.002 s; distance=131132 kB, estimate=208682 kB; lsn=0/67D0E3C8, redo lsn=0/5F2FB9F0
+2025-11-24 07:47:53.114 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:52:23.141 IST [5580] LOG:  checkpoint complete: wrote 1557 buffers (9.5%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 9 recycled; write=269.911 s, sync=0.054 s, total=270.027 s; sync files=32, longest=0.006 s, average=0.002 s; distance=147280 kB, estimate=202541 kB; lsn=0/76789710, redo lsn=0/682CFA80
+2025-11-24 07:52:53.151 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 07:57:23.146 IST [5580] LOG:  checkpoint complete: wrote 1768 buffers (10.8%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 14 recycled; write=269.849 s, sync=0.046 s, total=269.995 s; sync files=28, longest=0.008 s, average=0.002 s; distance=239122 kB, estimate=239122 kB; lsn=0/7E1E30B0, redo lsn=0/76C54418
+2025-11-24 07:57:53.160 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:00:41.334 IST [5580] LOG:  checkpoint complete: wrote 668 buffers (4.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 8 recycled; write=168.056 s, sync=0.055 s, total=168.175 s; sync files=31, longest=0.013 s, average=0.002 s; distance=128805 kB, estimate=228090 kB; lsn=0/851DC3B0, redo lsn=0/7EA1DBA0
+2025-11-24 08:02:53.216 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:03:32.416 IST [36528] LOG:  could not reserve shared memory region (addr=000002F19A200000) for child 00000000000014B0: error code 487
+2025-11-24 08:07:23.186 IST [5580] LOG:  checkpoint complete: wrote 4276 buffers (26.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 10 recycled; write=269.870 s, sync=0.031 s, total=269.971 s; sync files=32, longest=0.003 s, average=0.001 s; distance=155698 kB, estimate=220851 kB; lsn=0/8F660458, redo lsn=0/8822A4A8
+2025-11-24 08:07:53.187 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:12:23.162 IST [5580] LOG:  checkpoint complete: wrote 1917 buffers (11.7%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=269.868 s, sync=0.044 s, total=269.976 s; sync files=33, longest=0.005 s, average=0.002 s; distance=126474 kB, estimate=211413 kB; lsn=0/97B00098, redo lsn=0/8FDACD80
+2025-11-24 08:12:53.174 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:17:23.490 IST [5580] LOG:  checkpoint complete: wrote 3837 buffers (23.4%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 9 recycled; write=269.856 s, sync=0.044 s, total=270.317 s; sync files=24, longest=0.012 s, average=0.002 s; distance=134674 kB, estimate=203739 kB; lsn=0/A29F68B0, redo lsn=0/98131828
+2025-11-24 08:17:53.091 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:22:23.643 IST [5580] LOG:  checkpoint complete: wrote 1718 buffers (10.5%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 15 recycled; write=269.892 s, sync=0.064 s, total=270.552 s; sync files=30, longest=0.022 s, average=0.003 s; distance=247846 kB, estimate=247846 kB; lsn=0/AE352570, redo lsn=0/A733B388
+2025-11-24 08:22:53.652 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:27:23.114 IST [5580] LOG:  checkpoint complete: wrote 2758 buffers (16.8%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=269.312 s, sync=0.029 s, total=269.463 s; sync files=31, longest=0.004 s, average=0.001 s; distance=121612 kB, estimate=235223 kB; lsn=0/B6EF6380, redo lsn=0/AE9FE400
+2025-11-24 08:27:53.118 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:32:23.192 IST [5580] LOG:  checkpoint complete: wrote 1625 buffers (9.9%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 9 recycled; write=269.979 s, sync=0.035 s, total=270.075 s; sync files=33, longest=0.003 s, average=0.002 s; distance=145707 kB, estimate=226271 kB; lsn=0/C0A08538, redo lsn=0/B78493B0
+2025-11-24 08:32:53.207 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:37:23.163 IST [5580] LOG:  checkpoint complete: wrote 2136 buffers (13.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 10 recycled; write=269.845 s, sync=0.040 s, total=269.957 s; sync files=31, longest=0.008 s, average=0.002 s; distance=156771 kB, estimate=219321 kB; lsn=0/C7F17DE0, redo lsn=0/C1162258
+2025-11-24 08:37:53.178 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:41:39.859 IST [5580] LOG:  checkpoint complete: wrote 775 buffers (4.7%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=226.602 s, sync=0.025 s, total=226.682 s; sync files=29, longest=0.002 s, average=0.001 s; distance=118660 kB, estimate=209255 kB; lsn=0/CE31BED0, redo lsn=0/C85434C0
+2025-11-24 08:42:53.869 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:47:23.493 IST [5580] LOG:  checkpoint complete: wrote 3971 buffers (24.2%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=269.211 s, sync=0.060 s, total=269.624 s; sync files=32, longest=0.017 s, average=0.002 s; distance=107469 kB, estimate=199077 kB; lsn=0/D43528C0, redo lsn=0/CEE36BD0
+2025-11-24 08:47:53.496 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:51:24.459 IST [5580] LOG:  checkpoint complete: wrote 551 buffers (3.4%), wrote 2 SLRU buffers; 0 WAL file(s) added, 2 removed, 4 recycled; write=210.841 s, sync=0.037 s, total=210.963 s; sync files=27, longest=0.006 s, average=0.002 s; distance=93455 kB, estimate=188514 kB; lsn=0/D8547AB8, redo lsn=0/D497A9D8
+2025-11-24 08:52:53.470 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 08:57:23.240 IST [5580] LOG:  checkpoint complete: wrote 2988 buffers (18.2%), wrote 4 SLRU buffers; 0 WAL file(s) added, 1 removed, 4 recycled; write=269.580 s, sync=0.041 s, total=269.770 s; sync files=31, longest=0.004 s, average=0.002 s; distance=87660 kB, estimate=178429 kB; lsn=0/E8B4D910, redo lsn=0/D9F15D40
+2025-11-24 08:57:53.256 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:02:04.440 IST [5580] LOG:  checkpoint complete: wrote 1146 buffers (7.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 17 recycled; write=250.502 s, sync=0.081 s, total=251.184 s; sync files=32, longest=0.028 s, average=0.003 s; distance=268556 kB, estimate=268556 kB; lsn=0/F14BF448, redo lsn=0/EA559058
+2025-11-24 09:02:18.666 IST [36528] LOG:  could not reserve shared memory region (addr=000002F19A200000) for child 0000000000001660: error code 487
+2025-11-24 09:02:53.450 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:07:23.425 IST [5580] LOG:  checkpoint complete: wrote 1849 buffers (11.3%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 8 recycled; write=269.539 s, sync=0.056 s, total=269.976 s; sync files=26, longest=0.014 s, average=0.003 s; distance=129031 kB, estimate=254604 kB; lsn=0/F64C08D0, redo lsn=0/F235AD40
+2025-11-24 09:07:53.445 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:08:31.277 IST [5580] LOG:  checkpoint complete: wrote 97 buffers (0.6%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=37.485 s, sync=0.044 s, total=37.832 s; sync files=23, longest=0.012 s, average=0.002 s; distance=71784 kB, estimate=236322 kB; lsn=0/F7370118, redo lsn=0/F6974D48
+2025-11-24 09:12:53.218 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:13:24.419 IST [5580] LOG:  checkpoint complete: wrote 56 buffers (0.3%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=31.110 s, sync=0.042 s, total=31.202 s; sync files=31, longest=0.007 s, average=0.002 s; distance=118051 kB, estimate=224495 kB; lsn=0/FED56870, redo lsn=0/FDCBDCF8
+2025-11-24 09:17:53.999 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:18:49.450 IST [5580] LOG:  checkpoint complete: wrote 23 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=55.375 s, sync=0.029 s, total=55.451 s; sync files=25, longest=0.004 s, average=0.002 s; distance=86082 kB, estimate=210653 kB; lsn=1/44DC5B0, redo lsn=1/30CE690
+2025-11-24 09:20:20.577 IST [36528] LOG:  could not reserve shared memory region (addr=000002F19A200000) for child 0000000000000EA4: error code 487
+2025-11-24 09:37:57.751 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:39:17.528 IST [5580] LOG:  checkpoint complete: wrote 333 buffers (2.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=79.367 s, sync=0.059 s, total=79.778 s; sync files=33, longest=0.011 s, average=0.002 s; distance=85623 kB, estimate=198150 kB; lsn=1/A205C50, redo lsn=1/846C570
+2025-11-24 09:42:57.132 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:43:36.583 IST [5580] LOG:  checkpoint complete: wrote 34 buffers (0.2%), wrote 5 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=39.360 s, sync=0.052 s, total=39.452 s; sync files=31, longest=0.012 s, average=0.002 s; distance=81370 kB, estimate=186472 kB; lsn=1/12949B18, redo lsn=1/D3E2E88
+2025-11-24 09:47:57.997 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:48:09.230 IST [5580] LOG:  checkpoint complete: wrote 22 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 8 recycled; write=11.164 s, sync=0.025 s, total=11.234 s; sync files=26, longest=0.003 s, average=0.001 s; distance=132349 kB, estimate=181060 kB; lsn=1/159770E0, redo lsn=1/15522460
+2025-11-24 09:52:57.984 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 09:53:36.052 IST [5580] LOG:  checkpoint complete: wrote 179 buffers (1.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 1 removed, 5 recycled; write=37.988 s, sync=0.038 s, total=38.068 s; sync files=32, longest=0.004 s, average=0.002 s; distance=98341 kB, estimate=172788 kB; lsn=1/1C611398, redo lsn=1/1B52BA08
+2025-11-24 10:00:18.495 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 10:00:24.831 IST [5580] LOG:  checkpoint complete: wrote 24 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 1 removed, 1 recycled; write=6.281 s, sync=0.030 s, total=6.337 s; sync files=25, longest=0.005 s, average=0.002 s; distance=42415 kB, estimate=159751 kB; lsn=1/1E2F1840, redo lsn=1/1DE97608
+2025-11-24 10:05:18.201 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 10:05:30.442 IST [5580] LOG:  checkpoint complete: wrote 25 buffers (0.2%), wrote 4 SLRU buffers; 0 WAL file(s) added, 2 removed, 5 recycled; write=12.160 s, sync=0.048 s, total=12.241 s; sync files=34, longest=0.012 s, average=0.002 s; distance=103081 kB, estimate=154084 kB; lsn=1/262AF338, redo lsn=1/24341D38
+2025-11-24 10:10:18.644 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 10:10:49.467 IST [5580] LOG:  checkpoint complete: wrote 82 buffers (0.5%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 19 recycled; write=30.713 s, sync=0.027 s, total=30.823 s; sync files=31, longest=0.003 s, average=0.001 s; distance=321999 kB, estimate=321999 kB; lsn=1/3939C2D0, redo lsn=1/37DB5C50
+2025-11-24 11:47:17.016 IST [5580] LOG:  checkpoint starting: time
+2025-11-24 11:47:25.383 IST [5580] LOG:  checkpoint complete: wrote 37 buffers (0.2%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=8.298 s, sync=0.042 s, total=8.368 s; sync files=23, longest=0.009 s, average=0.002 s; distance=53155 kB, estimate=295115 kB; lsn=1/3B7368F8, redo lsn=1/3B19E9F8
+2025-11-24 11:47:42.965 IST [36528] LOG:  background worker "parallel worker" (PID 38404) was terminated by exception 0x40010004
+2025-11-24 11:47:42.965 IST [36528] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 11:47:42.965 IST [36528] LOG:  terminating any other active server processes
+2025-11-24 11:47:43.057 IST [36528] LOG:  all server processes terminated; reinitializing
+2025-11-24 11:47:43.212 IST [36528] LOG:  startup process (PID 42288) was terminated by exception 0xC000026B
+2025-11-24 11:47:43.212 IST [36528] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-24 11:47:43.212 IST [36528] LOG:  aborting startup due to startup process failure
+2025-11-24 11:47:43.212 IST [36528] LOG:  database system is shut down
+2025-11-24 13:12:07.675 IST [24900] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 13:12:07.678 IST [24900] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 13:12:07.678 IST [24900] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 13:12:07.727 IST [3268] LOG:  database system was interrupted; last known up at 2025-11-24 11:47:25 IST
+2025-11-24 13:12:08.197 IST [3268] LOG:  database system was not properly shut down; automatic recovery in progress
+2025-11-24 13:12:08.202 IST [3268] LOG:  redo starts at 1/3B19E9F8
+2025-11-24 13:12:08.254 IST [3268] LOG:  invalid record length at 1/3C353BD8: expected at least 24, got 0
+2025-11-24 13:12:08.254 IST [3268] LOG:  redo done at 1/3C353BB0 system usage: CPU: user: 0.00 s, system: 0.03 s, elapsed: 0.05 s
+2025-11-24 13:12:08.257 IST [24148] LOG:  checkpoint starting: end-of-recovery immediate wait
+2025-11-24 13:12:08.372 IST [24148] LOG:  checkpoint complete: wrote 2494 buffers (15.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 1 removed, 0 recycled; write=0.029 s, sync=0.079 s, total=0.117 s; sync files=23, longest=0.019 s, average=0.004 s; distance=18132 kB, estimate=18132 kB; lsn=1/3C353BD8, redo lsn=1/3C353BD8
+2025-11-24 13:12:08.377 IST [24900] LOG:  database system is ready to accept connections
+2025-11-24 13:12:11.860 IST [16444] ERROR:  canceling statement due to user request
+2025-11-24 13:12:11.861 IST [24148] LOG:  shutting down
+2025-11-24 13:12:11.861 IST [24900] LOG:  received fast shutdown request
+2025-11-24 13:12:11.864 IST [24148] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 13:12:11.864 IST [24900] LOG:  aborting any active transactions
+2025-11-24 13:12:11.870 IST [24900] LOG:  background worker "logical replication launcher" (PID 16444) exited with exit code 1
+2025-11-24 13:12:11.870 IST [24148] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.010 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=16319 kB; lsn=1/3C353C50, redo lsn=1/3C353C50
+2025-11-24 13:12:11.900 IST [24900] LOG:  database system is shut down
+2025-11-24 13:13:30.330 IST [5396] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-24 13:13:30.332 IST [5396] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-24 13:13:30.332 IST [5396] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-24 13:13:30.363 IST [4192] LOG:  database system was shut down at 2025-11-24 13:12:11 IST
+2025-11-24 13:13:30.368 IST [5396] LOG:  database system is ready to accept connections
+2025-11-24 13:13:47.498 IST [5396] LOG:  could not reserve shared memory region (addr=0000024364540000) for child 0000000000001670: error code 487
+2025-11-24 13:15:52.490 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000EDC: error code 487
+2025-11-24 13:15:55.767 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 000000000000102C: error code 487
+2025-11-24 13:15:58.770 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000001008: error code 487
+2025-11-24 13:18:30.871 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:18:38.486 IST [11060] LOG:  checkpoint complete: wrote 25 buffers (0.2%), wrote 7 SLRU buffers; 0 WAL file(s) added, 4 removed, 2 recycled; write=7.545 s, sync=0.031 s, total=7.616 s; sync files=25, longest=0.005 s, average=0.002 s; distance=110994 kB, estimate=110994 kB; lsn=1/433DBFD0, redo lsn=1/42FB87E8
+2025-11-24 13:21:13.607 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000A9C: error code 487
+2025-11-24 13:23:30.911 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:23:44.835 IST [11060] LOG:  checkpoint complete: wrote 42 buffers (0.3%), wrote 5 SLRU buffers; 0 WAL file(s) added, 1 removed, 5 recycled; write=13.866 s, sync=0.025 s, total=13.925 s; sync files=23, longest=0.003 s, average=0.002 s; distance=88783 kB, estimate=108773 kB; lsn=1/48BF4420, redo lsn=1/4866C798
+2025-11-24 13:24:41.775 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000FB8: error code 487
+2025-11-24 13:28:30.066 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:28:36.449 IST [11060] LOG:  checkpoint complete: wrote 15 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 7 recycled; write=6.311 s, sync=0.037 s, total=6.384 s; sync files=30, longest=0.005 s, average=0.002 s; distance=122863 kB, estimate=122863 kB; lsn=1/501BB318, redo lsn=1/4FE684F0
+2025-11-24 13:29:06.704 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000BA0: error code 487
+2025-11-24 13:29:08.892 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000001084: error code 487
+2025-11-24 13:29:55.592 IST [5396] LOG:  could not reserve shared memory region (addr=0000024364540000) for child 0000000000000B04: error code 487
+2025-11-24 13:30:39.819 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000F58: error code 487
+2025-11-24 13:32:10.865 IST [5396] LOG:  could not reserve shared memory region (addr=0000024364540000) for child 0000000000000C80: error code 487
+2025-11-24 13:33:30.582 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:33:37.966 IST [11060] LOG:  checkpoint complete: wrote 15 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=7.316 s, sync=0.033 s, total=7.384 s; sync files=25, longest=0.005 s, average=0.002 s; distance=90793 kB, estimate=119656 kB; lsn=1/55AD0C70, redo lsn=1/55712B08
+2025-11-24 13:38:30.863 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:38:43.093 IST [11060] LOG:  checkpoint complete: wrote 15 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=12.179 s, sync=0.023 s, total=12.230 s; sync files=33, longest=0.002 s, average=0.001 s; distance=84185 kB, estimate=116109 kB; lsn=1/5B1B6F78, redo lsn=1/5A949240
+2025-11-24 13:39:31.400 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 00000000000012CC: error code 487
+2025-11-24 13:40:19.764 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 00000000000010B0: error code 487
+2025-11-24 13:41:54.610 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000EC8: error code 487
+2025-11-24 13:43:30.794 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:43:38.518 IST [11060] LOG:  checkpoint complete: wrote 11 buffers (0.1%), wrote 5 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=7.655 s, sync=0.035 s, total=7.724 s; sync files=30, longest=0.004 s, average=0.002 s; distance=100370 kB, estimate=114535 kB; lsn=1/60FA43D0, redo lsn=1/60B4DCC0
+2025-11-24 13:44:39.416 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 0000000000000BD8: error code 487
+2025-11-24 13:48:30.524 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:48:34.468 IST [11060] LOG:  checkpoint complete: wrote 12 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=3.887 s, sync=0.027 s, total=3.945 s; sync files=25, longest=0.004 s, average=0.002 s; distance=62378 kB, estimate=109319 kB; lsn=1/64ADB480, redo lsn=1/64838738
+2025-11-24 13:53:28.662 IST [5396] LOG:  could not reserve shared memory region (addr=0000024366E00000) for child 000000000000168C: error code 487
+2025-11-24 13:53:30.099 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:53:36.157 IST [11060] LOG:  checkpoint complete: wrote 13 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 1 removed, 5 recycled; write=5.983 s, sync=0.039 s, total=6.058 s; sync files=32, longest=0.004 s, average=0.002 s; distance=93582 kB, estimate=107746 kB; lsn=1/6A6E6350, redo lsn=1/6A39C100
+2025-11-24 13:54:45.277 IST [5396] LOG:  could not reserve shared memory region (addr=0000024364540000) for child 0000000000001548: error code 487
+2025-11-24 13:58:30.114 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 13:58:34.843 IST [11060] LOG:  checkpoint complete: wrote 13 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=4.670 s, sync=0.031 s, total=4.730 s; sync files=25, longest=0.006 s, average=0.002 s; distance=76208 kB, estimate=104592 kB; lsn=1/6F06D898, redo lsn=1/6EE08278
+2025-11-24 18:06:10.255 IST [11060] LOG:  checkpoint starting: time
+2025-11-24 18:06:14.687 IST [11060] LOG:  checkpoint complete: wrote 12 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 1 removed, 3 recycled; write=4.357 s, sync=0.054 s, total=4.433 s; sync files=25, longest=0.012 s, average=0.003 s; distance=51336 kB, estimate=99266 kB; lsn=1/7226E6D8, redo lsn=1/7202A478
+2025-11-24 18:06:15.809 IST [11060] LOG:  shutting down
+2025-11-24 18:06:15.809 IST [13240] ERROR:  canceling statement due to user request
+2025-11-24 18:06:15.809 IST [5396] LOG:  received fast shutdown request
+2025-11-24 18:06:15.811 IST [11060] LOG:  checkpoint starting: shutdown immediate
+2025-11-24 18:06:15.811 IST [12276] ERROR:  canceling statement due to user request
+2025-11-24 18:06:15.811 IST [12276] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5016744503';
+2025-11-24 18:06:15.811 IST [6684] ERROR:  canceling statement due to user request
+2025-11-24 18:06:15.811 IST [6684] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5027171565';
+2025-11-24 18:06:15.811 IST [5396] LOG:  aborting any active transactions
+2025-11-24 18:06:15.837 IST [11060] LOG:  checkpoint complete: wrote 48 buffers (0.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.017 s, total=0.029 s; sync files=17, longest=0.004 s, average=0.001 s; distance=2716 kB, estimate=89611 kB; lsn=1/722D1680, redo lsn=1/722D1680
+2025-11-24 18:06:15.870 IST [5396] LOG:  WAL was shut down unexpectedly
+2025-11-24 18:06:15.871 IST [5396] LOG:  background worker "logical replication launcher" (PID 13240) exited with exit code 1
+2025-11-24 18:06:15.883 IST [5396] LOG:  abnormal database system shutdown
+2025-11-24 18:06:15.885 IST [5396] LOG:  database system is shut down
+2025-11-25 05:41:38.519 IST [1516] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 05:41:38.521 IST [1516] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 05:41:38.522 IST [1516] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 05:41:38.554 IST [6628] LOG:  database system was shut down at 2025-11-24 18:06:15 IST
+2025-11-25 05:41:38.564 IST [1516] LOG:  database system is ready to accept connections
+2025-11-25 05:44:31.196 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 0000000000001124: error code 487
+2025-11-25 05:45:04.055 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 00000000000012B0: error code 487
+2025-11-25 05:46:38.984 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 05:46:41.310 IST [21684] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 5 SLRU buffers; 0 WAL file(s) added, 2 removed, 0 recycled; write=2.220 s, sync=0.035 s, total=2.326 s; sync files=24, longest=0.004 s, average=0.002 s; distance=33392 kB, estimate=33392 kB; lsn=1/744285C8, redo lsn=1/7436D848
+2025-11-25 05:48:08.939 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000000F34: error code 487
+2025-11-25 05:49:59.707 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000000BB8: error code 487
+2025-11-25 05:51:38.905 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 05:51:44.444 IST [21684] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 2 removed, 0 recycled; write=5.445 s, sync=0.043 s, total=5.539 s; sync files=30, longest=0.006 s, average=0.002 s; distance=36991 kB, estimate=36991 kB; lsn=1/768F77F8, redo lsn=1/7678D518
+2025-11-25 05:52:20.800 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 0000000000000980: error code 487
+2025-11-25 05:52:41.755 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 00000000000013C8: error code 487
+2025-11-25 05:52:58.403 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000001088: error code 487
+2025-11-25 05:53:07.816 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 00000000000013C8: error code 487
+2025-11-25 05:53:51.529 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000001328: error code 487
+2025-11-25 05:54:07.713 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 00000000000011E0: error code 487
+2025-11-25 05:56:38.493 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 05:56:43.534 IST [21684] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 2 removed, 1 recycled; write=4.880 s, sync=0.057 s, total=5.042 s; sync files=23, longest=0.006 s, average=0.003 s; distance=47367 kB, estimate=47367 kB; lsn=1/7974F618, redo lsn=1/795CF1C8
+2025-11-25 06:01:38.916 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:01:43.568 IST [21684] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=4.528 s, sync=0.040 s, total=4.652 s; sync files=33, longest=0.005 s, average=0.002 s; distance=52764 kB, estimate=52764 kB; lsn=1/7CA985A0, redo lsn=1/7C956308
+2025-11-25 06:04:33.050 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000001104: error code 487
+2025-11-25 06:06:38.620 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:06:46.527 IST [21684] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=7.758 s, sync=0.051 s, total=7.908 s; sync files=23, longest=0.007 s, average=0.003 s; distance=46044 kB, estimate=52092 kB; lsn=1/7F89CB38, redo lsn=1/7F64D5B0
+2025-11-25 06:08:21.001 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 000000000000175C: error code 487
+2025-11-25 06:09:48.248 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 00000000000012E4: error code 487
+2025-11-25 06:11:38.608 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:11:45.043 IST [21684] LOG:  checkpoint complete: wrote 10 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=6.339 s, sync=0.047 s, total=6.435 s; sync files=23, longest=0.007 s, average=0.003 s; distance=46425 kB, estimate=51525 kB; lsn=1/825AE270, redo lsn=1/823A3D70
+2025-11-25 06:12:23.316 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 00000000000011AC: error code 487
+2025-11-25 06:14:12.033 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000000F88: error code 487
+2025-11-25 06:16:38.033 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:16:43.020 IST [21684] LOG:  checkpoint complete: wrote 13 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=4.894 s, sync=0.034 s, total=4.987 s; sync files=23, longest=0.005 s, average=0.002 s; distance=45859 kB, estimate=50959 kB; lsn=1/852131C0, redo lsn=1/8506CC50
+2025-11-25 06:21:38.949 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:21:43.288 IST [21684] LOG:  checkpoint complete: wrote 17 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=4.253 s, sync=0.032 s, total=4.340 s; sync files=25, longest=0.005 s, average=0.002 s; distance=51295 kB, estimate=51295 kB; lsn=1/883AFD40, redo lsn=1/88284928
+2025-11-25 06:26:38.104 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:26:47.677 IST [21684] LOG:  checkpoint complete: wrote 19 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 19 recycled; write=8.981 s, sync=0.113 s, total=9.573 s; sync files=32, longest=0.016 s, average=0.004 s; distance=308782 kB, estimate=308782 kB; lsn=1/9B41E810, redo lsn=1/9B0104D0
+2025-11-25 06:31:38.242 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:31:39.876 IST [21684] LOG:  checkpoint complete: wrote 7 buffers (0.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=1.440 s, sync=0.075 s, total=1.635 s; sync files=25, longest=0.009 s, average=0.003 s; distance=76676 kB, estimate=285572 kB; lsn=1/9FBCD4F0, redo lsn=1/9FAF1560
+2025-11-25 06:33:15.609 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 00000000000014D8: error code 487
+2025-11-25 06:34:05.747 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 00000000000007E8: error code 487
+2025-11-25 06:36:38.331 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:36:44.072 IST [21684] LOG:  checkpoint complete: wrote 15 buffers (0.1%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 6 recycled; write=5.540 s, sync=0.058 s, total=5.741 s; sync files=26, longest=0.014 s, average=0.003 s; distance=91786 kB, estimate=266193 kB; lsn=1/A5719FA8, redo lsn=1/A5493F98
+2025-11-25 06:38:06.824 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 0000000000001618: error code 487
+2025-11-25 06:41:38.228 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:41:42.911 IST [21684] LOG:  checkpoint complete: wrote 21 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 4 recycled; write=4.569 s, sync=0.029 s, total=4.684 s; sync files=25, longest=0.004 s, average=0.002 s; distance=64982 kB, estimate=246072 kB; lsn=1/A959F490, redo lsn=1/A9409988
+2025-11-25 06:45:23.462 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B0A40000) for child 0000000000000EC0: error code 487
+2025-11-25 06:46:38.699 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:46:44.411 IST [21684] LOG:  checkpoint complete: wrote 8 buffers (0.0%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=5.544 s, sync=0.072 s, total=5.712 s; sync files=23, longest=0.018 s, average=0.004 s; distance=54168 kB, estimate=226882 kB; lsn=1/ACAF0900, redo lsn=1/AC8EFB48
+2025-11-25 06:50:11.537 IST [1516] LOG:  could not reserve shared memory region (addr=000001D3B3400000) for child 0000000000001544: error code 487
+2025-11-25 06:51:38.121 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:51:46.844 IST [21684] LOG:  checkpoint complete: wrote 15 buffers (0.1%), wrote 2 SLRU buffers; 0 WAL file(s) added, 0 removed, 3 recycled; write=8.528 s, sync=0.037 s, total=8.724 s; sync files=25, longest=0.006 s, average=0.002 s; distance=52094 kB, estimate=209403 kB; lsn=1/AFED0278, redo lsn=1/AFBCF4D0
+2025-11-25 06:56:38.822 IST [21684] LOG:  checkpoint starting: time
+2025-11-25 06:56:45.861 IST [21684] LOG:  checkpoint complete: wrote 18 buffers (0.1%), wrote 4 SLRU buffers; 0 WAL file(s) added, 0 removed, 5 recycled; write=6.853 s, sync=0.057 s, total=7.040 s; sync files=33, longest=0.008 s, average=0.002 s; distance=83897 kB, estimate=196852 kB; lsn=1/B500DE78, redo lsn=1/B4DBD950
+2025-11-25 06:57:38.921 IST [21684] LOG:  shutting down
+2025-11-25 06:57:38.922 IST [1516] LOG:  received fast shutdown request
+2025-11-25 06:57:38.923 IST [21684] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 06:57:38.924 IST [1516] LOG:  aborting any active transactions
+2025-11-25 06:57:38.925 IST [5852] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.925 IST [5852] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5044621275';
+2025-11-25 06:57:38.926 IST [16976] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.928 IST [3448] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.928 IST [3448] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5027751949';
+2025-11-25 06:57:38.927 IST [17696] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [17696] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5007359643';
+2025-11-25 06:57:38.927 IST [3336] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [3336] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5027751949';
+2025-11-25 06:57:38.927 IST [26764] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [26764] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5056324053';
+2025-11-25 06:57:38.927 IST [2036] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [2036] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5100711522';
+2025-11-25 06:57:38.927 IST [29632] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [29632] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5015682532';
+2025-11-25 06:57:38.928 IST [15580] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.928 IST [15580] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5056324053';
+2025-11-25 06:57:38.927 IST [13616] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.928 IST [16800] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.928 IST [16800] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5103176102';
+2025-11-25 06:57:38.928 IST [29632] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.927 IST [1624] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [1624] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5007359643';
+2025-11-25 06:57:38.927 IST [25272] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [25272] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5014805759';
+2025-11-25 06:57:38.928 IST [17884] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.928 IST [17884] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5103176102';
+2025-11-25 06:57:38.927 IST [19408] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [19408] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5100711522';
+2025-11-25 06:57:38.927 IST [13456] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [13456] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5103176102';
+2025-11-25 06:57:38.927 IST [26796] ERROR:  canceling statement due to user request
+2025-11-25 06:57:38.927 IST [26796] STATEMENT:  SELECT id FROM authors WHERE external_ids ->> 'openalex' = 'https://openalex.org/A5056324053';
+2025-11-25 06:57:38.928 IST [25272] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.945 IST [1516] LOG:  background worker "parallel worker" (PID 17696) exited with exit code 1
+2025-11-25 06:57:38.945 IST [1624] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.945 IST [1516] LOG:  background worker "parallel worker" (PID 3448) exited with exit code 1
+2025-11-25 06:57:38.945 IST [3336] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.945 IST [1516] LOG:  background worker "logical replication launcher" (PID 13616) exited with exit code 1
+2025-11-25 06:57:38.945 IST [1516] LOG:  background worker "parallel worker" (PID 13456) exited with exit code 1
+2025-11-25 06:57:38.946 IST [1516] LOG:  background worker "parallel worker" (PID 16800) exited with exit code 1
+2025-11-25 06:57:38.946 IST [17884] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.946 IST [1516] LOG:  background worker "parallel worker" (PID 15580) exited with exit code 1
+2025-11-25 06:57:38.946 IST [1516] LOG:  background worker "parallel worker" (PID 19408) exited with exit code 1
+2025-11-25 06:57:38.946 IST [2036] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.946 IST [1516] LOG:  background worker "parallel worker" (PID 26796) exited with exit code 1
+2025-11-25 06:57:38.947 IST [26764] FATAL:  terminating connection due to administrator command
+2025-11-25 06:57:38.965 IST [21684] PANIC:  concurrent write-ahead log activity while database system is shutting down
+2025-11-25 06:57:39.442 IST [1516] LOG:  checkpointer process (PID 21684) was terminated by exception 0xC0000409
+2025-11-25 06:57:39.442 IST [1516] HINT:  See C include file "ntstatus.h" for a description of the hexadecimal value.
+2025-11-25 06:57:39.442 IST [1516] LOG:  terminating any other active server processes
+2025-11-25 06:57:39.445 IST [1516] LOG:  abnormal database system shutdown
+2025-11-25 06:57:39.447 IST [1516] LOG:  database system is shut down
+2025-11-25 07:07:34.183 IST [26380] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 07:07:34.188 IST [26380] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 07:07:34.188 IST [26380] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 07:07:34.239 IST [11472] LOG:  database system was shut down at 2025-11-25 07:07:30 IST
+2025-11-25 07:07:34.246 IST [26380] LOG:  database system is ready to accept connections
+2025-11-25 07:08:27.782 IST [12744] ERROR:  column "cluster_ids" does not exist at character 2658
+2025-11-25 07:08:27.782 IST [12744] HINT:  Perhaps you meant to reference the column "papers.clusters_ids".
+2025-11-25 07:08:27.782 IST [12744] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliations            JSONB,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+	    related_works           TEXT[] NOT NULL DEFAULT '{}',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    concepts                JSONB,
+	    clusters_ids            BIGINT[] DEFAULT '{}',
+	    cluster_ids_weightage   REAL[] DEFAULT '{}',
+	    external_ids            JSONB NOT NULL
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	--     ON papers USING GIN (cluster_ids);
+	
+	-- -- Fast "authors in cluster X" queries
+	-- CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	--     ON authors USING GIN (cluster_ids);
+2025-11-25 07:09:49.322 IST [4832] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:09:49.367 IST [4832] LOG:  checkpoint complete: wrote 53 buffers (0.3%), wrote 3 SLRU buffers; 1 WAL file(s) added, 0 removed, 0 recycled; write=0.004 s, sync=0.012 s, total=0.045 s; sync files=21, longest=0.001 s, average=0.001 s; distance=5090 kB, estimate=5090 kB; lsn=0/1CE9C68, redo lsn=0/1CE9C10
+2025-11-25 07:09:49.571 IST [29520] ERROR:  syntax error at or near "Fast" at character 4463
+2025-11-25 07:09:49.571 IST [29520] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliations            JSONB,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+	    related_works           TEXT[] NOT NULL DEFAULT '{}',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    concepts                JSONB,
+	    clusters_ids            BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
+	    external_ids            JSONB NOT NULL
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-25 07:09:59.122 IST [4832] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:09:59.137 IST [4832] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.004 s, sync=0.004 s, total=0.015 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4727 kB, estimate=5054 kB; lsn=0/2187990, redo lsn=0/2187938
+2025-11-25 07:09:59.334 IST [28972] ERROR:  column "cluster_ids" does not exist at character 2548
+2025-11-25 07:09:59.334 IST [28972] HINT:  Perhaps you meant to reference the column "papers.clusters_ids".
+2025-11-25 07:09:59.334 IST [28972] STATEMENT:  CREATE TYPE venue_type AS ENUM ('conference', 'journal');
+	
+	-- Authors
+	CREATE TABLE authors (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    full_name               TEXT NOT NULL,
+	    affiliations            JSONB,
+	    orcid                   TEXT UNIQUE,
+	    external_ids            JSONB,
+	    cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
+	
+	    CONSTRAINT authors_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Venues (conferences / journals)
+	CREATE TABLE venues (
+	    id              BIGSERIAL PRIMARY KEY,
+	    name            TEXT NOT NULL,
+	    short_name      TEXT,
+	    venue_type      venue_type NOT NULL,
+	    homepage_url    TEXT,
+	    location        TEXT,
+	    rank_label      TEXT,
+	    external_ids    JSONB,
+	    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Specific yearly / edition instances of a venue
+	CREATE TABLE venue_instances (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+	    year                    INTEGER NOT NULL,
+	    submission_deadline     DATE,
+	    notification_date       DATE,
+	    camera_ready_deadline   DATE,
+	    start_date              DATE,
+	    end_date                DATE,
+	    location_override       TEXT,  -- if this year's location differs
+	    notes                   TEXT,
+	    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	
+	    UNIQUE (venue_id, year)
+	);
+	
+	-- Papers
+	CREATE TABLE papers (
+	    id                      BIGSERIAL PRIMARY KEY,
+	    title                   TEXT NOT NULL,
+	    abstract                TEXT,
+	    conclusion              TEXT,
+	    year                    INTEGER,
+	    publication_date        DATE,
+	    doi                     TEXT UNIQUE,
+	    field                   TEXT,
+	    language                TEXT,
+	    referenced_works        TEXT[] NOT NULL DEFAULT '{}',
+	    related_works           TEXT[] NOT NULL DEFAULT '{}',
+	    venue_id                BIGINT REFERENCES venues(id),
+	    venue_instance_id       BIGINT REFERENCES venue_instances(id),
+	    concepts                JSONB,
+	    clusters_ids            BIGINT[] NOT NULL DEFAULT '{}',
+	    cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
+	    external_ids            JSONB NOT NULL
+	
+	    CONSTRAINT papers_clusters_same_length
+	        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
+	);
+	
+	-- Many-to-many: which authors wrote which papers, in what order
+	CREATE TABLE paper_authors (
+	    paper_id        BIGINT NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    author_order    INTEGER NOT NULL, -- Starts from 1
+	    is_corresponding BOOLEAN NOT NULL DEFAULT FALSE,
+	
+	    PRIMARY KEY (paper_id, author_id)
+	);
+	
+	-- Author Specialties / Research Areas
+	CREATE TABLE specialties (
+	    id          BIGSERIAL PRIMARY KEY,
+	    name        TEXT NOT NULL UNIQUE,              -- 'Computer Vision', 'NLP', ...
+	    parent_id   BIGINT REFERENCES specialties(id),
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+	    updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	CREATE TABLE author_specialties (
+	    author_id       BIGINT NOT NULL REFERENCES authors(id) ON DELETE CASCADE,
+	    specialty_id    BIGINT NOT NULL REFERENCES specialties(id) ON DELETE CASCADE,
+	    PRIMARY KEY (author_id, specialty_id)
+	);
+	
+	-- Clusters for papers and authors
+	CREATE TABLE clusters (
+	    id          BIGSERIAL PRIMARY KEY,
+	    label       TEXT,  -- human-readable
+	    object_type TEXT NOT NULL,  -- 'paper', 'author', or 'both'
+	    algorithm   TEXT NOT NULL,  -- e.g. 'umap+hdbscan_v1'
+	    params      JSONB,  -- hyperparameters snapshot
+	    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+	);
+	
+	-- Indexing for faster lookups
+	
+	-- Lookup all papers for an author
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_paper
+	    ON paper_authors(paper_id);
+	
+	-- Lookup all authors for a paper
+	CREATE INDEX IF NOT EXISTS idx_paper_authors_author
+	    ON paper_authors(author_id);
+	
+	-- Lookup papers by year
+	CREATE INDEX IF NOT EXISTS idx_papers_year
+	    ON papers(year);
+	
+	-- Deadline-based queries for conferences
+	CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
+	    ON venue_instances(submission_deadline);
+	
+	-- Fast "papers in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+	    ON papers USING GIN (cluster_ids);
+	
+	-- Fast "authors in cluster X" queries
+	CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+	    ON authors USING GIN (cluster_ids);
+2025-11-25 07:10:20.794 IST [4832] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:10:20.805 IST [4832] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.004 s, total=0.012 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4832 kB, estimate=5032 kB; lsn=0/263FB98, redo lsn=0/263FB40
+2025-11-25 07:10:50.299 IST [13576] ERROR:  column "last_known_institutions" of relation "authors" does not exist at character 68
+2025-11-25 07:10:50.299 IST [13576] STATEMENT:  
+	        INSERT INTO authors
+	            (full_name, affiliations, last_known_institutions,
+	            topic_shares, orcid, external_ids)
+	        VALUES 
+	            ('Hadley Wickham', '[{"name": "University of Iowa", "country_code": "US", "type": "education", "id": "https://openalex.org/I126307644", "years": [2010]}, {"name": "NHS Blood and Transplant", "country_code": "GB", "type": "healthcare", "id": "https://openalex.org/I1307946715", "years": [2023]}, {"name": "American Statistical Association", "country_code": "US", "type": "other", "id": "https://openalex.org/I143622237", "years": [2010]}, {"name": "The King''s College", "country_code": "US", "type": "education", "id": "https://openalex.org/I144852770", "years": [1961]}, {"name": "University of Auckland", "country_code": "NZ", "type": "education", "id": "https://openalex.org/I154130895", "years": [2022, 2017]}, {"name": "Iowa State University", "country_code": "US", "type": "education", "id": "https://openalex.org/I173911158", "years": [2010, 2008, 2007, 2006]}, {"name": "\u00c9cole Nationale V\u00e9t\u00e9rinaire d''Alfort", "country_code": "FR", "type": "education", "id": "https://openalex.org/I17606148", "years": [2023]}, {"name": "Purdue University West Lafayette", "country_code": "US", "type": "education", "id": "https://openalex.org/I219193219", "years": [2016]}, {"name": "San Diego State University", "country_code": "US", "type": "education", "id": "https://openalex.org/I26538001", "years": [2010]}, {"name": "Institute of Clinical and Experimental Medicine", "country_code": "CZ", "type": "healthcare", "id": "https://openalex.org/I4210127955", "years": [2023]}, {"name": "Center for Occupational Research and Development", "country_code": "US", "type": "nonprofit", "id": "https://openalex.org/I4210156377", "years": [2013]}, {"name": "University of Houston", "country_code": "US", "type": "education", "id": "https://openalex.org/I44461941", "years": [2009]}, {"name": "Rice University", "country_code": "US", "type": "education", "id": "https://openalex.org/I74775410", "years": [2022, 2017, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008]}, {"name": "University of Pennsylvania", "country_code": "US", "type": "education", "id": "https://openalex.org/I79576946", "years": [2009]}, {"name": "Stanford University", "country_code": "US", "type": "education", "id": "https://openalex.org/I97018004", "years": [2022, 2017]}]', '[]',
+	            'null', 'https://orcid.org/0000-0003-4757-117X', '{"openalex": "https://openalex.org/A5016175339", "orcid": "https://orcid.org/0000-0003-4757-117X", "scopus": null, "semantic_scholar": null}')
+	        RETURNING id;
+	        
+2025-11-25 07:10:52.175 IST [15588] ERROR:  column "last_known_institutions" of relation "authors" does not exist at character 68
+2025-11-25 07:10:52.175 IST [15588] STATEMENT:  
+	        INSERT INTO authors
+	            (full_name, affiliations, last_known_institutions,
+	            topic_shares, orcid, external_ids)
+	        VALUES 
+	            ('Hendrik J. Monkhorst', '[{"name": "Uppsala University", "country_code": "SE", "type": "education", "id": "https://openalex.org/I123387679", "years": [1993, 1987]}, {"name": "University of Copenhagen", "country_code": "DK", "type": "education", "id": "https://openalex.org/I124055696", "years": [1992]}, {"name": "University of Minnesota", "country_code": "US", "type": "education", "id": "https://openalex.org/I130238516", "years": [1992]}, {"name": "University of Wisconsin\u2013Madison", "country_code": "US", "type": "education", "id": "https://openalex.org/I135310074", "years": [2018]}, {"name": "University of Groningen", "country_code": "NL", "type": "education", "id": "https://openalex.org/I169381384", "years": [1969, 1968, 1967]}, {"name": "University of Konstanz", "country_code": "DE", "type": "education", "id": "https://openalex.org/I189712700", "years": [1993]}, {"name": "University of California, Irvine", "country_code": "US", "type": "education", "id": "https://openalex.org/I204250578", "years": [1997]}, {"name": "Aarhus University", "country_code": "DK", "type": "education", "id": "https://openalex.org/I204337017", "years": [1983]}, {"name": "University of Utah", "country_code": "US", "type": "education", "id": "https://openalex.org/I223532165", "years": [2009, 2005, 1981, 1979, 1978, 1977, 1976, 1975, 1974, 1973, 1972, 1971, 1970, 1969]}, {"name": "University of Cambridge", "country_code": "GB", "type": "education", "id": "https://openalex.org/I241749", "years": [1992]}, {"name": "University of Florida", "country_code": "US", "type": "education", "id": "https://openalex.org/I33213144", "years": [2010, 2009, 2006, 2005, 2002, 2000, 1999, 1998, 1997, 1996, 1993, 1992, 1991, 1990, 1989, 1988, 1987, 1986, 1985, 1984, 1983, 1982, 1981]}, {"name": "Bridge University", "country_code": "SS", "type": "education", "id": "https://openalex.org/I4210096386", "years": [1992]}, {"name": "IIT@MIT", "country_code": "US", "type": "facility", "id": "https://openalex.org/I4210110987", "years": [2018]}, {"name": "John Wiley & Sons (United Kingdom)", "country_code": "GB", "type": "company", "id": "https://openalex.org/I4210114768", "years": [1992]}, {"name": "Institute for Nuclear Research and Nuclear Energy", "country_code": "BG", "type": "facility", "id": "https://openalex.org/I4210116884", "years": [1998]}, {"name": "Rudjer Boskovic Institute", "country_code": "HR", "type": "facility", "id": "https://openalex.org/I4210123216", "years": [1987, 1973]}, {"name": "University of Warsaw", "country_code": "PL", "type": "education", "id": "https://openalex.org/I4654613", "years": [1993, 1987]}, {"name": "University of Delaware", "country_code": "US", "type": "education", "id": "https://openalex.org/I86501945", "years": [1993, 1989]}, {"name": "Tri Alpha Energy (United States)", "country_code": "US", "type": "company", "id": "https://openalex.org/I926342451", "years": [2025, 2018]}, {"name": "McMaster University", "country_code": "CA", "type": "education", "id": "https://openalex.org/I98251732", "years": [1992]}]', '[{"name": "Tri Alpha Energy (United States)", "country_code": "US", "type": "company", "id": "https://openalex.org/I926342451"}]',
+	            'null', 'https://orcid.org/0000-0002-2007-4096', '{"openalex": "https://openalex.org/A5082036603", "orcid": "https://orcid.org/0000-0002-2007-4096", "scopus": null, "semantic_scholar": null}')
+	        RETURNING id;
+	        
+2025-11-25 07:10:52.870 IST [20964] ERROR:  canceling statement due to user request
+2025-11-25 07:10:52.870 IST [4832] LOG:  shutting down
+2025-11-25 07:10:52.870 IST [26380] LOG:  received fast shutdown request
+2025-11-25 07:10:52.876 IST [4832] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 07:10:52.876 IST [26380] LOG:  aborting any active transactions
+2025-11-25 07:10:52.876 IST [8736] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [3280] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [18092] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [13076] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [26528] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [20900] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [25420] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [29284] FATAL:  terminating connection due to administrator command
+2025-11-25 07:10:52.877 IST [26380] LOG:  background worker "logical replication launcher" (PID 20964) exited with exit code 1
+2025-11-25 07:10:52.998 IST [28700] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.017 IST [28040] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.036 IST [19072] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.061 IST [14544] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.079 IST [4784] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.088 IST [4832] LOG:  checkpoint complete: wrote 1033 buffers (6.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.058 s, sync=0.148 s, total=0.219 s; sync files=353, longest=0.002 s, average=0.001 s; distance=5003 kB, estimate=5029 kB; lsn=0/2B22AF8, redo lsn=0/2B22AF8
+2025-11-25 07:10:53.097 IST [13172] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.116 IST [28776] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.134 IST [27336] FATAL:  the database system is shutting down
+2025-11-25 07:10:53.157 IST [26380] LOG:  database system is shut down
+2025-11-25 07:11:28.678 IST [6468] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 07:11:28.681 IST [6468] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 07:11:28.681 IST [6468] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 07:11:28.714 IST [13924] LOG:  database system was shut down at 2025-11-25 07:10:53 IST
+2025-11-25 07:11:28.720 IST [6468] LOG:  database system is ready to accept connections
+2025-11-25 07:11:34.666 IST [9540] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:11:34.676 IST [9540] LOG:  checkpoint complete: wrote 2 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.003 s, total=0.010 s; sync files=4, longest=0.001 s, average=0.001 s; distance=4 kB, estimate=4 kB; lsn=0/2B23ED8, redo lsn=0/2B23E80
+2025-11-25 07:12:24.817 IST [9540] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:12:24.829 IST [9540] LOG:  checkpoint complete: wrote 6 buffers (0.0%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 1 recycled; write=0.002 s, sync=0.005 s, total=0.013 s; sync files=7, longest=0.001 s, average=0.001 s; distance=4994 kB, estimate=4994 kB; lsn=0/30047F8, redo lsn=0/30047A0
+2025-11-25 07:14:13.326 IST [9540] LOG:  checkpoint starting: immediate force wait
+2025-11-25 07:14:13.343 IST [9540] LOG:  checkpoint complete: wrote 40 buffers (0.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.010 s, total=0.018 s; sync files=14, longest=0.002 s, average=0.001 s; distance=5651 kB, estimate=5651 kB; lsn=0/3589530, redo lsn=0/35894D8
+2025-11-25 07:14:25.592 IST [29432] ERROR:  canceling statement due to user request
+2025-11-25 07:14:25.592 IST [9540] LOG:  shutting down
+2025-11-25 07:14:25.592 IST [6468] LOG:  received fast shutdown request
+2025-11-25 07:14:25.594 IST [9540] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 07:14:25.595 IST [6468] LOG:  aborting any active transactions
+2025-11-25 07:14:25.595 IST [28780] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [29428] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [13696] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [25404] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [18820] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [19308] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [29580] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.595 IST [3252] FATAL:  terminating connection due to administrator command
+2025-11-25 07:14:25.604 IST [6468] LOG:  background worker "logical replication launcher" (PID 29432) exited with exit code 1
+2025-11-25 07:14:25.818 IST [9540] LOG:  checkpoint complete: wrote 1033 buffers (6.3%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.057 s, sync=0.161 s, total=0.227 s; sync files=353, longest=0.003 s, average=0.001 s; distance=4953 kB, estimate=5581 kB; lsn=0/3A5FA18, redo lsn=0/3A5FA18
+2025-11-25 07:14:25.866 IST [6468] LOG:  database system is shut down
+2025-11-25 07:14:45.971 IST [8600] LOG:  starting PostgreSQL 18.1 on x86_64-windows, compiled by msvc-19.44.35219, 64-bit
+2025-11-25 07:14:45.974 IST [8600] LOG:  listening on IPv6 address "::1", port 5432
+2025-11-25 07:14:45.974 IST [8600] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2025-11-25 07:14:46.004 IST [11120] LOG:  database system was shut down at 2025-11-25 07:14:25 IST
+2025-11-25 07:14:46.011 IST [8600] LOG:  database system is ready to accept connections
+2025-11-25 07:16:47.013 IST [28136] ERROR:  canceling statement due to user request
+2025-11-25 07:16:47.013 IST [3292] LOG:  shutting down
+2025-11-25 07:16:47.013 IST [8600] LOG:  received fast shutdown request
+2025-11-25 07:16:47.017 IST [3292] LOG:  checkpoint starting: shutdown immediate
+2025-11-25 07:16:47.018 IST [8600] LOG:  aborting any active transactions
+2025-11-25 07:16:47.018 IST [12888] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.018 IST [14212] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [15556] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [22876] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [6344] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [14296] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [28368] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.019 IST [3076] FATAL:  terminating connection due to administrator command
+2025-11-25 07:16:47.024 IST [8600] LOG:  background worker "logical replication launcher" (PID 28136) exited with exit code 1
+2025-11-25 07:16:47.065 IST [3292] LOG:  checkpoint complete: wrote 93 buffers (0.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.015 s, sync=0.025 s, total=0.052 s; sync files=43, longest=0.001 s, average=0.001 s; distance=441 kB, estimate=441 kB; lsn=0/3ACE028, redo lsn=0/3ACE028
+2025-11-25 07:16:47.083 IST [8600] LOG:  database system is shut down

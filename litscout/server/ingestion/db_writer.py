@@ -161,11 +161,17 @@ def upsert_author(cur, author: NormalizedAuthor) -> int:
 
     cur.execute(
         """
-        INSERT INTO authors (full_name, affiliation, orcid, external_ids)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO authors
+            (full_name, affiliations, last_known_institutions,
+            topic_shares, orcid, external_ids)
+        VALUES 
+            (%s, %s, %s,
+            %s, %s, %s)
         RETURNING id;
         """,
-        (author.full_name, author.affiliation, author.orcid, Json(ext)),
+        (author.full_name, Json(author.affiliations), Json(author.last_known_institutions),
+         Json(author.topic_shares), author.orcid, Json(ext)
+        ),
     )
     (author_id,) = cur.fetchone()
     return author_id
@@ -193,11 +199,11 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
             INSERT INTO papers
                 (title, abstract, conclusion, year, publication_date,
                 doi, field, language, referenced_works, related_works, 
-                venue_id, venue_instance_id, external_ids)
+                venue_id, venue_instance_id, concepts, external_ids)
             VALUES
                 (%s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s,
-                %s, %s, %s)
+                %s, %s, %s, %s)
             ON CONFLICT (doi) DO UPDATE
                SET title            = EXCLUDED.title,
                    abstract         = EXCLUDED.abstract,
@@ -210,13 +216,14 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
                    related_works    = EXCLUDED.related_works,
                    venue_id         = EXCLUDED.venue_id,
                    venue_instance_id= EXCLUDED.venue_instance_id,
+                   concepts         = EXCLUDED.concepts,
                    external_ids     = EXCLUDED.external_ids
             RETURNING id;
             """,
             (
                 p.title, p.abstract, p.conclusion, p.year, p.publication_date,
                 p.doi, p.field, p.language, p.referenced_works, p.related_works,
-                venue_id, venue_instance_id, Json(p.external_ids),
+                venue_id, venue_instance_id, Json(p.concepts), Json(p.external_ids),
             ),
         )
         cur.execute("SELECT id FROM papers WHERE doi=%s;", (doi,))
@@ -262,17 +269,17 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
         INSERT INTO papers
             (title, abstract, conclusion, year, publication_date,
              doi, field, language, referenced_works, related_works, 
-             venue_id, venue_instance_id, external_ids)
+             venue_id, venue_instance_id, concepts, external_ids)
         VALUES
             (%s, %s, %s, %s, %s,
              %s, %s, %s, %s, %s,
-             %s, %s, %s)
+             %s, %s, %s, %s)
         RETURNING id;
         """,
         (
             p.title, p.abstract, p.conclusion, p.year, p.publication_date,
             p.doi, p.field, p.language, p.referenced_works, p.related_works,
-            venue_id, venue_instance_id, Json(p.external_ids),
+            venue_id, venue_instance_id, Json(p.concepts), Json(p.external_ids),
         ),
     )
     (pid,) = cur.fetchone()

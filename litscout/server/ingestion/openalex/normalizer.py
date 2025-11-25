@@ -8,7 +8,7 @@ from server.ingestion.models import (
     NormalizedVenue,
     NormalizedVenueInstance,
 )
-
+from server.ingestion.openalex.client import _get
 
 def _reconstruct_abstract(inverted_index: Dict[str, List[int]]) -> str:
     """
@@ -72,6 +72,19 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         year = work.get("publication_year")
         venue_instance = NormalizedVenueInstance(venue=venue, year=year)
 
+
+    # Concepts
+    concepts_map: Dict[str, float] = {}
+    for c in work.get("concepts", []):
+        name = c.get("display_name")
+        score = c.get("score")
+        if not name or score is None or score <= 0.0:
+            continue
+        # If same name appears multiple times, keep max score
+        prev = concepts_map.get(name, 0.0)
+        if score > prev:
+            concepts_map[name] = float(score)
+
     # Authors
     authorships = work.get("authorships") or []
     authors = []
@@ -79,18 +92,43 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
     is_corr = []
 
     for idx, auth in enumerate(authorships, start=1):
-        author = auth.get("author") or {}
+        author = _get(f"https://api.openalex.org/{auth.get('author').get('id').split('/')[-1]}")
+
         name = author.get("display_name")
         if not name:
             continue
 
-        institutions = auth.get("institutions") or []
-        affiliation = institutions[0].get("display_name") if institutions else None
+        institutions = author.get("affiliations") or []
+        affiliations = []
+        last_known_institutions = []
+
+        for institution in institutions:
+            inst = institution.get("institution") or {}
+            affiliations.append({
+                "name": inst.get("display_name"),
+                "country_code": inst.get("country_code"),
+                "type": inst.get("type"),
+                "id": inst.get("id"),
+                "years": institution.get("years"),
+            })
+
+        for last_inst in author.get("last_known_institutions", []):
+            last_known_institutions.append({
+                "name": last_inst.get("display_name"),
+                "country_code": last_inst.get("country_code"),
+                "type": last_inst.get("type"),
+                "id": last_inst.get("id"),
+            })
+
         ids = author.get("ids") or {}
 
         na = NormalizedAuthor(
             full_name=name,
-            affiliation=affiliation,
+            affiliations=affiliations,
+            last_known_institutions=last_known_institutions,
+            works_counted=author.get("works_count"),
+            cited_by_count=author.get("cited_by_count"),
+            topic_shares=auth.get("topic_share"),
             orcid=ids.get("orcid"),
             external_ids={
                 "openalex": author.get("id"),
@@ -118,5 +156,6 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         author_order=author_order,
         referenced_works=work.get("referenced_works", []),
         related_works=work.get("related_works", []),
+        concepts=concepts_map,
         external_ids={"openalex": work.get("id")},
     )

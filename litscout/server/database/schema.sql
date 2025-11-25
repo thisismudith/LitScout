@@ -4,13 +4,15 @@ CREATE TYPE venue_type AS ENUM ('conference', 'journal');
 CREATE TABLE authors (
     id                      BIGSERIAL PRIMARY KEY,
     full_name               TEXT NOT NULL,
-    affiliation             TEXT,
+    works_counted           INTEGER,
+    cited_by_count          INTEGER,
     orcid                   TEXT UNIQUE,
+    affiliations            JSONB,
+    last_known_institutions JSONB,
+    topic_shares            JSONB,
     external_ids            JSONB,
     cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
     cluster_ids_weightage   REAL[]   NOT NULL DEFAULT '{}',
-    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
     CONSTRAINT authors_clusters_same_length
         CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
@@ -63,7 +65,13 @@ CREATE TABLE papers (
     related_works           TEXT[] NOT NULL DEFAULT '{}',
     venue_id                BIGINT REFERENCES venues(id),
     venue_instance_id       BIGINT REFERENCES venue_instances(id),
+    concepts                JSONB,
+    cluster_ids            BIGINT[] NOT NULL DEFAULT '{}',
+    cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
     external_ids            JSONB NOT NULL
+
+    CONSTRAINT papers_clusters_same_length
+        CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
 );
 
 -- Many-to-many: which authors wrote which papers, in what order
@@ -120,9 +128,9 @@ CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
     ON venue_instances(submission_deadline);
 
 -- Fast "papers in cluster X" queries
--- CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
---     ON papers USING GIN (cluster_ids);
+CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin
+    ON papers USING GIN (cluster_ids);
 
--- -- Fast "authors in cluster X" queries
--- CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
---     ON authors USING GIN (cluster_ids);
+-- Fast "authors in cluster X" queries
+CREATE INDEX IF NOT EXISTS idx_authors_cluster_ids_gin
+    ON authors USING GIN (cluster_ids);
