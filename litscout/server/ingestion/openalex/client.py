@@ -3,7 +3,7 @@
 import time
 from colorama import Fore
 import requests
-from litscout.server.logger import ColorLogger
+from server.logger import ColorLogger
 
 BASE_URL = "https://api.openalex.org"
 WORKS_URL = f"{BASE_URL}/works"

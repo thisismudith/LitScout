@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from colorama import Fore
 import requests
 import time
-from litscout.server.logger import ColorLogger
+from server.logger import ColorLogger
 from server.ingestion.openalex.ingest import (
     ingest_openalex_concepts,
     ensure_openalex_tracking_table_global,

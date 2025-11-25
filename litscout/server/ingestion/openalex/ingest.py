@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from colorama import Fore
 
-from litscout.server.logger import ColorLogger
+from server.logger import ColorLogger
 from server.ingestion.db_writer import (
     get_conn,
     upsert_concept,
