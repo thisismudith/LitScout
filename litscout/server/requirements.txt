@@ -7,3 +7,5 @@ sentence-transformers
 requests
 psycopg2-binary
 colorama
+fastapi
+uvicorn
