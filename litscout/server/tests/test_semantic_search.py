@@ -112,7 +112,7 @@ class TestFormatSearchResults:
             )
         ]
         output = format_search_results(results)
-        assert "Found 1 results" in output
+        assert "Found 1 result" in output
         assert "[0.950]" in output
         assert "Test Paper" in output
         assert "Year: 2023" in output

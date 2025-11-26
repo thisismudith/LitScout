@@ -185,7 +185,8 @@ def format_search_results(results: List[SearchResult], verbose: bool = False) ->
     if not results:
         return "No results found."
     
-    lines = [f"Found {len(results)} results:\n"]
+    result_word = "result" if len(results) == 1 else "results"
+    lines = [f"Found {len(results)} {result_word}:\n"]
     
     for i, result in enumerate(results, 1):
         lines.append(f"{i}. [{result.score:.3f}] {result.title}")
