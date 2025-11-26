@@ -15,6 +15,7 @@ from server.ingestion.openalex.ingest import ingest_openalex_concept
 from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
 from server.ingestion.openalex.enrich import enrich_openalex
 from server.embeddings.papers import embed_missing_papers
+from server.search.semantic import semantic_search, format_search_results
 
 
 cli_log = ColorLogger("CLI", include_timestamps=False, include_threading_id=False)
@@ -97,6 +98,22 @@ def build_parser():
     embed_papers_parser.add_argument("--batch-size", type=int, default=64, help="Embedding batch size per API call.")
     embed_papers_parser.add_argument("--limit", type=int, default=None, help="Optional max number of papers to embed (for testing).")
 
+    # Search commands
+    search_parser = subparsers.add_parser("search", help="Semantic search for research papers.")
+    search_parser.add_argument("query", nargs="?", help="Search query (natural language description of the topic).")
+    search_parser.add_argument("--model", default="bge-small-en-v1.5-local",
+        help="Embedding model name to use for search (default: bge-small-en-v1.5-local)."
+    )
+    search_parser.add_argument("--top-k", type=int, default=10, help="Number of results to return (default: 10).")
+    search_parser.add_argument("--min-score", type=float, default=0.0, help="Minimum similarity score threshold (0-1).")
+    search_parser.add_argument("--verbose", "-v", action="store_true", help="Show abstracts in results.")
+
+    # Server command
+    serve_parser = subparsers.add_parser("serve", help="Start the FastAPI server.")
+    serve_parser.add_argument("--host", default="0.0.0.0", help="Host to bind the server to (default: 0.0.0.0).")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port to bind the server to (default: 8000).")
+    serve_parser.add_argument("--reload", action="store_true", help="Enable auto-reload for development.")
+
     return parser
 
 
@@ -177,6 +194,35 @@ def main():
         if args.embed_command == "papers":
             cli_log.info(f"Embedding papers using model '{args.model}'...")
             embed_missing_papers(model_name=args.model, batch_size=args.batch_size, limit=args.limit)
+
+    # SEARCH COMMANDS
+    elif args.category == "search":
+        if not args.query:
+            cli_log.error("No search query provided. Usage: litscout search 'your query here'")
+            return
+        
+        cli_log.info(f"Searching for papers matching: '{args.query}'...")
+        results = semantic_search(
+            query=args.query,
+            model_name=args.model,
+            top_k=args.top_k,
+            min_score=args.min_score,
+        )
+        
+        # Print formatted results
+        output = format_search_results(results, verbose=args.verbose)
+        print("\n" + output)
+
+    # SERVER COMMAND
+    elif args.category == "serve":
+        import uvicorn
+        cli_log.info(f"Starting LitScout API server on {args.host}:{args.port}...")
+        uvicorn.run(
+            "server.main:app",
+            host=args.host,
+            port=args.port,
+            reload=args.reload,
+        )
 
     else:
         cli_log.error("Unknown command.")
