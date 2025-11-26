@@ -8,7 +8,7 @@ from psycopg2.extras import RealDictCursor
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from psycopg2.extras import Json
 
-from server.ingestion.db_writer import get_conn
+from server.database.db_utils import get_conn
 from server.ingestion.openalex.client import _get
 from server.logger import ColorLogger
 from server.utils.progress import create_progress_bar

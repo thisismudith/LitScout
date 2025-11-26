@@ -8,14 +8,10 @@ from concurrent.futures import ThreadPoolExecutor
 from colorama import Fore
 
 from server.logger import ColorLogger
+from server.database.db_utils import get_conn
 from server.ingestion.db_writer import (
-    get_conn,
-    upsert_concept,
-    upsert_venue,
-    get_or_create_venue_instance,
-    upsert_author,
-    upsert_paper,
-    insert_paper_authors,
+    upsert_concept, upsert_venue, get_or_create_venue_instance,
+    upsert_author, upsert_paper, insert_paper_authors,
 )
 from server.ingestion.openalex.client import iter_works_for_concept
 from server.ingestion.openalex.normalizer import normalize_openalex_work

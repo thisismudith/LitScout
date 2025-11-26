@@ -8,26 +8,13 @@ from psycopg2 import sql, OperationalError
 from getpass import getpass
 from colorama import Fore
 
+from server.globals import ENV_DB_NAME, ENV_DB_USER, ENV_DB_PASSWORD, ENV_DB_HOST, ENV_DB_PORT
 from server.logger import ColorLogger
 
 log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False, include_threading_id=False)
 
-# Shared env-based configuration
-ENV_DB_NAME = os.getenv("LITSCOUT_DB_NAME", "litscout")
-ENV_DB_USER = os.getenv("LITSCOUT_DB_USER", "admin")
-ENV_DB_PASSWORD = os.getenv("LITSCOUT_DB_PASSWORD", "admin")
-ENV_DB_HOST = os.getenv("LITSCOUT_DB_HOST", "localhost")
-ENV_DB_PORT = os.getenv("LITSCOUT_DB_PORT", "5432")
 
-
-def _connect_with_optional_prompt(
-    dbname: str,
-    user: str,
-    password: str,
-    host: str,
-    port: str,
-    purpose: str,
-):
+def _connect_with_optional_prompt(dbname: str, user: str, password: str, host: str, port: str):
     """
     Try to connect with given password.
     If password is empty or invalid, prompt once and retry.
@@ -38,13 +25,7 @@ def _connect_with_optional_prompt(
 
     while True:
         try:
-            conn = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=current_password,
-                host=host,
-                port=port,
-            )
+            conn = psycopg2.connect(dbname=dbname, user=user, password=current_password, host=host, port=port)
             return conn, current_password
 
         except OperationalError as e:
@@ -55,15 +36,28 @@ def _connect_with_optional_prompt(
             )
 
             if needs_prompt:
-                log.warn(f"{purpose} password is missing or invalid.")
+                log.warn(f"LITSCOUT_DB_PASSWORD is missing or invalid.")
                 current_password = getpass(f"Enter password for PostgreSQL user '{user}': ")
                 attempted_prompt = True
                 continue
 
-            log.error(f"Could not connect to Postgres for {purpose}.")
+            log.error(f"Could not connect to Postgres.")
             log.error(e)
-            sys.exit(1)
+            raise e
 
+def get_conn():
+    """
+    Get a connection to the target database using env vars.
+    Prompts for password if needed.
+    """
+    conn, _ = _connect_with_optional_prompt(
+        dbname=ENV_DB_NAME,
+        user=ENV_DB_USER,
+        password=ENV_DB_PASSWORD,
+        host=ENV_DB_HOST,
+        port=ENV_DB_PORT,
+    )
+    return conn
 
 def schema_exists(conn) -> bool:
     """

@@ -1,50 +1,15 @@
 # server/ingestion/db_writer.py
 
 from typing import List
-from psycopg2 import OperationalError
 from psycopg2.extras import Json
 from colorama import Fore
 
-from server.database.db_utils import (
-    ENV_DB_NAME, ENV_DB_USER, ENV_DB_PASSWORD,
-    ENV_DB_HOST, ENV_DB_PORT, _connect_with_optional_prompt,
-)
 from server.ingestion.models import NormalizedVenue, NormalizedAuthor, NormalizedPaper
 from server.logger import ColorLogger
 
 log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
 
-def get_conn():
-    """
-    Get a psycopg2 connection for ingestion.
 
-    Silent on success to avoid log spam when used by many threads.
-    """
-
-    try:
-        dbname = ENV_DB_NAME
-        user = ENV_DB_USER
-        password = ENV_DB_PASSWORD
-        host = ENV_DB_HOST
-        port = ENV_DB_PORT
-
-        conn, _ = _connect_with_optional_prompt(
-            dbname=dbname,
-            user=user,
-            password=password,
-            host=host,
-            port=port,
-            purpose=f"ingestion connection to '{dbname}'",
-        )
-        conn.autocommit = True
-        return conn
-    except OperationalError as e:
-        # Only log on real failure
-        log.error(
-            f"[INGEST] Failed to connect to database '{dbname}' as '{user}'."
-        )
-        log.error(str(e))
-        raise
 
 # VENUE + VENUE INSTANCES
 def upsert_venue(cur, venue: NormalizedVenue) -> int:

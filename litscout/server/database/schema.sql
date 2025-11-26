@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS vector;
+
 CREATE TYPE venue_type AS ENUM ('conference', 'journal');
 
 -- Concepts
@@ -98,10 +100,11 @@ CREATE TABLE paper_authors (
 
 -- Embeddings for papers (one row per paper, per model)
 CREATE TABLE paper_embeddings (
-    paper_id    BIGINT PRIMARY KEY REFERENCES papers(id) ON DELETE CASCADE,
-    embedding   DOUBLE PRECISION[] NOT NULL,
-    model_name  TEXT NOT NULL,
-    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    paper_id        BIGINT PRIMARY KEY REFERENCES papers(id) ON DELETE CASCADE,
+    model_name      TEXT NOT NULL,
+    embedding_vec   vector(768) NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (paper_id, model_name)
 );
 
 -- Author Specialties / Research Areas
