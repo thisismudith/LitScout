@@ -13,6 +13,14 @@ CREATE TABLE concepts (
     related_concepts    JSONB
 );
 
+CREATE TABLE concept_embeddings (
+    concept_id      TEXT REFERENCES concepts(id) ON DELETE CASCADE,
+    model_name      TEXT NOT NULL,
+    embedding_vec   vector(768) NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (concept_id, model_name)
+);
+
 -- Authors
 CREATE TABLE authors (
     id                      BIGSERIAL PRIMARY KEY,
@@ -100,7 +108,7 @@ CREATE TABLE paper_authors (
 
 -- Embeddings for papers (one row per paper, per model)
 CREATE TABLE paper_embeddings (
-    paper_id        BIGINT PRIMARY KEY REFERENCES papers(id) ON DELETE CASCADE,
+    paper_id        BIGINT REFERENCES papers(id) ON DELETE CASCADE,
     model_name      TEXT NOT NULL,
     embedding_vec   vector(768) NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),

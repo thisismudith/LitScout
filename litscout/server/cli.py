@@ -15,8 +15,8 @@ from server.database.db_manager import (
 from server.ingestion.openalex.ingest import ingest_openalex_concept
 from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
 from server.ingestion.openalex.enrich import enrich_openalex
-from server.semantic.embeddings import embed_missing_papers
-from server.semantic.search import search_papers
+from server.semantic.embeddings import embed_missing_papers, embed_missing_concepts
+from server.semantic.search import search_papers, search_papers_hybrid, search_papers_via_concepts
 
 cli_log = ColorLogger("CLI", include_timestamps=False, include_threading_id=False)
 
@@ -182,8 +182,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     embed_parser.add_argument(
         "embed_command",
-        choices=["papers"],
-        help="What to embed (currently only 'papers' supported).",
+        choices=["papers", "concepts"],
+        help="What to embed.",
     )
     embed_parser.add_argument(
         "--model",
@@ -209,6 +209,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Semantic search over paper embeddings.",
     )
     sem_search_parser.add_argument(
+        "search_command",
+        choices=["papers", "concepts", "hybrid"],
+        help="What to embed.",
+    )
+    sem_search_parser.add_argument(
         "--query",
         type=str,
         required=True,
@@ -219,6 +224,30 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=10,
         help="Number of top results to return.",
+    )
+    sem_search_parser.add_argument(
+        "--concepts-limit",
+        type=int,
+        default=10,
+        help="Number of top concepts to consider in concept-based search.",
+    )
+    sem_search_parser.add_argument(
+        "--offset",
+        type=int,
+        default=0,
+        help="Number of top results to skip.",
+    )
+    sem_search_parser.add_argument(
+        "--paper-weight",
+        type=float,
+        default=0.6,
+        help="Weight for paper similarity in hybrid search.",
+    )
+    sem_search_parser.add_argument(
+        "--concept-weight",
+        type=float,
+        default=0.4,
+        help="Weight for concept-based similarity in hybrid search.",
     )
 
     return parser
@@ -341,13 +370,53 @@ def run_command(args: argparse.Namespace) -> None:
                     batch_size=args.batch_size,
                     limit=args.limit,
                 )
+            elif args.embed_command == "concepts":
+                embed_missing_concepts(
+                    batch_size=args.batch_size,
+                    limit=args.limit,
+                )
             return
         elif args.semantic_cmd == "search":
-            results = search_papers(query=args.query, top_k=args.limit)
-            cli_log.info(f"Top {len(results)} results:")
-            for r in results:
-                print(f"{r['score']:.3f}, {r['distance']:.3f}  |  {r['paper_id']}, {r['external_ids']['openalex']}  |  {r['title']}")
-            return
+            if args.search_command == "papers":
+                results = search_papers(query=args.query, limit=args.limit, offset=args.offset)
+                cli_log.info(f"Top {len(results)} results:")
+                for r in results:
+                    print(f"{r['similarity']:.3f}  |  {r['external_ids']['openalex']}  |  {r['title']}")
+                return
+            elif args.search_command == "concepts":
+                result = search_papers_via_concepts(
+                    query=args.query, top_k_concepts=args.concepts_limit,
+                    top_k_papers_per_concept=args.limit, limit=args.limit, offset=args.offset,
+                )
+                cli_log.info(f"Top {result['offset']} - {result['offset'] + result['limit']} results:")
+
+                print(f"Found via {len(result['concepts'])} concepts:")
+                for c in result['concepts']:
+                    print(f"  {c['similarity']:.3f}  |  {c['concept_id']} | {c['name']}")
+                print("Papers:")
+                for r in result['papers']:
+                    print(f"  {r['total_score']:.3f}  |  {r['external_ids']['openalex']}  |  {r['title']}")
+                return
+            elif args.search_command == "hybrid":
+                if args.paper_weight + args.concept_weight != 1.0:
+                    if args.paper_weight == 0.4:
+                        args.paper_weight = 1.0 - args.concept_weight
+                    else:
+                        args.concept_weight = 1.0 - args.paper_weight
+                    cli_log.warn(
+                        f"paper_weight and concept_weight must sum to 1.0; "
+                        f"adjusted to paper_weight={args.paper_weight}, concept_weight={args.concept_weight}."
+                    )
+
+                result = search_papers_hybrid(
+                    query=args.query, limit=args.limit, offset=args.offset,
+                    paper_weight=args.paper_weight, concept_weight=args.concept_weight,
+                    top_k_concepts=args.concepts_limit, top_k_papers_per_concept=args.limit
+                )
+                cli_log.info(f"Top {result['offset']} - {result['offset'] + result['limit']} results:")
+                for r in result['papers']:
+                    print(f"{r['combined_score']:.3f}  |  {r['external_ids']['openalex']}  |  {r['title']}")
+                return
 
     cli_log.error("Unknown command.")
 
