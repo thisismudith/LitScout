@@ -12,8 +12,9 @@ from server.database.db_manager import (
     stop_postgres,
     init_database,
 )
-from server.ingestion.openalex.ingest import ingest_openalex_concept
+from server.ingestion.openalex.ingest import ingest_openalex_concept, ingest_openalex_sources_for_publisher
 from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
+from server.ingestion.openalex.fetch_sources import ingest_sources_for_fields
 from server.ingestion.openalex.enrich import enrich_openalex
 from server.semantic.embeddings import embed_missing_papers, embed_missing_concepts
 from server.semantic.search import search_papers, search_papers_hybrid, search_papers_via_concepts
@@ -68,7 +69,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     # Single concept
     oa_parser = ingest_subp.add_parser(
-        "openalex", help="Ingest a single OpenAlex concept."
+        "openalex",
+        help="Ingest a single OpenAlex concept."
     )
     oa_parser.add_argument(
         "--concept_id",
@@ -131,6 +133,64 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Run verify/enrich pass instead of fresh ingest.",
     )
+
+    # Sources
+    source_parser = ingest_subp.add_parser(
+        "source",
+        help="Ingest OpenAlex sources for publishers associated with given fields.",
+    )
+    source_parser.add_argument(
+        "--publisher",
+        required=True,
+        help="OpenAlex publisher ID, e.g., P4310319965.",
+    )
+    source_parser.add_argument(
+        "--per-page",
+        type=int,
+        default=200,
+        help="Number of sources to fetch per page (default: 200).",
+    )
+
+    sources_parser = ingest_subp.add_parser(
+        "sources",
+        help="Ingest OpenAlex sources for publishers associated with given fields.",
+    )
+    sources_parser.add_argument(
+        "--fields",
+        nargs="+",
+        required=True,
+        help=(
+            "One or more field names to search publishers for, e.g.: "
+            "--fields 'computer science' 'economics'."
+        ),
+    )
+    sources_parser.add_argument(
+        "--limit",
+        type=int,
+        default=500,
+        help="Number of publishers to ingest per field (default: 500).",
+    )
+    sources_parser.add_argument(
+        "--max-publishers",
+        type=int,
+        default=1000,
+        help="Maximum number of unique publishers to ingest (default: 1000).",
+    )
+    sources_parser.add_argument(
+        "--per-page",
+        type=int,
+        default=200,
+        help="Number of sources to fetch per page (default: 200).",
+    )
+    sources_parser.add_argument(
+        "--max-workers",
+        type=int,
+        default=None,
+        help=(
+            "Maximum number of worker threads. Defaults to min(#concepts, cpu_cores*2)."
+        ),
+    )
+
 
     # =========================
     # ENRICH COMMANDS
@@ -298,27 +358,43 @@ def run_command(args: argparse.Namespace) -> None:
         elif args.ingest_cmd == "openalex-multi":
             fields = [f.strip() for f in (args.fields or []) if f.strip()]
             if not fields:
-                cli_log.error(
-                    "No valid fields provided. Use --fields 'computer science' 'economics' ..."
-                )
+                cli_log.error("No valid fields provided. Use --fields 'computer science' 'economics' ...")
                 return
 
             max_workers = args.max_workers or (os.cpu_count() or 4)
             cli_log.info(
-                f"Starting OpenAlex multi-field ingestion for "
-                f"fields={fields}, pages={args.pages}, max_workers={max_workers}, "
-                f"skip_existing={args.skip_existing}, per_field_limit={args.per_field_limit}, "
-                f"verify={args.verify}..."
+                f"Starting OpenAlex multi-field ingestion for fields={fields}, pages={args.pages}, max_workers={max_workers}, "
+                f"skip_existing={args.skip_existing}, per_field_limit={args.per_field_limit}, verify={args.verify}..."
             )
 
             ingest_openalex_from_fields(
-                fields=fields,
-                max_workers=max_workers,
-                pages=args.pages,
-                skip_existing=args.skip_existing,
-                per_field_limit=args.per_field_limit,
-                verify=args.verify,
+                fields=fields, max_workers=max_workers, pages=args.pages,
+                skip_existing=args.skip_existing, per_field_limit=args.per_field_limit, verify=args.verify,
             )
+        
+        elif args.ingest_cmd == "source":
+            cli_log.info(f"Starting OpenAlex sources ingestion for publisher {args.publisher}...")
+            ingest_openalex_sources_for_publisher(host_org_id=args.publisher, per_page=args.per_page)
+
+        elif args.ingest_cmd == "sources":
+            fields = [f.strip() for f in (args.fields or []) if f.strip()]
+            if not fields:
+                cli_log.error("No valid fields provided. Use --fields 'computer science' 'economics' ...")
+                return
+
+            max_workers = args.max_workers or (os.cpu_count() or 4)
+
+            cli_log.info(
+                f"Starting OpenAlex sources ingestion for fields={fields}, publishers_per_field={args.limit}, "
+                f"max_publishers={args.max_publishers}, per_page={args.per_page}..."
+            )
+
+            ingest_sources_for_fields(
+                fields=fields, max_workers=max_workers, publishers_per_field=args.limit,
+                max_publishers=args.max_publishers, per_page_sources=args.per_page
+            )
+
+
         return
 
     # =========================

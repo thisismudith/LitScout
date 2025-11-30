@@ -40,37 +40,30 @@ CREATE TABLE authors (
         CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))
 );
 
--- Venues (conferences / journals)
-CREATE TABLE venues (
-    id              BIGSERIAL PRIMARY KEY,
-    name            TEXT NOT NULL,
-    short_name      TEXT,
-    venue_type      venue_type NOT NULL,
-    homepage_url    TEXT,
-    location        TEXT,
-    rank_label      TEXT,
-    external_ids    JSONB,
-    created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+-- Sources (Venues)
+CREATE TABLE IF NOT EXISTS sources (
+    id                  TEXT PRIMARY KEY,       -- OpenAlex source ID, e.g. 'https://openalex.org/S123...'
+    short_id            TEXT UNIQUE,            -- e.g. 'S123...' extracted from id
+    display_name        TEXT NOT NULL,
+    source_type         TEXT NOT NULL,          -- 'journal', 'conference', 'repository', etc.
+    host_organization_id   TEXT,
+    host_organization_name TEXT,
+    country_code        TEXT,
+    issn_l              TEXT,
+    issn                TEXT[],                 -- all ISSNs as array of text
+    is_oa               BOOLEAN,
+    is_in_doaj          BOOLEAN,
+    works_count         INTEGER,
+    cited_by_count      INTEGER,
+    summary_stats       JSONB,                  -- 2yr_mean_citedness, h_index, i10_index, etc.
+    topics              JSONB,                  -- OpenAlex topics/topics_share if you want them
+    counts_by_year      JSONB,                  -- time series of works_count/cited_by_count
+    homepage_url        TEXT,
+    created_date        TIMESTAMPTZ,
+    updated_date        TIMESTAMPTZ,
+    raw_json            JSONB
 );
 
--- Specific yearly / edition instances of a venue
-CREATE TABLE venue_instances (
-    id                      BIGSERIAL PRIMARY KEY,
-    venue_id                BIGINT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
-    year                    INTEGER NOT NULL,
-    submission_deadline     DATE,
-    notification_date       DATE,
-    camera_ready_deadline   DATE,
-    start_date              DATE,
-    end_date                DATE,
-    location_override       TEXT,  -- if this year's location differs
-    notes                   TEXT,
-    created_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at              TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-
-    UNIQUE (venue_id, year)
-);
 
 -- Papers
 CREATE TABLE papers (
@@ -157,10 +150,6 @@ CREATE INDEX IF NOT EXISTS idx_paper_authors_author
 -- Lookup papers by year
 CREATE INDEX IF NOT EXISTS idx_papers_year
     ON papers(year);
-
--- Deadline-based queries for conferences
-CREATE INDEX IF NOT EXISTS idx_venue_instances_deadline
-    ON venue_instances(submission_deadline);
 
 -- Fast "papers in cluster X" queries
 CREATE INDEX IF NOT EXISTS idx_papers_cluster_ids_gin

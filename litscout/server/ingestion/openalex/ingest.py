@@ -1,25 +1,24 @@
 # server/ingestion/openalex/ingest.py
 
-import os
 import traceback
-from typing import List, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
 from colorama import Fore
+import requests
+
 
 from server.logger import ColorLogger
 from server.database.db_utils import get_conn
-from server.ingestion.db_writer import (
-    upsert_concept, upsert_venue, get_or_create_venue_instance,
-    upsert_author, upsert_paper, insert_paper_authors,
-)
+from server.ingestion.db_writer import upsert_concept, upsert_sources_batch, upsert_author, upsert_paper, insert_paper_authors
 from server.ingestion.openalex.client import iter_works_for_concept
-from server.ingestion.openalex.normalizer import normalize_openalex_work
+from server.ingestion.openalex.normalizer import normalize_openalex_source, normalize_openalex_work
 from server.utils.progress import create_progress_bar
 
 log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True, include_threading_id=False)
 
 OPENALEX_CONCEPTS_URL = "https://api.openalex.org/concepts"
+OPENALEX_SOURCES_URL = "https://api.openalex.org/sources"
 
 
 # Tracking table for "which concepts have already been ingested"
@@ -132,17 +131,6 @@ def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool
         for work in iter_works_for_concept(concept_id, pages=pages):
             # Normalize JSON → NormalizedPaper
             p = normalize_openalex_work(work)
-
-            # Venue & instance
-            venue_id = None
-            venue_instance_id = None
-            if p.venue:
-                venue_id = upsert_venue(cur, p.venue)
-                year = p.venue_instance.year if p.venue_instance else p.year
-                venue_instance_id = get_or_create_venue_instance(
-                    cur, venue_id, year
-                )
-
             # Concepts
             for cid, info in p.concepts.items():
                 upsert_concept(cur, cid, info["name"], info["level"])
@@ -151,7 +139,7 @@ def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool
             author_ids = [upsert_author(cur, a) for a in p.authors]
 
             # Paper
-            paper_id = upsert_paper(cur, p, venue_id, venue_instance_id)
+            paper_id = upsert_paper(cur, p)
 
             # Paper-author mapping
             insert_paper_authors(cur, paper_id, p, author_ids)
@@ -271,3 +259,50 @@ def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: in
     failure_count = len(results) - success_count
 
     log.success(f"Parallel ingestion completed: {success_count} succeeded, {failure_count} failed.")
+
+
+# Source ingestions
+def _fetch_sources_page(params: Dict[str, Any], ) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+    """
+    Fetch one page of sources from OpenAlex and return (results, next_cursor).
+    """
+    resp = requests.get(OPENALEX_SOURCES_URL, params=params, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+
+    results = data.get("results", [])
+    meta = data.get("meta", {})
+    next_cursor = meta.get("next_cursor")
+
+    return results, next_cursor
+
+def ingest_openalex_sources_for_publisher(host_org_id: str, per_page: int = 200) -> None:
+    """
+    Ingest all sources (journals, conferences, etc.) for a given host_organization.id
+    into the 'sources' table.
+
+    Example host_org_id: 'P4310319965' (Springer Nature).
+    """
+    log.info(f"Starting source ingestion for host_organization.id={host_org_id}")
+
+    cursor: Optional[str] = "*"
+    total = 0
+
+    while cursor:
+        params = {
+            "filter": f"host_organization.id:{host_org_id}",
+            "per_page": per_page,
+            "cursor": cursor,
+        }
+        page_results, next_cursor = _fetch_sources_page(params)
+        if not page_results:
+            break
+
+        norm_records = [normalize_openalex_source(src) for src in page_results]
+        upsert_sources_batch(norm_records)
+
+        total += len(norm_records)
+
+        cursor = next_cursor
+
+    log.success(f"Completed source ingestion for host_organization.id={host_org_id} (total={total}).")

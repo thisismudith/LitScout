@@ -5,8 +5,7 @@ from typing import Dict, Any, Optional, List
 from server.ingestion.models import (
     NormalizedPaper,
     NormalizedAuthor,
-    NormalizedVenue,
-    NormalizedVenueInstance,
+    NormalizedSource,
 )
 
 def _reconstruct_abstract(inverted_index: Dict[str, List[int]]) -> str:
@@ -27,12 +26,20 @@ def _reconstruct_abstract(inverted_index: Dict[str, List[int]]) -> str:
     return " ".join(token for token in tokens if token is not None)
 
 
+def _shorten_id(openalex_id: str) -> str:
+    """
+    Convert 'https://openalex.org/S123456789' -> 'S123456789'.
+    """
+    if not openalex_id:
+        return ""
+    return openalex_id.rstrip("/").split("/")[-1]
+
+
 def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
     # Title
     raw_title = work.get("title") or work.get("display_name")
     title = raw_title.strip() if isinstance(raw_title, str) and raw_title.strip() else "(untitled)"
 
-    host_venue = work.get("host_venue") or {}
     concepts = work.get("concepts") or []
     primary_field = concepts[0]["display_name"] if concepts else None
 
@@ -42,35 +49,6 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         inv = work.get("abstract_inverted_index")
         if inv:
             abstract = _reconstruct_abstract(inv)
-
-    # Venue normalization
-    venue = None
-    venue_instance = None
-    if host_venue.get("display_name"):
-        vt_raw = (host_venue.get("type") or "").lower()
-        if vt_raw in ("journal", "book-series"):
-            venue_type = "journal"
-        elif vt_raw in ("conference", "proceedings"):
-            venue_type = "conference"
-        else:
-            # default guess
-            venue_type = "journal"
-
-        venue = NormalizedVenue(
-            name=host_venue.get("display_name"),
-            short_name=host_venue.get("abbreviated_title"),
-            venue_type=venue_type,
-            homepage_url=host_venue.get("homepage_url"),
-            location=None,
-            rank_label=None,
-            external_ids={
-                "openalex": host_venue.get("id"),
-            },
-        )
-
-        year = work.get("publication_year")
-        venue_instance = NormalizedVenueInstance(venue=venue, year=year)
-
 
     # Concepts
     concepts_map: Dict[str, float] = {}
@@ -133,8 +111,6 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         doi=work.get("doi"),
         field=primary_field,
         language=work.get("language"),
-        venue=venue,
-        venue_instance=venue_instance,
         authors=authors,
         author_order=author_order,
         referenced_works=work.get("referenced_works", []),
@@ -144,55 +120,48 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         is_corresponding_flags=is_corr,
     )
 
-# for idx, auth in enumerate(authorships, start=1):
-#         try:
-#             author = _get(f"https://api.openalex.org/{auth.get('author').get('id').split('/')[-1]}")
-#         except AttributeError:
-#             continue
+def normalize_openalex_source(src: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Take a raw OpenAlex Source object and produce a dict matching our DB schema.
+    https://docs.openalex.org/api-entities/sources/source-object
+    """
+    ids = src.get("ids") or {}
+    host_org = src.get("host_organization") or {}
+    host_org_name = src.get("host_organization_name")
 
-#         name = author.get("display_name")
-#         if not name:
-#             continue
+    issn_l = src.get("issn_l")
+    issn_list = src.get("issn") or []
 
-#         institutions = author.get("affiliations") or []
-#         affiliations = []
-#         last_known_institutions = []
+    summary_stats = src.get("summary_stats") or {}
+    topics = src.get("topics") or src.get("x_concepts") or []
+    counts_by_year = src.get("counts_by_year") or []
 
-#         for institution in institutions:
-#             inst = institution.get("institution") or {}
-#             affiliations.append({
-#                 "name": inst.get("display_name"),
-#                 "country_code": inst.get("country_code"),
-#                 "type": inst.get("type"),
-#                 "id": inst.get("id"),
-#                 "years": institution.get("years"),
-#             })
+    is_oa = src.get("is_oa")
+    is_in_doaj = src.get("is_in_doaj")
+    homepage_url = src.get("homepage_url")
 
-#         for last_inst in author.get("last_known_institutions", []):
-#             last_known_institutions.append({
-#                 "name": last_inst.get("display_name"),
-#                 "country_code": last_inst.get("country_code"),
-#                 "type": last_inst.get("type"),
-#                 "id": last_inst.get("id"),
-#             })
+    created_date = src.get("created_date")
+    updated_date = src.get("updated_date")
 
-#         ids = author.get("ids") or {}
-
-#         na = NormalizedAuthor(
-#             full_name=name,
-#             affiliations=affiliations,
-#             last_known_institutions=last_known_institutions,
-#             works_counted=author.get("works_count"),
-#             cited_by_count=author.get("cited_by_count"),
-#             topic_shares=auth.get("topic_share"),
-#             orcid=ids.get("orcid"),
-#             external_ids={
-#                 "openalex": author.get("id"),
-#                 "orcid": ids.get("orcid"),
-#                 "scopus": ids.get("scopus"),
-#                 "semantic_scholar": ids.get("semantic_scholar"),
-#             },
-#         )
-#         authors.append(na)
-#         author_order.append(idx)
-#         is_corr.append(False)  # OpenAlex doesn't expose this cleanly
+    return NormalizedSource(
+        id=src.get("id"),
+        short_id=_shorten_id(src.get("id", "")),
+        name=src.get("display_name"),
+        source_type=src.get("type"),
+        host_organization_id=host_org or ids.get("publisher"),
+        host_organization_name=host_org_name,
+        country_code=src.get("country_code"),
+        issn_l=issn_l,
+        issn=issn_list,
+        is_oa=is_oa,
+        is_in_doaj=is_in_doaj,
+        works_count=src.get("works_count"),
+        cited_by_count=src.get("cited_by_count"),
+        summary_stats=summary_stats,
+        topics=topics,
+        counts_by_year=counts_by_year,
+        homepage_url=homepage_url,
+        created_date=created_date,
+        updated_date=updated_date,
+        raw_json=src,
+    )

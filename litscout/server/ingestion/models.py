@@ -5,23 +5,6 @@ from typing import Optional, Dict, Any, List
 
 
 @dataclass
-class NormalizedVenue:
-    name: str
-    short_name: Optional[str]
-    venue_type: str            # "conference" or "journal"
-    homepage_url: Optional[str]
-    location: Optional[str]
-    rank_label: Optional[str]
-    external_ids: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class NormalizedVenueInstance:
-    venue: NormalizedVenue
-    year: Optional[int]
-
-
-@dataclass
 class NormalizedAuthor:
     full_name: str
     works_counted: Optional[int]
@@ -44,8 +27,6 @@ class NormalizedPaper:
     doi: Optional[str]
     field: Optional[str]
     language: Optional[str]
-    venue: Optional[NormalizedVenue]
-    venue_instance: Optional[NormalizedVenueInstance]
     authors: List[NormalizedAuthor] = field(default_factory=list)
     author_order: List[int] = field(default_factory=list)
     referenced_works: List[str] = field(default_factory=list)
@@ -53,3 +34,26 @@ class NormalizedPaper:
     concepts: Dict[str, Any] = field(default_factory=dict)
     external_ids: Dict[str, Any] = field(default_factory=dict)
     is_corresponding_flags: List[bool] = field(default_factory=list)
+
+@dataclass
+class NormalizedSource:
+    id: str
+    short_id: str
+    name: str
+    source_type: Optional[str]
+    host_organization_id: Optional[str]
+    host_organization_name: Optional[str]
+    country_code: Optional[str]
+    issn_l: Optional[str]
+    is_oa: Optional[bool]
+    is_in_doaj: Optional[bool]
+    works_count: Optional[int]
+    cited_by_count: Optional[int]
+    homepage_url: Optional[str]
+    created_date: Optional[str]
+    updated_date: Optional[str]
+    issn: List[str] = field(default_factory=list)
+    summary_stats: Dict[str, Any] = field(default_factory=dict)
+    topics: List[Dict[str, Any]] = field(default_factory=list)
+    counts_by_year: List[Dict[str, Any]] = field(default_factory=list)
+    raw_json: Dict[str, Any] = field(default_factory=dict)

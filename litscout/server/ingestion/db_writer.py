@@ -1,91 +1,14 @@
 # server/ingestion/db_writer.py
 
-from typing import List
+from typing import Dict, List, Any
 from psycopg2.extras import Json
 from colorama import Fore
 
-from server.ingestion.models import NormalizedVenue, NormalizedAuthor, NormalizedPaper
+from server.database.db_utils import get_conn
+from server.ingestion.models import NormalizedAuthor, NormalizedPaper, NormalizedSource
 from server.logger import ColorLogger
 
 log = ColorLogger("DB", tag_color=Fore.BLUE, include_timestamps=False)
-
-
-
-# VENUE + VENUE INSTANCES
-def upsert_venue(cur, venue: NormalizedVenue) -> int:
-    """
-    Insert or reuse a venue.
-    Prefer external_ids->'openalex'
-    """
-    openalex_id = (venue.external_ids or {}).get("openalex")
-
-    if openalex_id:
-        cur.execute(
-            "SELECT id FROM venues WHERE external_ids ->> 'openalex' = %s;",
-            (openalex_id,),
-        )
-        row = cur.fetchone()
-        if row:
-            return row[0]
-
-    # fallback by name
-    cur.execute(
-        """
-        INSERT INTO venues (name, short_name, venue_type, homepage_url,
-                            location, rank_label, external_ids)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (name) DO UPDATE
-        SET short_name   = EXCLUDED.short_name,
-            venue_type   = EXCLUDED.venue_type,
-            homepage_url = EXCLUDED.homepage_url,
-            location     = EXCLUDED.location,
-            rank_label   = EXCLUDED.rank_label,
-            external_ids = EXCLUDED.external_ids
-        RETURNING id;
-        """,
-        (
-            venue.name,
-            venue.short_name,
-            venue.venue_type,
-            venue.homepage_url,
-            venue.location,
-            venue.rank_label,
-            Json(venue.external_ids),
-        ),
-    )
-    (venue_id,) = cur.fetchone()
-    return venue_id
-
-
-def get_or_create_venue_instance(cur, venue_id: int, year: int | None):
-    """
-    Create or reuse a specific venue instance (venue + year)
-    """
-    if year is None:
-        return None
-    
-    cur.execute(
-        """
-        SELECT id FROM venue_instances
-        WHERE venue_id = %s AND year = %s;
-        """,
-        (venue_id, year),
-    )
-    row = cur.fetchone()
-    if row:
-        return row[0]
-
-    cur.execute(
-        """
-        INSERT INTO venue_instances (venue_id, year)
-        VALUES (%s, %s)
-        RETURNING id;
-        """,
-        (venue_id, year),
-    )
-    (vi_id,) = cur.fetchone()
-    return vi_id
-
 
 # CONCEPTS
 def upsert_concept(cur, concept_id: str, name: str, level: int) -> int:
@@ -159,13 +82,12 @@ def upsert_author(cur, author: NormalizedAuthor) -> int:
 
 
 # PAPERS
-def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
+def upsert_paper(cur, p: NormalizedPaper) -> int:
     """
     Insert or reuse a paper.
     Priority:
         1. DOI
         2. external_ids->openalex
-    Updates venue_id & venue_instance_id if found.
     """
 
     doi = p.doi
@@ -178,11 +100,11 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
             INSERT INTO papers
                 (title, abstract, conclusion, year, publication_date,
                 doi, field, language, referenced_works, related_works, 
-                venue_id, venue_instance_id, concepts, external_ids)
+                concepts, external_ids)
             VALUES
                 (%s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s,
-                %s, %s, %s, %s)
+                %s, %s)
             ON CONFLICT (doi) DO UPDATE
             SET title            = EXCLUDED.title,
                 abstract         = EXCLUDED.abstract,
@@ -193,8 +115,6 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
                 language         = EXCLUDED.language,
                 referenced_works = EXCLUDED.referenced_works,
                 related_works    = EXCLUDED.related_works,
-                venue_id         = EXCLUDED.venue_id,
-                venue_instance_id= EXCLUDED.venue_instance_id,
                 concepts         = EXCLUDED.concepts,
                 external_ids     = EXCLUDED.external_ids
             RETURNING id;
@@ -202,7 +122,7 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
             (
                 p.title, p.abstract, p.conclusion, p.year, p.publication_date,
                 p.doi, p.field, p.language, p.referenced_works, p.related_works,
-                venue_id, venue_instance_id, Json(p.concepts), Json(p.external_ids),
+                Json(p.concepts), Json(p.external_ids),
             ),
         )
         cur.execute("SELECT id FROM papers WHERE doi=%s;", (doi,))
@@ -212,12 +132,10 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
             cur.execute(
                 """
                 UPDATE papers
-                SET venue_id = COALESCE(%s, venue_id),
-                    venue_instance_id = COALESCE(%s, venue_instance_id),
-                    external_ids = external_ids || %s
+                SET external_ids = external_ids || %s
                 WHERE id=%s;
                 """,
-                (venue_id, venue_instance_id, Json(p.external_ids), pid),
+                (Json(p.external_ids), pid),
             )
             return pid
 
@@ -233,12 +151,10 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
             cur.execute(
                 """
                 UPDATE papers
-                SET venue_id = COALESCE(%s, venue_id),
-                    venue_instance_id = COALESCE(%s, venue_instance_id),
-                    external_ids = external_ids || %s
+                SET external_ids = external_ids || %s
                 WHERE id=%s;
                 """,
-                (venue_id, venue_instance_id, Json(p.external_ids), pid),
+                (Json(p.external_ids), pid),
             )
             return pid
 
@@ -248,17 +164,17 @@ def upsert_paper(cur, p: NormalizedPaper, venue_id, venue_instance_id) -> int:
         INSERT INTO papers
             (title, abstract, conclusion, year, publication_date,
              doi, field, language, referenced_works, related_works, 
-             venue_id, venue_instance_id, concepts, external_ids)
+             concepts, external_ids)
         VALUES
-            (%s, %s, %s, %s, %s,
+            (%s, %s, %s, %s, %s, 
              %s, %s, %s, %s, %s,
-             %s, %s, %s, %s)
+             %s, %s)
         RETURNING id;
         """,
         (
             p.title, p.abstract, p.conclusion, p.year, p.publication_date,
             p.doi, p.field, p.language, p.referenced_works, p.related_works,
-            venue_id, venue_instance_id, Json(p.concepts), Json(p.external_ids),
+            Json(p.concepts), Json(p.external_ids),
         ),
     )
     (pid,) = cur.fetchone()
@@ -287,3 +203,108 @@ def insert_paper_authors(cur, paper_id, p: NormalizedPaper, author_ids: List[int
             """,
             (paper_id, author_id, order, corr),
         )
+
+def upsert_sources_batch(records: List[NormalizedSource]) -> None:
+    """
+    UPSERT a batch of normalized sources into the 'sources' table.
+    """
+    if not records:
+        return
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    for record in records:
+        insert_sql = """
+            INSERT INTO sources (
+                id,
+                short_id,
+                display_name,
+                source_type,
+                host_organization_id,
+                host_organization_name,
+                country_code,
+                issn_l,
+                issn,
+                is_oa,
+                is_in_doaj,
+                works_count,
+                cited_by_count,
+                summary_stats,
+                topics,
+                counts_by_year,
+                homepage_url,
+                created_date,
+                updated_date,
+                raw_json
+            )
+            VALUES (
+                %(id)s,
+                %(short_id)s,
+                %(display_name)s,
+                %(source_type)s,
+                %(host_organization_id)s,
+                %(host_organization_name)s,
+                %(country_code)s,
+                %(issn_l)s,
+                %(issn)s,
+                %(is_oa)s,
+                %(is_in_doaj)s,
+                %(works_count)s,
+                %(cited_by_count)s,
+                %(summary_stats)s,
+                %(topics)s,
+                %(counts_by_year)s,
+                %(homepage_url)s,
+                %(created_date)s,
+                %(updated_date)s,
+                %(raw_json)s
+            )
+            ON CONFLICT (id) DO UPDATE
+            SET
+                short_id = EXCLUDED.short_id,
+                display_name = EXCLUDED.display_name,
+                source_type = EXCLUDED.source_type,
+                host_organization_id = EXCLUDED.host_organization_id,
+                host_organization_name = EXCLUDED.host_organization_name,
+                country_code = EXCLUDED.country_code,
+                issn_l = EXCLUDED.issn_l,
+                issn = EXCLUDED.issn,
+                is_oa = EXCLUDED.is_oa,
+                is_in_doaj = EXCLUDED.is_in_doaj,
+                works_count = EXCLUDED.works_count,
+                cited_by_count = EXCLUDED.cited_by_count,
+                summary_stats = EXCLUDED.summary_stats,
+                topics = EXCLUDED.topics,
+                counts_by_year = EXCLUDED.counts_by_year,
+                homepage_url = EXCLUDED.homepage_url,
+                created_date = EXCLUDED.created_date,
+                updated_date = EXCLUDED.updated_date,
+                raw_json = EXCLUDED.raw_json;
+        """
+        cur.execute(insert_sql, {
+            'id': record.id,
+            'short_id': record.short_id,
+            'display_name': record.name,
+            'source_type': record.source_type,
+            'host_organization_id': record.host_organization_id,
+            'host_organization_name': record.host_organization_name,
+            'country_code': record.country_code,
+            'issn_l': record.issn_l,
+            'issn': record.issn,
+            'is_oa': record.is_oa,
+            'is_in_doaj': record.is_in_doaj,
+            'works_count': record.works_count,
+            'cited_by_count': record.cited_by_count,
+            'summary_stats': Json(record.summary_stats),
+            'topics': Json(record.topics),
+            'counts_by_year': Json(record.counts_by_year),
+            'homepage_url': record.homepage_url,
+            'created_date': record.created_date,
+            'updated_date': record.updated_date,
+            'raw_json': Json(record.raw_json),
+        })
+
+    conn.commit()
+    cur.close()
+    conn.close()
