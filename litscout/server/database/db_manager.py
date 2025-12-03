@@ -1,12 +1,11 @@
-# server/database/db_manager.py
+# litscout/server/database/db_manager.py
 
 import os
-import sys
 import subprocess
 from pathlib import Path
 
 import psycopg2
-from colorama import Fore
+from typing import Dict
 
 from server.globals import (
     ENV_DB_NAME, ENV_DB_USER, ENV_DB_PASSWORD, ENV_DB_HOST, ENV_DB_PORT,
@@ -28,7 +27,7 @@ def run_cmd(command: list[str]) -> None:
 
 
 #  Postgres control functions
-def start_postgres() -> None:
+def start_postgres(host: str = ENV_DB_HOST, port: str = ENV_DB_PORT) -> None:
     """
     Start a local Postgres instance using pg_ctl.
     Uses PGDATA from LITSCOUT_PGDATA or database/pgdata by default.
@@ -41,8 +40,9 @@ def start_postgres() -> None:
     if not (pgdata / "PG_VERSION").exists():
         log.info(f"Initializing new Postgres cluster in {pgdata} (UTF8)...")
         run_cmd(["initdb", "-D", str(pgdata), "-E", "UTF8", "--locale=C"])
+
     try:
-        conn = psycopg2.connect(dbname="postgres", user=os.getlogin(), password="", host=ENV_DB_HOST, port=ENV_DB_PORT)
+        conn = psycopg2.connect(dbname="postgres", user=os.getlogin(), password="", host=host, port=port)
         conn.close()
         log.info("Postgres is already running. Nothing to do.")
         return
@@ -50,7 +50,7 @@ def start_postgres() -> None:
     except psycopg2.OperationalError:
         pass
 
-    port = os.getenv("LITSCOUT_DB_PORT", ENV_DB_PORT)
+    port = os.getenv("LITSCOUT_DB_PORT", port)
     log_file = BASE_DIR / "postgres.log"
 
     log.info(f"Starting Postgres on port {port} (PGDATA={pgdata})...")
@@ -63,8 +63,8 @@ def start_postgres() -> None:
     try:
         conn = psycopg2.connect(dbname="postgres", user=os.getlogin(),  
             password="",
-            host=ENV_DB_HOST,
-            port=ENV_DB_PORT,
+            host=host,
+            port=port,
         )
         cur = conn.cursor()
 
@@ -165,8 +165,7 @@ def init_database(
     user = db_user or ENV_DB_USER
     host = db_host or ENV_DB_HOST
     port = db_port or ENV_DB_PORT
-
-    initial_password = db_password if db_password is not None else ENV_DB_PASSWORD
+    initial_password = db_password or ENV_DB_PASSWORD
 
     log.info(
         f"Initializing database '{name}' "

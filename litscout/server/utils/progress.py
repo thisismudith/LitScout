@@ -1,4 +1,4 @@
-# server/utils/progress.py
+# litscout/server/utils/progress.py
 
 import sys
 from typing import Optional

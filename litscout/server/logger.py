@@ -1,4 +1,4 @@
-# server/logger.py
+# litscout/server/logger.py
 
 from colorama import Fore, Style, init as colorama_init
 from datetime import datetime

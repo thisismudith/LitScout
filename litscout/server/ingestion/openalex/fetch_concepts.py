@@ -1,4 +1,4 @@
-# server/ingestion/openalex/fetch_concepts.py
+# litscout/server/ingestion/openalex/fetch_concepts.py
 
 from typing import List, Dict, Any
 from colorama import Fore
@@ -102,7 +102,10 @@ def fetch_openalex_concept_ids_for_fields(fields: List[str], per_field_limit: in
     return concept_ids
 
 
-def ingest_openalex_from_fields(fields: List[str], max_workers: int, pages: int = 1, skip_existing: bool = False, per_field_limit: int = 500) -> None:
+def ingest_openalex_from_fields(
+    fields: List[str], max_workers: int, pages: int = 1,
+    skip_existing: bool = False, per_field_limit: int = 500
+) -> Dict[str, int]:
     """
     High-level helper:
 
@@ -127,4 +130,4 @@ def ingest_openalex_from_fields(fields: List[str], max_workers: int, pages: int 
     log.info(f"Resolved {len(concept_ids)} unique concept IDs from fields: {', '.join(fields)}.")
 
     ensure_openalex_tracking_table_global()
-    ingest_openalex_concepts(concept_ids=concept_ids, max_workers=max_workers, pages=pages, skip_existing=skip_existing)
+    return ingest_openalex_concepts(concept_ids=concept_ids, max_workers=max_workers, pages=pages, skip_existing=skip_existing)

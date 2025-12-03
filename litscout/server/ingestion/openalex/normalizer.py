@@ -1,4 +1,4 @@
-# server/ingestion/openalex/normalizer.py
+# litscout/server/ingestion/openalex/normalizer.py
 
 from typing import Dict, Any, Optional, List
 

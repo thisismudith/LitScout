@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="desktop">
+<head>
+  <meta charset="UTF-8">
+  <title>LitScout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="brand">
+        <div class="logo-dot"></div>
+        <div class="brand-text">
+          <h1>LitScout</h1>
+          <p class="subtitle">Find the best venues, papers, and concepts for your research.</p>
+        </div>
+      </div>
+      <div class="top-right-controls">
+        <button class="ghost-btn" id="admin-dashboard-btn">
+          <span class="icon">📊</span>
+          <span>Admin dashboard</span>
+        </button>
+        <div class="theme-toggle">
+          <button class="ghost-btn theme-btn" data-theme="desktop">🖥 Desktop</button>
+          <button class="ghost-btn theme-btn" data-theme="light">☀️ Light</button>
+          <button class="ghost-btn theme-btn" data-theme="dark">🌙 Dark</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

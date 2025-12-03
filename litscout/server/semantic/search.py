@@ -1,4 +1,4 @@
-# server/semantic/search.py
+# litscout/server/semantic/search.py
 
 from typing import List, Dict, Any, Tuple, Set
 

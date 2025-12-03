@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict
 from colorama import Fore
 
 from server.utils.progress import ProgressBar
@@ -9,7 +10,7 @@ from server.ingestion.openalex.ingest import ingest_source
 
 log = ColorLogger("INGEST OA", Fore.GREEN, include_timestamps=True)
 
-def ingest_sources_from_papers(batch_size: int = 100, max_workers: int = 6) -> None:
+def ingest_sources_from_papers(batch_size: int = 100, max_workers: int = 6) -> Dict[str, Any]:
     """
     Iterate over all papers, collect distinct source_ids, and ensure
     there is a matching row in the 'sources' table for each.
@@ -55,7 +56,7 @@ def ingest_sources_from_papers(batch_size: int = 100, max_workers: int = 6) -> N
 
     if not missing_ids:
         log.info("All ids from papers already exist in sources table.")
-        return
+        return True
 
     log.info(
         f"Found {len(missing_ids)} missing sources out of {len(all_source_ids)} distinct "
@@ -94,6 +95,7 @@ def ingest_sources_from_papers(batch_size: int = 100, max_workers: int = 6) -> N
                 bar.update(processed_in_chunk)
                 processed += processed_in_chunk
 
-    log.success(
-        f"Sources ingest completed: {processed}/{len(missing_ids)} missing sources processed."
-    )
+    missing_ids_len = len(missing_ids)
+
+    log.success(f"Sources ingest completed: {processed}/{missing_ids_len} missing sources processed.")
+    return {"processed": processed, "total_missing": missing_ids_len, "missing_ids": missing_ids}

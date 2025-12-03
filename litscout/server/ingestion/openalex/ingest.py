@@ -1,4 +1,4 @@
-# server/ingestion/openalex/ingest.py
+# litscout/server/ingestion/openalex/ingest.py
 
 import traceback
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -97,7 +97,7 @@ def get_existing_openalex_concepts(concept_ids: List[str]) -> Set[str]:
 
 
 # Single-concept ingestion
-def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool = True, log_output: bool = True) -> None:
+def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool = True, log_output: bool = True) -> bool:
     """
     Ingest OpenAlex works for a single concept into the litscout database.
 
@@ -159,6 +159,7 @@ def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool
             progress.close()
         if log_output:
             log.success(f"Concept {concept_id}: ingestion completed. Processed {count} works.")
+
     except Exception as e:
         conn.rollback()
         if progress is not None:
@@ -166,7 +167,7 @@ def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool
         log.error(f"Concept {concept_id}: ingestion failed; transaction rolled back.")
         log.error(str(e))
         traceback.print_exc()
-        raise
+        return False
 
     finally:
         if progress is not None:
@@ -175,10 +176,11 @@ def ingest_openalex_concept(concept_id: str, pages: int = 1, show_progress: bool
         conn.close()
     
     log.success(f"Concept {concept_id}: ingestion completed. Processed {count} works.")
+    return True
 
 
 # Multi-concept, threaded ingestion (concept IDs already known)
-def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: int = 1, skip_existing: bool = False) -> None:
+def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: int = 1, skip_existing: bool = False) -> Dict[str, int]:
     """
     Ingest multiple OpenAlex concepts in parallel using threads.
 
@@ -202,7 +204,7 @@ def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: in
 
         if not concept_ids:
             log.info("All provided concepts are already ingested; nothing to do.")
-            return
+            return True
 
     CONCEPT_COUNT = len(concept_ids)
     max_workers = min(CONCEPT_COUNT, max_workers)
@@ -260,6 +262,7 @@ def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: in
     failure_count = len(results) - success_count
 
     log.success(f"Parallel ingestion completed: {success_count} succeeded, {failure_count} failed.")
+    return {"success": success_count, "failed": failure_count, "failed_ids": [(cid, e) for cid, ok, e in results if not ok]}
 
 
 # Source ingestions
@@ -368,12 +371,13 @@ def _upsert_sources_batch(records: list[NormalizedSource]) -> None:
     conn.close()
 
 
-def ingest_source(source_id: str) -> None:
+def ingest_source(source_id: str) -> bool:
     try:
         raw = _fetch_source_by_id(source_id)
     except Exception as e:
         log.error(f"Failed to fetch source {source_id} from OpenAlex: {e}")
-        return
+        return False
     norm = normalize_openalex_source(raw)
     _upsert_sources_batch([norm])
     log.info(f"Ingested/updated source {source_id} ({norm.name!r}).")
+    return True

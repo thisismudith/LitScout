@@ -1,4 +1,4 @@
-# server/ingestion/db_writer.py
+# litscout/server/ingestion/db_writer.py
 
 from typing import Dict, List, Any
 from psycopg2.extras import Json

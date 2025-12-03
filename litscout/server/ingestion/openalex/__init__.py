@@ -1,2 +1,2 @@
-# server/ingestion/openalex/__init__.py
+# litscout/server/ingestion/openalex/__init__.py
 # Empty file: serves to mark this directory as a package.

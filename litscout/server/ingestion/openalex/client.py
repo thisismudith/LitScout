@@ -1,4 +1,4 @@
-# server/ingestion/openalex/client.py
+# litscout/server/ingestion/openalex/client.py
 
 import time
 from colorama import Fore

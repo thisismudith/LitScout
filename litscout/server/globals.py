@@ -1,4 +1,4 @@
-# server/globals.py
+# litscout/server/globals.py
 
 # Global imports and configurations used across the server
 import os
@@ -20,6 +20,14 @@ ENV_DB_USER = os.getenv("LITSCOUT_DB_USER", "admin")
 ENV_DB_PASSWORD = os.getenv("LITSCOUT_DB_PASSWORD", "admin")
 ENV_DB_HOST = os.getenv("LITSCOUT_DB_HOST", "localhost")
 ENV_DB_PORT = os.getenv("LITSCOUT_DB_PORT", "5432")
+ENV_VARIABLES = {
+    "name": ENV_DB_NAME,
+    "user": ENV_DB_USER,
+    "password": ENV_DB_PASSWORD,
+    "host": ENV_DB_HOST,
+    "port": ENV_DB_PORT,
+}
+DEFAULT_MAX_WORKERS = os.cpu_count() or 4
 
 # Semantic search model
 SEMANTIC_SEARCH_MODEL_NAME = os.getenv("LITSCOUT_EMBED_MODEL", "BAAI/bge-base-en-v1.5")

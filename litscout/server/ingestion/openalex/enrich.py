@@ -1,4 +1,4 @@
-# server/ingestion/openalex/enrich.py
+# litscout/server/ingestion/openalex/enrich.py
 
 import time
 from typing import Any, Dict
@@ -48,12 +48,13 @@ def enrich_single_concept(cur, concept_id: str):
     return True
 
 
-def enrich_concepts_chunked(max_workers: int):
+def enrich_concepts_chunked(max_workers: int) -> Dict[str, Any]:
     conn = get_conn()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute("SELECT id FROM concepts ORDER BY id;")
     concepts = [row["id"] for row in cur.fetchall()]
+    failed = []
 
     log.info(f"Enriching {len(concepts)} concepts")
 
@@ -70,6 +71,7 @@ def enrich_concepts_chunked(max_workers: int):
             except Exception as e:
                 concept_id = futures[f]
                 log.error(f"Concept enrichment failed for concept {concept_id}: {e}")
+                failed.append(concept_id, e)
             finally:
                 progress.update(1)
 
@@ -78,6 +80,9 @@ def enrich_concepts_chunked(max_workers: int):
     conn.commit()
     cur.close()
     conn.close()
+    
+    failed_len = len(failed)
+    return {"success": len(concepts) - failed_len, "failed": failed_len, "failed_ids": failed}
 
 
 # Author Enrichment
@@ -151,12 +156,13 @@ def enrich_single_author(cur, author: Dict[str, Any]):
     return True, None
 
 
-def enrich_authors_chunked(max_workers: int):
+def enrich_authors_chunked(max_workers: int) -> Dict[str, Any]:
     conn = get_conn()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     cur.execute("SELECT * FROM authors ORDER BY id;")
     authors = cur.fetchall()
+    failed = []
 
     log.info(f"Enriching {len(authors)} authors…")
 
@@ -173,6 +179,7 @@ def enrich_authors_chunked(max_workers: int):
             except Exception as e:
                 author_id = futures[f]
                 log.error(f"Author enrichment failed for author {author_id}: {e}")
+                failed.append(author_id, e)
             finally:
                 progress.update(1)
 
@@ -181,6 +188,9 @@ def enrich_authors_chunked(max_workers: int):
     conn.commit()
     cur.close()
     conn.close()
+
+    failed_len = len(failed)
+    return {"success": len(authors) - failed_len, "failed": failed_len, "failed_ids": failed}
 
 
 # Paper Enrichment
@@ -227,7 +237,7 @@ def enrich_single_paper(cur, paper: Dict[str, Any]):
     return True
 
 
-def enrich_papers_chunked(max_workers: int, concept_ids: list = None):
+def enrich_papers_chunked(max_workers: int, concept_ids: list = None) -> Dict[str, Any]:
     conn = get_conn()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -244,6 +254,7 @@ def enrich_papers_chunked(max_workers: int, concept_ids: list = None):
         cur.execute("SELECT * FROM papers ORDER BY id;")
 
     papers = cur.fetchall()
+    failed = []
 
     log.info(f"Enriching {len(papers)} papers…")
 
@@ -260,6 +271,7 @@ def enrich_papers_chunked(max_workers: int, concept_ids: list = None):
             except Exception as e:
                 paper_id = futures[f]
                 log.error(f"Paper enrichment failed for paper {paper_id}: {e}")
+                failed.append(paper_id, e)
             finally:
                 progress.update(1)
 
@@ -269,24 +281,30 @@ def enrich_papers_chunked(max_workers: int, concept_ids: list = None):
     cur.close()
     conn.close()
 
+    failed_len = len(failed)
+    return {"success": len(papers) - failed_len, "failed": failed_len, "failed_ids": failed}
 
-def enrich_openalex(
-    enrich_authors: bool,
-    enrich_papers: bool,
-    enrich_concepts: bool,
-    concept_ids: list,
-    max_workers: int,
-):
+
+def enrich_openalex(enrich_authors: bool, enrich_papers: bool, enrich_concepts: bool, concept_ids: list, max_workers: int) -> Dict[str, Dict[str, Any]]:
+    authors = None
+    papers = None
+    concepts = None
+
     if enrich_authors:
-        enrich_authors_chunked(max_workers=max_workers)
+        authors = enrich_authors_chunked(max_workers=max_workers)
         log.success("Author enrichment completed.")
 
     if enrich_papers:
-        enrich_papers_chunked(max_workers=max_workers, concept_ids=concept_ids)
+        papers = enrich_papers_chunked(max_workers=max_workers, concept_ids=concept_ids)
         log.success("Paper enrichment completed.")
 
     if enrich_concepts:
-        enrich_concepts_chunked(max_workers=max_workers)
+        concepts = enrich_concepts_chunked(max_workers=max_workers)
         log.success("Concept enrichment completed.")
 
     log.success("OpenAlex enrichment process finished.")
+    return {
+        "authors": authors,
+        "papers": papers,
+        "concepts": concepts,
+    }

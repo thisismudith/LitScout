@@ -1,4 +1,4 @@
-# server/database/db_utils.py
+# litscout/server/database/db_utils.py
 
 import os
 import sys

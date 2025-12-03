@@ -1,4 +1,4 @@
-# server/cli.py
+# litscout/server/cli.py
 
 import os
 import sys
@@ -279,13 +279,13 @@ def build_parser() -> argparse.ArgumentParser:
     sem_search_parser.add_argument(
         "--paper-weight",
         type=float,
-        default=0.6,
+        default=0.8,
         help="Weight for paper similarity in hybrid search.",
     )
     sem_search_parser.add_argument(
         "--concept-weight",
         type=float,
-        default=0.4,
+        default=0.2,
         help="Weight for concept-based similarity in hybrid search.",
     )
 

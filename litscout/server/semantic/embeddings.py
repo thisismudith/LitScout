@@ -1,4 +1,4 @@
-# server/semantic/embeddings.py
+# litscout/server/semantic/embeddings.py
 
 from typing import List, Dict, Optional, Callable, Any
 
@@ -171,7 +171,7 @@ def embed_texts_local(texts: List[str], batch_size: int = 64) -> List[List[float
 def _embed_missing_entities(
     *, entity_label: str, unit_label: str, embed_type: str, select_fn: Callable[[Any, Optional[int]], List[dict]],
     text_builder: Callable[[dict], Optional[str]], batch_size: int, limit: Optional[int], force: bool = False
-) -> None:
+) -> Dict[str, int]:
     """
     Generic implementation for embedding "missing" entities (papers/concepts/...).
     """
@@ -191,6 +191,7 @@ def _embed_missing_entities(
 
     ids: List[Any] = []
     texts: List[str] = []
+    failed = 0
 
     for row in rows:
         text = text_builder(row)
@@ -222,11 +223,13 @@ def _embed_missing_entities(
         except Exception as e:
             log.error(f"Embedding batch starting at index {i} FAILED: {e}")
             progress.update(len(batch_ids))
+            failed += len(batch_ids)
             continue
 
         if len(batch_vecs) != len(batch_ids):
             log.error(f"Batch size mismatch at index {i}: {len(batch_vecs)} embeddings vs {len(batch_ids)} ids")
             progress.update(len(batch_ids))
+            failed += len(batch_ids)
             continue
 
         _insert_embeddings_batch(cur, embed_type, batch_ids, batch_vecs)
@@ -238,18 +241,19 @@ def _embed_missing_entities(
     log.success(f"Embedded {len(texts)} {entity_label} using local model '{SEMANTIC_SEARCH_MODEL_NAME}' on device '{DEVICE}'.")
     cur.close()
     conn.close()
+    return {"success": len(texts) - failed, "failed": failed}
 
 
-def embed_missing_concepts(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> None:
-    _embed_missing_entities(
+def embed_missing_concepts(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> Dict[str, int]:
+    return _embed_missing_entities(
         entity_label="concepts", unit_label="concepts", embed_type="concept",
         select_fn=_select_concepts_needing_embeddings, text_builder=_build_concept_text,
         batch_size=batch_size, limit=limit, force=force,
     )
 
 
-def embed_missing_papers(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> None:
-    _embed_missing_entities(
+def embed_missing_papers(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> Dict[str, int]:
+    return _embed_missing_entities(
         entity_label="papers", unit_label="papers", embed_type="paper",
         select_fn=_select_papers_needing_embeddings, text_builder=_build_paper_text,
         batch_size=batch_size, limit=limit, force=force,
