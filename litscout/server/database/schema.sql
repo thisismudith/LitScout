@@ -41,10 +41,9 @@ CREATE TABLE authors (
 );
 
 -- Sources (Venues)
-CREATE TABLE IF NOT EXISTS sources (
+CREATE TABLE sources (
     id                  TEXT PRIMARY KEY,       -- OpenAlex source ID, e.g. 'https://openalex.org/S123...'
-    short_id            TEXT UNIQUE,            -- e.g. 'S123...' extracted from id
-    display_name        TEXT NOT NULL,
+    name        TEXT NOT NULL,
     source_type         TEXT NOT NULL,          -- 'journal', 'conference', 'repository', etc.
     host_organization_id   TEXT,
     host_organization_name TEXT,
@@ -60,8 +59,7 @@ CREATE TABLE IF NOT EXISTS sources (
     counts_by_year      JSONB,                  -- time series of works_count/cited_by_count
     homepage_url        TEXT,
     created_date        TIMESTAMPTZ,
-    updated_date        TIMESTAMPTZ,
-    raw_json            JSONB
+    updated_date        TIMESTAMPTZ
 );
 
 
@@ -78,12 +76,12 @@ CREATE TABLE papers (
     language                TEXT,
     referenced_works        TEXT[] NOT NULL DEFAULT '{}',
     related_works           TEXT[] NOT NULL DEFAULT '{}',
-    venue_id                BIGINT REFERENCES venues(id),
-    venue_instance_id       BIGINT REFERENCES venue_instances(id),
     concepts                JSONB,
     cluster_ids             BIGINT[] NOT NULL DEFAULT '{}',
     cluster_ids_weightage   REAL[] NOT NULL DEFAULT '{}',
-    external_ids            JSONB NOT NULL
+    external_ids            JSONB NOT NULL,
+    source_id               TEXT,
+    publisher_id            TEXT,
 
     CONSTRAINT papers_clusters_same_length
         CHECK (cardinality(cluster_ids) = cardinality(cluster_ids_weightage))

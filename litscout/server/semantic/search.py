@@ -101,6 +101,7 @@ def search_papers(query: str, limit: int = 10, offset: int = 0) -> List[Dict[str
             p.title,
             p.abstract,
             p.external_ids,
+            p.source_id,
             e.embedding_vec <-> %s::vector AS distance
         FROM paper_embeddings e
         JOIN papers p ON p.id = e.paper_id
@@ -127,6 +128,7 @@ def search_papers(query: str, limit: int = 10, offset: int = 0) -> List[Dict[str
                 "title": r["title"],
                 "abstract": r["abstract"],
                 "external_ids": r["external_ids"],
+                "source_id": r["source_id"],
                 "distance": dist,
                 "similarity": sim,
             }
@@ -264,6 +266,7 @@ def search_papers_via_concepts(
                 p.title,
                 p.abstract,
                 p.external_ids,
+                p.source_id,
                 (p.concepts::jsonb -> cp.concept_id ->> 'score')::float AS concept_score_in_paper,
                 cp.similarity * (p.concepts::jsonb -> cp.concept_id ->> 'score')::float AS matching_score
             FROM papers p
@@ -286,6 +289,7 @@ def search_papers_via_concepts(
             title,
             abstract,
             external_ids,
+            source_id,
             concept_score_in_paper,
             matching_score
         FROM ranked
@@ -329,6 +333,7 @@ def search_papers_via_concepts(
             "title": r["title"],
             "abstract": r["abstract"],
             "external_ids": r["external_ids"],
+            "source_id": r["source_id"],
             "concept_score_in_paper": float(r["concept_score_in_paper"]),
             "matching_score": float(r["matching_score"]),
         }
@@ -342,6 +347,7 @@ def search_papers_via_concepts(
                 "title": r["title"],
                 "abstract": r["abstract"],
                 "external_ids": r["external_ids"],
+                "source_id": r["source_id"],
                 "score_sum": 0.0,
                 "matched_concepts_count": 0,
             }
@@ -365,6 +371,7 @@ def search_papers_via_concepts(
                     "title": p["title"],
                     "abstract": p["abstract"],
                     "external_ids": p["external_ids"],
+                    "source_id": p["source_id"],
                     "total_score": total_score,
                 }
             )
@@ -591,6 +598,7 @@ def search_papers_hybrid(
                 "title": meta_source["title"],
                 "abstract": meta_source["abstract"],
                 "external_ids": meta_source["external_ids"],
+                "source_id": meta_source["source_id"],
                 "paper_score": paper_score,
                 "concept_score": concept_score,
                 "combined_score": combined_score,
@@ -618,4 +626,63 @@ def search_papers_hybrid(
         "limit": limit,
         "offset": offset,
         "total_papers": total_papers,
+    }
+
+def search_sources_from_papers(
+    query: str, *, limit: int, offset: int, paper_weight: float = 0.6, concept_weight: float = 0.4,
+    top_k_concepts: int = 10, top_k_papers_per_concept: int = 10
+) -> Dict[str, Any]:
+    """
+    Hybrid search that combines:
+      - direct semantic paper search (search_papers)
+      - concept-driven search (search_papers_via_concepts)
+
+    Aggregates results at the source level.
+
+    See search_papers_hybrid() for detailed description of the hybrid approach.
+    """
+    hybrid_results = search_papers_hybrid(
+        query=query, limit=1000000000, offset=0, paper_weight=paper_weight,
+        concept_weight=concept_weight, top_k_concepts=top_k_concepts, top_k_papers_per_concept=top_k_papers_per_concept
+    )
+
+    # Aggregate by source_id
+    source_map: Dict[str, Dict[str, Any]] = {}
+
+    for p in hybrid_results["papers"]:
+        source_id = p.get("source_id")
+        if not source_id:
+            continue
+
+        if source_id not in source_map:
+            source_map[source_id] = {
+                "source_id": source_id,
+                "papers": [],
+                "aggregate_score": 0.0,
+            }
+
+        source_entry = source_map[source_id]
+        if str(p["paper_id"]) not in source_entry["papers"]:
+            source_entry["papers"].append(str(p["paper_id"]))
+            source_entry["aggregate_score"] += p["combined_score"]
+
+    # Convert to list and sort by aggregate_score desc
+    source_list = list(source_map.values())
+    source_list.sort(key=lambda x: x["aggregate_score"], reverse=True)
+
+    total_sources = len(source_list)
+    start = offset
+    end = offset + limit
+    paginated_sources = source_list[start:end]
+
+    log.info(
+        f"Search yielded {total_sources} unique sources, "
+        f"returning {len(paginated_sources)} (limit={limit}, offset={offset})."
+    )
+
+    return {
+        "sources": paginated_sources,
+        "limit": limit,
+        "offset": offset,
+        "total_sources": total_sources,
     }

@@ -27,6 +27,8 @@ class NormalizedPaper:
     doi: Optional[str]
     field: Optional[str]
     language: Optional[str]
+    source_id: Optional[str]
+    publisher_id: Optional[str]
     authors: List[NormalizedAuthor] = field(default_factory=list)
     author_order: List[int] = field(default_factory=list)
     referenced_works: List[str] = field(default_factory=list)
@@ -38,7 +40,6 @@ class NormalizedPaper:
 @dataclass
 class NormalizedSource:
     id: str
-    short_id: str
     name: str
     source_type: Optional[str]
     host_organization_id: Optional[str]
@@ -56,4 +57,3 @@ class NormalizedSource:
     summary_stats: Dict[str, Any] = field(default_factory=dict)
     topics: List[Dict[str, Any]] = field(default_factory=list)
     counts_by_year: List[Dict[str, Any]] = field(default_factory=list)
-    raw_json: Dict[str, Any] = field(default_factory=dict)

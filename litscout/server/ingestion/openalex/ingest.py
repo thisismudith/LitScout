@@ -5,9 +5,10 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
 from colorama import Fore
+from psycopg2.extras import Json
 import requests
 
-
+from server.ingestion.models import NormalizedSource
 from server.logger import ColorLogger
 from server.database.db_utils import get_conn
 from server.ingestion.db_writer import upsert_concept, upsert_sources_batch, upsert_author, upsert_paper, insert_paper_authors
@@ -262,47 +263,117 @@ def ingest_openalex_concepts(concept_ids: List[str], max_workers: int, pages: in
 
 
 # Source ingestions
-def _fetch_sources_page(params: Dict[str, Any], ) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+def _fetch_source_by_id(source_id: str) -> Dict[str, Any]:
     """
-    Fetch one page of sources from OpenAlex and return (results, next_cursor).
+    Fetch a single source from OpenAlex by its short_id (S...) or full URL.
     """
-    resp = requests.get(OPENALEX_SOURCES_URL, params=params, timeout=30)
+    if source_id.startswith("http"):
+        url = source_id
+    else:
+        url = f"{OPENALEX_SOURCES_URL}/{source_id}"
+
+    resp = requests.get(url, timeout=25)
     resp.raise_for_status()
-    data = resp.json()
+    return resp.json()
 
-    results = data.get("results", [])
-    meta = data.get("meta", {})
-    next_cursor = meta.get("next_cursor")
 
-    return results, next_cursor
-
-def ingest_openalex_sources_for_publisher(host_org_id: str, per_page: int = 200) -> None:
+def _upsert_sources_batch(records: list[NormalizedSource]) -> None:
     """
-    Ingest all sources (journals, conferences, etc.) for a given host_organization.id
-    into the 'sources' table.
-
-    Example host_org_id: 'P4310319965' (Springer Nature).
+    Upsert a batch of sources into the 'sources' table.
+    Expects records from normalize_openalex_source (dicts).
     """
-    log.info(f"Starting source ingestion for host_organization.id={host_org_id}")
+    if not records:
+        return
 
-    cursor: Optional[str] = "*"
-    total = 0
+    conn = get_conn()
+    cur = conn.cursor()
 
-    while cursor:
-        params = {
-            "filter": f"host_organization.id:{host_org_id}",
-            "per_page": per_page,
-            "cursor": cursor,
-        }
-        page_results, next_cursor = _fetch_sources_page(params)
-        if not page_results:
-            break
+    values = [
+        (
+            r.id,
+            r.name,
+            r.source_type,
+            r.host_organization_id,
+            r.host_organization_name,
+            r.country_code,
+            r.issn_l,
+            r.issn,
+            r.is_oa,
+            r.is_in_doaj,
+            r.works_count,
+            r.cited_by_count,
+            Json(r.summary_stats),
+            Json(r.topics),
+            Json(r.counts_by_year),
+            r.homepage_url,
+            r.created_date,
+            r.updated_date,
+        )
+        for r in records
+        if r.id
+    ]
 
-        norm_records = [normalize_openalex_source(src) for src in page_results]
-        upsert_sources_batch(norm_records)
+    if not values:
+        cur.close()
+        conn.close()
+        return
 
-        total += len(norm_records)
+    cur.executemany(
+        """
+        INSERT INTO sources (
+            id,
+            name,
+            source_type,
+            host_organization_id,
+            host_organization_name,
+            country_code,
+            issn_l,
+            issn,
+            is_oa,
+            is_in_doaj,
+            works_count,
+            cited_by_count,
+            summary_stats,
+            topics,
+            counts_by_year,
+            homepage_url,
+            created_date,
+            updated_date
+        )
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        ON CONFLICT (id) DO UPDATE SET
+            name                   = EXCLUDED.name,
+            source_type            = EXCLUDED.source_type,
+            host_organization_id   = EXCLUDED.host_organization_id,
+            host_organization_name = EXCLUDED.host_organization_name,
+            country_code           = EXCLUDED.country_code,
+            issn_l                 = EXCLUDED.issn_l,
+            issn                   = EXCLUDED.issn,
+            is_oa                  = EXCLUDED.is_oa,
+            is_in_doaj             = EXCLUDED.is_in_doaj,
+            works_count            = EXCLUDED.works_count,
+            cited_by_count         = EXCLUDED.cited_by_count,
+            summary_stats          = EXCLUDED.summary_stats,
+            topics                 = EXCLUDED.topics,
+            counts_by_year         = EXCLUDED.counts_by_year,
+            homepage_url           = EXCLUDED.homepage_url,
+            created_date           = EXCLUDED.created_date,
+            updated_date           = EXCLUDED.updated_date;
+        """,
+        values,
+    )
 
-        cursor = next_cursor
+    conn.commit()
+    cur.close()
+    conn.close()
 
-    log.success(f"Completed source ingestion for host_organization.id={host_org_id} (total={total}).")
+
+def ingest_source(source_id: str) -> None:
+    try:
+        raw = _fetch_source_by_id(source_id)
+    except Exception as e:
+        log.error(f"Failed to fetch source {source_id} from OpenAlex: {e}")
+        return
+    norm = normalize_openalex_source(raw)
+    _upsert_sources_batch([norm])
+    log.info(f"Ingested/updated source {source_id} ({norm.name!r}).")

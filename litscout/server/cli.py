@@ -12,12 +12,12 @@ from server.database.db_manager import (
     stop_postgres,
     init_database,
 )
-from server.ingestion.openalex.ingest import ingest_openalex_concept, ingest_openalex_sources_for_publisher
+from server.ingestion.openalex.ingest import ingest_openalex_concept, ingest_source
 from server.ingestion.openalex.fetch_concepts import ingest_openalex_from_fields
-from server.ingestion.openalex.fetch_sources import ingest_sources_for_fields
+from server.ingestion.openalex.fetch_sources import ingest_sources_from_papers
 from server.ingestion.openalex.enrich import enrich_openalex
 from server.semantic.embeddings import embed_missing_papers, embed_missing_concepts
-from server.semantic.search import search_papers, search_papers_hybrid, search_papers_via_concepts
+from server.semantic.search import search_papers, search_papers_hybrid, search_papers_via_concepts, search_sources_from_papers
 
 cli_log = ColorLogger("CLI", include_timestamps=False, include_threading_id=False)
 
@@ -140,15 +140,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Ingest OpenAlex sources for publishers associated with given fields.",
     )
     source_parser.add_argument(
-        "--publisher",
+        "--id",
         required=True,
         help="OpenAlex publisher ID, e.g., P4310319965.",
-    )
-    source_parser.add_argument(
-        "--per-page",
-        type=int,
-        default=200,
-        help="Number of sources to fetch per page (default: 200).",
     )
 
     sources_parser = ingest_subp.add_parser(
@@ -156,31 +150,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="Ingest OpenAlex sources for publishers associated with given fields.",
     )
     sources_parser.add_argument(
-        "--fields",
-        nargs="+",
-        required=True,
-        help=(
-            "One or more field names to search publishers for, e.g.: "
-            "--fields 'computer science' 'economics'."
-        ),
-    )
-    sources_parser.add_argument(
-        "--limit",
+        "--batch-size",
         type=int,
-        default=500,
-        help="Number of publishers to ingest per field (default: 500).",
-    )
-    sources_parser.add_argument(
-        "--max-publishers",
-        type=int,
-        default=1000,
-        help="Maximum number of unique publishers to ingest (default: 1000).",
-    )
-    sources_parser.add_argument(
-        "--per-page",
-        type=int,
-        default=200,
-        help="Number of sources to fetch per page (default: 200).",
+        default=50,
+        help="Number of papers to process per batch (default: 100).",
     )
     sources_parser.add_argument(
         "--max-workers",
@@ -262,6 +235,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional limit on number of papers to embed.",
     )
+    embed_parser.add_argument(
+        "--F",
+        "--force",
+        action="store_true",
+        help="Force re-embedding of all missing texts.",
+    )
 
     # Semantic Search
     sem_search_parser = semantic_subp.add_parser(
@@ -270,7 +249,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sem_search_parser.add_argument(
         "search_command",
-        choices=["papers", "concepts", "hybrid"],
+        choices=["papers", "concepts", "hybrid", "venue"],
         help="What to embed.",
     )
     sem_search_parser.add_argument(
@@ -373,26 +352,18 @@ def run_command(args: argparse.Namespace) -> None:
             )
         
         elif args.ingest_cmd == "source":
-            cli_log.info(f"Starting OpenAlex sources ingestion for publisher {args.publisher}...")
-            ingest_openalex_sources_for_publisher(host_org_id=args.publisher, per_page=args.per_page)
+            cli_log.info(f"Starting OpenAlex sources ingestion for publisher {args.id}...")
+            ingest_source(source_id=args.id)
 
         elif args.ingest_cmd == "sources":
-            fields = [f.strip() for f in (args.fields or []) if f.strip()]
-            if not fields:
-                cli_log.error("No valid fields provided. Use --fields 'computer science' 'economics' ...")
-                return
-
             max_workers = args.max_workers or (os.cpu_count() or 4)
 
             cli_log.info(
-                f"Starting OpenAlex sources ingestion for fields={fields}, publishers_per_field={args.limit}, "
-                f"max_publishers={args.max_publishers}, per_page={args.per_page}..."
+                f"Starting OpenAlex sources ingestion with a batch size of {args.batch_size} "
+                f"and {max_workers} workers..."
             )
 
-            ingest_sources_for_fields(
-                fields=fields, max_workers=max_workers, publishers_per_field=args.limit,
-                max_publishers=args.max_publishers, per_page_sources=args.per_page
-            )
+            ingest_sources_from_papers(batch_size=args.batch_size, max_workers=max_workers)
 
 
         return
@@ -444,12 +415,12 @@ def run_command(args: argparse.Namespace) -> None:
             if args.embed_command == "papers":
                 embed_missing_papers(
                     batch_size=args.batch_size,
-                    limit=args.limit,
+                    limit=args.limit, force=args.force,
                 )
             elif args.embed_command == "concepts":
                 embed_missing_concepts(
                     batch_size=args.batch_size,
-                    limit=args.limit,
+                    limit=args.limit, force=args.force,
                 )
             return
         elif args.semantic_cmd == "search":
@@ -492,6 +463,26 @@ def run_command(args: argparse.Namespace) -> None:
                 cli_log.info(f"Top {result['offset']} - {result['offset'] + result['limit']} results:")
                 for r in result['papers']:
                     print(f"{r['combined_score']:.3f}  |  {r['external_ids']['openalex']}  |  {r['title']}")
+                return
+            elif args.search_command == "venue":
+                if args.paper_weight + args.concept_weight != 1.0:
+                    if args.paper_weight == 0.4:
+                        args.paper_weight = 1.0 - args.concept_weight
+                    else:
+                        args.concept_weight = 1.0 - args.paper_weight
+                    cli_log.warn(
+                        f"paper_weight and concept_weight must sum to 1.0; "
+                        f"adjusted to paper_weight={args.paper_weight}, concept_weight={args.concept_weight}."
+                    )
+
+                result = search_sources_from_papers(
+                    query=args.query, limit=args.limit, offset=args.offset,
+                    paper_weight=args.paper_weight, concept_weight=args.concept_weight,
+                    top_k_concepts=args.concepts_limit, top_k_papers_per_concept=args.limit
+                )
+                cli_log.info(f"Top {result['offset']} - {result['offset'] + result['limit']} results:")
+                for r in result['sources']:
+                    print(f"{r['aggregate_score']:.3f}  |  {r['source_id']}")
                 return
 
     cli_log.error("Unknown command.")

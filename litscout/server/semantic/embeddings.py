@@ -1,6 +1,6 @@
 # server/semantic/embeddings.py
 
-from typing import List, Optional, Callable, Any
+from typing import List, Dict, Optional, Callable, Any
 
 import time
 
@@ -17,6 +17,27 @@ log = ColorLogger("EMBED", Fore.MAGENTA, include_timestamps=True, include_thread
 
 # ======================= text builders =======================
 
+def _build_abstract_from_inverted_index_fast(
+    inverted_index: Dict[str, List[int]]
+) -> str:
+
+    if not inverted_index:
+        return ""
+
+    # Prealloc minimal (we will expand dynamically only when needed)
+    tokens: List[Optional[str]] = []
+
+    for word, positions in inverted_index.items():
+        for pos in positions:
+
+            # Expand list only when necessary
+            if pos >= len(tokens):
+                tokens.extend([""] * (pos + 1 - len(tokens)))
+
+            tokens[pos] = word
+
+    return " ".join(tokens).strip()
+
 def _build_paper_text(row: dict) -> Optional[str]:
     """
     Build the text representation of a paper for embedding.
@@ -26,7 +47,7 @@ def _build_paper_text(row: dict) -> Optional[str]:
     """
     parts = []
     title = row.get("title")
-    abstract = row.get("abstract")
+    abstract = _build_abstract_from_inverted_index_fast(row.get("abstract_inverted_index") or {})
     conclusion = row.get("conclusion")
 
     if title: parts.append(title)
@@ -54,7 +75,7 @@ def _build_concept_text(row: dict) -> Optional[str]:
     return text or None
 
 
-def _select_concepts_needing_embeddings(cur, limit: Optional[int] = None):
+def _select_concepts_needing_embeddings(cur, limit: Optional[int] = None, force: bool = False):
     """
     Select concepts that don't yet have an embedding for SEMANTIC_SEARCH_MODEL_NAME.
     """
@@ -65,18 +86,19 @@ def _select_concepts_needing_embeddings(cur, limit: Optional[int] = None):
         LEFT JOIN concept_embeddings e
             ON e.concept_id = c.id
            AND e.model_name = %s
-        WHERE e.concept_id IS NULL
+        WHERE e.concept_id IS NULL OR %s
         ORDER BY c.id
     """
     if limit is not None:
         sql += " LIMIT %s"
         params.append(limit)
+    params.insert(1, force)  # second param is for the OR %s condition
 
     cur.execute(sql, params)
     return cur.fetchall()
 
 
-def _select_papers_needing_embeddings(cur, limit: Optional[int] = None):
+def _select_papers_needing_embeddings(cur, limit: Optional[int] = None, force: bool = False):
     """
     Select papers that don't yet have an embedding for SEMANTIC_SEARCH_MODEL_NAME.
     """
@@ -87,12 +109,13 @@ def _select_papers_needing_embeddings(cur, limit: Optional[int] = None):
         LEFT JOIN paper_embeddings e
             ON e.paper_id   = p.id
            AND e.model_name = %s
-        WHERE e.paper_id IS NULL
+        WHERE e.paper_id IS NULL OR %s
         ORDER BY p.id
     """
     if limit is not None:
         sql += " LIMIT %s"
         params.append(limit)
+    params.insert(1, force)  # second param is for the OR %s condition
 
     cur.execute(sql, params)
     return cur.fetchall()
@@ -147,7 +170,7 @@ def embed_texts_local(texts: List[str], batch_size: int = 64) -> List[List[float
 
 def _embed_missing_entities(
     *, entity_label: str, unit_label: str, embed_type: str, select_fn: Callable[[Any, Optional[int]], List[dict]],
-    text_builder: Callable[[dict], Optional[str]], batch_size: int, limit: Optional[int]
+    text_builder: Callable[[dict], Optional[str]], batch_size: int, limit: Optional[int], force: bool = False
 ) -> None:
     """
     Generic implementation for embedding "missing" entities (papers/concepts/...).
@@ -156,7 +179,7 @@ def _embed_missing_entities(
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     log.info(f"Selecting {entity_label} without embeddings for model label '{SEMANTIC_SEARCH_MODEL_NAME}'...")
-    rows = select_fn(cur, limit=limit)
+    rows = select_fn(cur, limit=limit, force=force)
 
     if not rows:
         log.info(f"No {entity_label} need embeddings; everything is up to date.")
@@ -217,17 +240,17 @@ def _embed_missing_entities(
     conn.close()
 
 
-def embed_missing_concepts(batch_size: int = 64, limit: Optional[int] = None) -> None:
+def embed_missing_concepts(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> None:
     _embed_missing_entities(
         entity_label="concepts", unit_label="concepts", embed_type="concept",
         select_fn=_select_concepts_needing_embeddings, text_builder=_build_concept_text,
-        batch_size=batch_size, limit=limit,
+        batch_size=batch_size, limit=limit, force=force,
     )
 
 
-def embed_missing_papers(batch_size: int = 64, limit: Optional[int] = None) -> None:
+def embed_missing_papers(batch_size: int = 64, limit: Optional[int] = None, force: bool = False) -> None:
     _embed_missing_entities(
         entity_label="papers", unit_label="papers", embed_type="paper",
         select_fn=_select_papers_needing_embeddings, text_builder=_build_paper_text,
-        batch_size=batch_size, limit=limit,
+        batch_size=batch_size, limit=limit, force=force,
     )

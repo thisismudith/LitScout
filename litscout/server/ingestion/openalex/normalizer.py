@@ -36,6 +36,13 @@ def _shorten_id(openalex_id: str) -> str:
 
 
 def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
+    # Source
+    loc = work.get("primary_location") or {}
+    src = loc.get("source") or {}
+
+    source_id = _shorten_id(src.get("id"))
+    publisher_id = _shorten_id(src.get("host_organization"))
+
     # Title
     raw_title = work.get("title") or work.get("display_name")
     title = raw_title.strip() if isinstance(raw_title, str) and raw_title.strip() else "(untitled)"
@@ -118,6 +125,8 @@ def normalize_openalex_work(work: Dict[str, Any]) -> NormalizedPaper:
         concepts=concepts_map,
         external_ids={"openalex": work.get("id").split("/")[-1]},
         is_corresponding_flags=is_corr,
+        source_id=source_id,
+        publisher_id=publisher_id,
     )
 
 def normalize_openalex_source(src: Dict[str, Any]) -> Dict[str, Any]:
@@ -145,7 +154,6 @@ def normalize_openalex_source(src: Dict[str, Any]) -> Dict[str, Any]:
 
     return NormalizedSource(
         id=src.get("id"),
-        short_id=_shorten_id(src.get("id", "")),
         name=src.get("display_name"),
         source_type=src.get("type"),
         host_organization_id=host_org or ids.get("publisher"),
@@ -163,5 +171,4 @@ def normalize_openalex_source(src: Dict[str, Any]) -> Dict[str, Any]:
         homepage_url=homepage_url,
         created_date=created_date,
         updated_date=updated_date,
-        raw_json=src,
     )

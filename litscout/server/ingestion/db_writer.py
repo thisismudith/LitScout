@@ -218,7 +218,6 @@ def upsert_sources_batch(records: List[NormalizedSource]) -> None:
         insert_sql = """
             INSERT INTO sources (
                 id,
-                short_id,
                 display_name,
                 source_type,
                 host_organization_id,
@@ -240,7 +239,6 @@ def upsert_sources_batch(records: List[NormalizedSource]) -> None:
             )
             VALUES (
                 %(id)s,
-                %(short_id)s,
                 %(display_name)s,
                 %(source_type)s,
                 %(host_organization_id)s,
@@ -262,7 +260,6 @@ def upsert_sources_batch(records: List[NormalizedSource]) -> None:
             )
             ON CONFLICT (id) DO UPDATE
             SET
-                short_id = EXCLUDED.short_id,
                 display_name = EXCLUDED.display_name,
                 source_type = EXCLUDED.source_type,
                 host_organization_id = EXCLUDED.host_organization_id,
@@ -284,7 +281,6 @@ def upsert_sources_batch(records: List[NormalizedSource]) -> None:
         """
         cur.execute(insert_sql, {
             'id': record.id,
-            'short_id': record.short_id,
             'display_name': record.name,
             'source_type': record.source_type,
             'host_organization_id': record.host_organization_id,
