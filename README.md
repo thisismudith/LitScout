@@ -23,7 +23,7 @@ Most tools show results — not **insights**.
 
 ### **⚡ The Approach**
 
-LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, and **Natural Language Processing (NLP)** to create a unified research ecosystem that enables users to:
+LitScout uses ML to create a unified research ecosystem that enables users to:
 
 - Search and summarize the latest research papers *(based upon lexical context and section priority)*.  
 - Explore **authors** and other sources of **collaboration networks**.  
