@@ -150,3 +150,4 @@ More aligned → higher score.
 - Integrate more data sources (e.g., PubMed, IEEE Xplore).
 - Implement advanced visualization (e.g., network graphs for authors).
 - Enhance NLP summaries with more context-aware models.
+- Use an ML model (Random Forest / XGBoost) for adding more features such as timeline, history, credibility, and citations.
