@@ -476,12 +476,13 @@ def run_command(args: argparse.Namespace) -> None:
                     )
 
                 result = search_sources_from_papers(
-                    query=args.query, limit=args.limit, offset=args.offset,
-                    paper_weight=args.paper_weight, concept_weight=args.concept_weight,
+                    query=args.query, paper_weight=args.paper_weight, concept_weight=args.concept_weight,
                     top_k_concepts=args.concepts_limit, top_k_papers_per_concept=args.limit
                 )
-                cli_log.info(f"Top {result['offset']} - {result['offset'] + result['limit']} results:")
-                for r in result['sources']:
+                offset = args.offset
+                limit = args.limit
+                cli_log.info(f"Top {offset} - {offset + limit} results:")
+                for r in result['sources'][offset:offset + limit]:
                     print(f"{r['aggregate_score']:.3f}  |  {r['source_id']}")
                 return
 

@@ -7,5 +7,6 @@ tqdm
 sentence-transformers
 requests
 psycopg2-binary
+pypdf2
 fastapi
 colorama

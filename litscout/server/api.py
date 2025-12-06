@@ -20,8 +20,8 @@ from server.ingestion.openalex.fetch_sources import ingest_sources_from_papers
 from server.semantic.search import (
     search_papers,
     search_concepts,
-    search_papers_via_concepts,
     search_papers_hybrid,
+    search_authors_from_papers,
     search_sources_from_papers,
 )
 
@@ -212,9 +212,9 @@ class LitScoutAPI:
         type: str = "hybrid",
         limit: int = 10,
         offset: int = 0,
-        concepts_limit: int = 10,
         paper_weight: float = 0.8,
         concept_weight: float = 0.2,
+        concepts_limit: int = 10,
     ) -> List[Dict[str, Any]]:
         """Perform semantic search for papers based on a text query."""
 
@@ -261,6 +261,25 @@ class LitScoutAPI:
                 )
             
             return search_sources_from_papers(
+                query=query,
+                paper_weight=paper_weight,
+                concept_weight=concept_weight,
+                top_k_concepts=concepts_limit,
+                top_k_papers_per_concept=limit,
+            )
+        elif type == "author":
+            if paper_weight + concept_weight != 1.0:
+                if paper_weight == 0.4:
+                    paper_weight = 1.0 - concept_weight
+                else:
+                    concept_weight = 1.0 - paper_weight
+
+                self.log.warn(
+                    f"paper_weight and concept_weight must sum to 1.0; "
+                    f"adjusted to paper_weight={paper_weight}, concept_weight={concept_weight}."
+                )
+
+            return search_authors_from_papers(
                 query=query,
                 limit=limit,
                 offset=offset,

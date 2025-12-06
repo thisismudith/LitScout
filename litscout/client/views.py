@@ -1,15 +1,25 @@
-# litscout/client/views.py
+# server/webapp/views.py
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Tuple
+from PyPDF2 import PdfReader
 
-from flask import Blueprint, current_app, render_template, request
+from flask import (
+    Blueprint,
+    current_app,
+    render_template,
+    request,
+    jsonify,
+)
+
+from psycopg2.extras import RealDictCursor
+from server.database.db_utils import get_conn
 
 main_bp = Blueprint("main", __name__)
 
 
-def _normalize_paper_results(raw: Any, limit: int) -> Tuple[List[Dict[str, Any]], int | None]:
+def _normalize_paper_results(raw: Any) -> Tuple[List[Dict[str, Any]], int | None]:
     """
     Normalize paper results regardless of whether they come from:
       - search_papers (list)
@@ -24,13 +34,12 @@ def _normalize_paper_results(raw: Any, limit: int) -> Tuple[List[Dict[str, Any]]
         return papers, total
 
     if isinstance(raw, list):
-        # No explicit total known; infer "has next" via len == limit if you want.
         return raw, None
 
     return [], None
 
 
-def _normalize_venue_results(raw: Any, limit: int) -> Tuple[List[Dict[str, Any]], int | None]:
+def _normalize_venue_results(raw: Any) -> Tuple[List[Dict[str, Any]], int | None]:
     """
     Normalize venue/source results from search_sources_from_papers.
     """
@@ -48,227 +57,263 @@ def _normalize_venue_results(raw: Any, limit: int) -> Tuple[List[Dict[str, Any]]
     return [], None
 
 
-def _derive_authors_from_papers(
-    papers: List[Dict[str, Any]],
-    limit: int,
-    offset: int,
-) -> Tuple[List[Dict[str, Any]], int]:
-    """
-    Build a simple "top authors" list from paper results.
-    Assumes each paper may have an 'authors' field like:
-      - list of strings, or
-      - list of { 'name': '...' } dicts.
-
-    This is heuristic and will gracefully degrade if authors are missing.
-    """
-    from collections import Counter
-
-    counter = Counter()
-
-    for p in papers:
-        authors = p.get("authors") or []
-        # Normalize to list of names
-        if isinstance(authors, list):
-            for a in authors:
-                if isinstance(a, str):
-                    name = a.strip()
-                elif isinstance(a, dict):
-                    name = (a.get("name") or "").strip()
-                else:
-                    name = ""
-                if name:
-                    counter[name] += 1
-
-    # Build sorted list
-    all_authors = [
-        {"name": name, "paper_count": count}
-        for name, count in counter.most_common()
-    ]
-    total = len(all_authors)
-
-    start = offset
-    end = offset + limit
-    paginated = all_authors[start:end]
-
-    return paginated, total
-
-
 @main_bp.route("/", methods=["GET"])
 def index():
     """
-    Main search UI.
+    Main UI shell. Results are fetched via JS from /api/search/*.
+    """
+    return render_template("index.html")
+
+
+# -------------------------- API: PAPERS --------------------------
+
+
+@main_bp.post("/api/search/papers")
+def api_search_papers():
+    """
+    POST JSON:
+    {
+      "query": "...",
+      "search_type": "hybrid" | "papers",
+      "limit": 10,
+      "offset": 0,
+      "paper_weight": 0.8,
+      "concept_weight": 0.2
+    }
     """
     api = current_app.litscout_api
 
-    # Query params
-    q = request.args.get("q", "").strip()
-    mode = request.args.get("mode", "query").lower()  # "query" or "upload" (upload handled via POST->redirect)
-    search_type = request.args.get("search_type", "hybrid").lower()  # papers | concepts | hybrid
+    data = request.get_json(force=True) or {}
 
-    # Pagination params (each panel independent)
-    paper_page = max(int(request.args.get("paper_page", 1) or 1), 1)
-    author_page = max(int(request.args.get("author_page", 1) or 1), 1)
-    venue_page = max(int(request.args.get("venue_page", 1) or 1), 1)
+    q = (data.get("query") or "").strip()
+    search_type = (data.get("search_type") or "hybrid").lower()
+    limit = int(data.get("limit") or 10)
+    offset = int(data.get("offset") or 0)
 
-    limit = 10
-    paper_offset = (paper_page - 1) * limit
-    author_offset = (author_page - 1) * limit
-    venue_offset = (venue_page - 1) * limit
+    paper_weight = float(data.get("paper_weight") or 0.8)
+    concept_weight = float(data.get("concept_weight") or 0.2)
 
-    # Weights (for hybrid / venue searches)
-    try:
-        paper_weight = float(request.args.get("paper_weight", 0.8))
-    except ValueError:
-        paper_weight = 0.8
-
-    try:
-        concept_weight = float(request.args.get("concept_weight", 0.2))
-    except ValueError:
-        concept_weight = 0.2
-
-    # Normalise weights to sum = 1.0
+    # Normalize weights to sum to 1.0
     if paper_weight + concept_weight != 1.0:
         if paper_weight == 0.4:
             paper_weight = 1.0 - concept_weight
         else:
             concept_weight = 1.0 - paper_weight
 
-    paper_results: List[Dict[str, Any]] = []
-    paper_total: int | None = None
+    if not q:
+        return jsonify(
+            {
+                "papers": [],
+                "total_papers": 0,
+            }
+        )
 
-    concept_results: List[Dict[str, Any]] = []
-    concept_total: int | None = None
-
-    venue_results: List[Dict[str, Any]] = []
-    venue_total: int | None = None
-
-    authors_results: List[Dict[str, Any]] = []
-    authors_total: int = 0
-
-    if q:
-        # ------------------------------------------------------------------
-        # 1) Papers / Concepts tile (large left panel)
-        # ------------------------------------------------------------------
-        if search_type == "concepts":
-            # Show concept results in main tile
-            concepts_raw = api.search(
-                query=q,
-                type="concepts",
-                limit=limit,
-                offset=paper_offset,
-            )
-            # For concepts, api.search should return a list
-            if isinstance(concepts_raw, list):
-                concept_results = concepts_raw
-                concept_total = None  # unknown; could infer via next-page presence
-        else:
-            # "papers" or "hybrid"
-            papers_raw = api.search(
-                query=q,
-                type=search_type,
-                limit=limit,
-                offset=paper_offset,
-                concepts_limit=10,
-                paper_weight=paper_weight,
-                concept_weight=concept_weight,
-            )
-            paper_results, paper_total = _normalize_paper_results(papers_raw, limit)
-
-            # ------------------------------------------------------------------
-            # 2) Authors tile (derived from paper_results)
-            # ------------------------------------------------------------------
-            authors_results, authors_total = _derive_authors_from_papers(
-                paper_results, limit=limit, offset=author_offset
-            )
-
-        # ----------------------------------------------------------------------
-        # 3) Venues tile (always uses venue search)
-        # ----------------------------------------------------------------------
-        venues_raw = api.search(
+    if search_type == "papers":
+        raw = api.search(
             query=q,
-            type="venue",
+            type="papers",
             limit=limit,
-            offset=venue_offset,
+            offset=offset,
+        )
+    else:
+        # default → hybrid
+        raw = api.search(
+            query=q,
+            type="hybrid",
+            limit=limit,
+            offset=offset,
             concepts_limit=10,
             paper_weight=paper_weight,
             concept_weight=concept_weight,
         )
-        venue_results, venue_total = _normalize_venue_results(venues_raw, limit)
 
-    return render_template(
-        "index.html",
-        query=q,
-        mode=mode,
-        search_type=search_type,
-        paper_weight=paper_weight,
-        concept_weight=concept_weight,
-        # results
-        paper_results=paper_results,
-        paper_total=paper_total,
-        concept_results=concept_results,
-        concept_total=concept_total,
-        venue_results=venue_results,
-        venue_total=venue_total,
-        authors_results=authors_results,
-        authors_total=authors_total,
-        # pagination
-        paper_page=paper_page,
-        author_page=author_page,
-        venue_page=venue_page,
-        limit=limit,
+    papers, total = _normalize_paper_results(raw)
+
+    # You may want to ensure each paper has a 'score' field
+    # that the UI can turn into XX.YY% match.
+    for p in papers:
+        if "combined_score" in p and p["combined_score"] is not None:
+            p["score"] = float(p["combined_score"])
+        elif "similarity" in p and p["similarity"] is not None:
+            p["score"] = float(p["similarity"])
+        else:
+            p["score"] = 0.0
+
+        # Make sure we always have a list of concept names for tags.
+        # Expected: top_concepts = ["Machine learning", "Causal inference", ...]
+        # If not present, the front-end will degrade gracefully.
+        if "top_concepts" not in p and "concepts" in p and isinstance(p["concepts"], list):
+            # You can keep it as-is; UI only needs a list of strings.
+            pass
+
+    return jsonify(
+        {
+            "papers": papers,
+            "total_papers": total if total is not None else len(papers),
+        }
     )
 
 
-@main_bp.route("/upload", methods=["POST"])
-def upload_and_search():
+# -------------------------- API: VENUES --------------------------
+
+
+@main_bp.post("/api/search/venues")
+def api_search_venues():
     """
-    Handle 'upload research paper' mode:
-      - reads uploaded text file (or any text-ish content)
-      - uses its content as query string
-      - redirects to main index with mode=upload & q=extracted_text
+    POST JSON:
+    {
+      "query": "...",
+      "paper_weight": 0.8,
+      "concept_weight": 0.2
+    }
+
+    Uses the 'venue' search type in LitScoutAPI, then enriches
+    each venue with metadata from the 'sources' table.
     """
-    file = request.files.get("paper_file")
-    if not file or file.filename == "":
-        # Just redirect back with no query
-        return render_template(
-            "index.html",
-            query="",
-            mode="upload",
-            search_type="hybrid",
-            paper_results=[],
-            paper_total=None,
-            concept_results=[],
-            concept_total=None,
-            venue_results=[],
-            venue_total=None,
-            authors_results=[],
-            authors_total=0,
-            paper_page=1,
-            author_page=1,
-            venue_page=1,
-            limit=10,
+    api = current_app.litscout_api
+
+    data = request.get_json(force=True) or {}
+
+    q = (data.get("query") or "").strip()
+
+    paper_weight = float(data.get("paper_weight") or 0.8)
+    concept_weight = float(data.get("concept_weight") or 0.2)
+
+    # Normalize weights
+    if paper_weight + concept_weight != 1.0:
+        if paper_weight == 0.4:
+            paper_weight = 1.0 - concept_weight
+        else:
+            concept_weight = 1.0 - paper_weight
+
+    if not q:
+        return jsonify(
+            {
+                "venues": [],
+                "total_sources": 0,
+            }
         )
 
-    # Simple text extraction (assumes text or decodable content)
-    raw_bytes = file.read()
+    raw = api.search(
+        query=q,
+        type="venue",
+        concepts_limit=10,
+        paper_weight=paper_weight,
+        concept_weight=concept_weight,
+    )
+
+    venues, total = _normalize_venue_results(raw)
+
+    # Enrich from sources table
+    source_ids = [f"https://openalex.org/{v.get('source_id')}" for v in venues if v.get("source_id")]
+    meta_by_id: Dict[str, Dict[str, Any]] = {}
+    if source_ids:
+        conn = get_conn()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(
+            """
+            SELECT
+                id,
+                name,
+                host_organization_name,
+                homepage_url
+            FROM sources
+            WHERE id = ANY(%s)
+            """,
+            (source_ids,),
+        )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        print(rows[0:5])
+        for r in rows:
+            sid = r["id"]
+            meta_by_id[sid.split("/")[-1]] = {
+                "name": r.get("name"),
+                "host_organization_name": r.get("host_organization_name"),
+                "homepage_url": r.get("homepage_url"),
+                "openalex_url": sid,
+            }
+
+    # Attach metadata + standardize score field
+    for v in venues:
+        sid = v.get("source_id")
+        meta = meta_by_id.get(sid, {})
+        v["name"] = meta.get("name") or sid
+        v["host_organization_name"] = meta.get("host_organization_name")
+        v["openalex_url"] = meta.get("openalex_url") or (f"https://openalex.org/{sid}" if sid else None)
+        # For UI label "Total Score: XXXX.YY"
+        v["total_score"] = float(v.get("aggregate_score") or 0.0)
+
+    return jsonify(
+        {
+            "venues": venues,
+            "total_sources": total if total is not None else len(venues),
+        }
+    )
+
+@main_bp.post("/api/search/authors")
+def api_search_authors():
+    api = current_app.litscout_api
+
+    data = request.get_json(force=True) or {}
+    query = (data.get("query") or "").strip()
+    limit = int(data.get("limit") or 10)
+    offset = int(data.get("offset") or 0)
+    paper_weight = float(data.get("paper_weight") or 0.8)
+    concept_weight = float(data.get("concept_weight") or 0.2)
+    concepts_limit = int(data.get("concepts_limit") or 10)
+
+    if not query:
+        return jsonify(
+            {
+                "authors": [],
+                "limit": limit,
+                "offset": offset,
+                "total_authors": 0,
+            }
+        )
+
+    raw = api.search(
+        query=query,
+        type="author",
+        limit=limit,
+        offset=offset,
+        paper_weight=paper_weight,
+        concept_weight=concept_weight,
+        concepts_limit=concepts_limit,
+    )
+
+    return jsonify(raw)
+
+
+@main_bp.route("/api/upload_query", methods=["POST"])
+def api_upload_query():
+    file = request.files.get("file")
+    if not file:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    filename = file.filename or ""
+    content_type = file.mimetype or ""
+
+    text = ""
     try:
-        content = raw_bytes.decode("utf-8", errors="ignore")
-    except Exception:
-        content = ""
+        if filename.lower().endswith(".pdf") or content_type == "application/pdf":
+            reader = PdfReader(file)
+            for page in reader.pages:
+                text += page.extract_text() or ""
+        else:
+            text = file.read().decode("utf-8", errors="ignore")
+    except Exception as e:
+        return jsonify({"error": f"Failed to read file: {e}"}), 500
 
-    # Truncate extremely long uploads to keep things fast
-    content = content[:8000]
+    text = text.strip()
+    if not text:
+        return jsonify({"error": "No text could be extracted from the file."}), 400
 
-    from urllib.parse import urlencode
-    params = {
-        "q": content,
-        "mode": "upload",
-        "search_type": "hybrid",
-        "paper_page": 1,
-        "author_page": 1,
-        "venue_page": 1,
-    }
-    url = f"/?{urlencode(params)}"
-    from flask import redirect
+    preview = " ".join(text.split())
 
-    return redirect(url)
+    return jsonify({
+        "ok": True,
+        "query": preview,
+    })

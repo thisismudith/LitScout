@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from flask import Flask
-from litscout.server.api import LitScoutAPI
+from server.api import LitScoutAPI
 
 
 def create_app() -> Flask:
@@ -15,9 +15,10 @@ def create_app() -> Flask:
 
     # Single shared LitScoutAPI instance
     app.litscout_api = LitScoutAPI()
+    app.litscout_api.start_database()
 
     # Register blueprints
-    from litscout.client.views import main_bp
+    from client.views import main_bp
     app.register_blueprint(main_bp)
 
     return app

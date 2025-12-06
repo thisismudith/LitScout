@@ -3,12 +3,25 @@
 **LitScout** is a Python-based platform that acts as your **personal research companion**. It helps you discover, analyze, and plan your research journey — from finding relevant papers to exploring top conferences, authors, and publishing opportunities. 
 
 LitScout consists of:
-- A **React.js Frontend** for user interaction and visualization.
-- A **FastAPI Backend** for data processing, AI/NLP analysis, and API management.
+- A **Flask Frontend** for user interaction and visualization.
+- A **Python 3.11 Backend** for data processing, NLP analysis, and API management.
 
 ---
 
 ## 🚀 Project Overview
+
+
+### **❓ The Problem**
+Research discovery today is:
+
+- Keyword dependent  
+- Fragmented across platforms  
+- Time-consuming  
+- Biased toward popularity rather than relevance  
+
+Most tools show results — not **insights**.
+
+### **⚡ The Approach**
 
 LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, and **Natural Language Processing (NLP)** to create a unified research ecosystem that enables users to:
 
@@ -16,7 +29,6 @@ LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, a
 - Explore **authors** and other sources of **collaboration networks**.  
 - Discover and compare **academic conferences** and **journals**.  
 - Upload a paper to find **where to publish** and view **conference suitability scores**.  
-- Receive a **step-by-step publishing guide** including submission timelines and next steps after selecting the "where to publish."
 
 ---
 
@@ -24,15 +36,15 @@ LitScout combines **Artificial Intelligence (AI)**, **Machine Learning (ML)**, a
 
 LitScout follows an architecture with **two sub-sections**:
 
-### **1. Backend (FastAPI)**
+### **1. Backend (FastAPI-like Structure)**
 - Handles all data processing, ML, and API logic.
-- Exposes endpoints that the React frontend can interact with.
-- Manages integrations with research APIs (Semantic Scholar, arXiv, Crossref, OpenAlex, WikiCFP, etc.).
+- Exposes endpoints that the frontend can interact with.
+- Manages integrations with the OpenAlex API.
 
-### **2. Frontend (React.js)**
+### **2. Frontend (Flask)**
 - Provides a modern, responsive UI for users.
-- Fetches processed data from the FastAPI backend.
-- Displays papers, clusters, author stats, conference data, and recommendations through interactive components and dashboards.
+- Fetches processed data from the backend.
+- Displays papers, author stats, conference data, and recommendations through interactive components and dashboards.
 
 ---
 
@@ -41,16 +53,13 @@ LitScout follows an architecture with **two sub-sections**:
 | Component | Description |
 |------------|--------------|
 | **`/server/ingest/`** | Fetches and normalizes data from APIs like Semantic Scholar, arXiv, Crossref, OpenAlex, and WikiCFP. |
-| **`/server/store/`** | Database models and storage layer (SQLite/PostgreSQL) for papers, authors, embeddings, clusters, and conferences. |
-| **`/server/nlp/`** | Text cleaning, summarization, keyword extraction, and similarity scoring using NLP. |
+| **`/server/db/`** | Database models and storage layer (SQLite/PostgreSQL) for papers, authors, embeddings, clusters, and conferences. |
 | **`/server/embed/`** | Generates embeddings (numerical meaning representations) for abstracts, author bios, and uploaded papers using Sentence Transformers. |
-| **`/server/cluster/`** | Performs topic clustering using UMAP (Uniform Manifold Approximation and Projection) and HDBSCAN (Hierarchical Density-Based Clustering). |
-| **`/server/recommend/`** | Suggests conferences and collaborators by comparing topic embeddings and trends. |
-| **`/server/conferences/`** | Stores and ranks conferences by topic relevance, deadline, and quality. |
-| **`/server/authors/`** | Builds author profiles and collaboration networks using citation data and co-authorship metrics. |
-| **`/client/src/components/`** | React components for Dashboard, Author View, Conference Explorer, and Paper Recommendation interface. |
+| **`/server/concepts/`** | Uses OpenAlex concept weightage and performs embedding. |
+| **`/server/search/`** | Search feature for papers, authors, concepts, and conferences. |
+| **`/client/`** | Flask components for Dashboard, Author View, Conference Explorer, and Paper Recommendation interface. |
 | **`/client/src/services/`** | API integration layer to communicate with FastAPI backend. |
-| **`/client/src/pages/`** | Routes for major pages: Discover, Authors, Conferences, and Publish. |
+| **`/client/templates/`** | Routes for the html code. |
 
 ---
 
@@ -59,33 +68,18 @@ LitScout follows an architecture with **two sub-sections**:
 1. **User Action**
    - The user enters a topic or uploads a research paper in the React interface.  
 2. **API Request**
-   - React sends a request to the FastAPI backend using RESTful API endpoints.  
+   - Flask sends a request to the API backend using HTML request endpoints.  
 3. **Data Collection**
-   - FastAPI retrieves relevant papers, authors, and conferences from APIs like Semantic Scholar, OpenAlex, and WikiCFP.  
+   - API retrieves relevant papers, authors, and conferences from OpenAlex.  
 4. **Processing**
-   - Papers are embedded using a sentence transformer and clustered into research themes.  
+   - Papers are embedded using bge-base-en-v1.5 and clustered into research themes.  
    - Summaries, keywords, and trend analyses are generated for each cluster.  
 5. **Author & Conference Analytics**
-   - Backend computes author metrics (citations, Hirsch-index, collaboration graph) and conference metrics (ranking, deadlines, suitability).  
+   - Backend computes author metrics and conference metrics. 
 6. **Response to Frontend**
-   - FastAPI sends structured JSON data to the React app.  
+   - API sends structured JSON data to the Flask app.  
 7. **Visualization**
-   - React renders charts, summaries, and recommendations interactively using Plotly and D3.js.  
-8. **Export / Reports**
-   - The user can download a PDF “Research Guide” directly from the dashboard.
-
----
-
-## 📊 Module Planning (6-Week Development Roadmap)
-
-| Week | Focus | Key Deliverables |
-|------|--------|------------------|
-| **1** | Planning & Setup | Define data sources, architecture diagrams, FastAPI project setup, and React scaffold. |
-| **2** | Backend Data Collection | Integrate Semantic Scholar, arXiv, Crossref, OpenAlex, and WikiCFP APIs; clean and store data. |
-| **3** | AI/NLP & Clustering | Build embeddings, summarization, and topic clustering logic in FastAPI. Train AI models.|
-| **4** | Frontend Development | Create React dashboards for Papers, Authors, Conferences, and Publishing suggestions. |
-| **5** | Recommendation Engine | Connect “Upload a Paper” feature to backend; return best-fit conferences and collaborators. |
-| **6** | Integration & Project Completion | Combine frontend and backend, refine UI/UX, deploy FastAPI + React, and finalize documentation. |
+   - Flask renders the data.
 
 ---
 
@@ -93,51 +87,66 @@ LitScout follows an architecture with **two sub-sections**:
 
 | Category | Tools / Frameworks |
 |-----------|------------------|
-| **Frontend** | React.js, Redux Toolkit (state management), Axios (API calls), Plotly.js / D3.js (charts) |
-| **Backend** | FastAPI (Python), AI Model (Python), Uvicorn (server), SQLite (database) |
-| **AI / NLP Libraries** | Sentence-Transformers, UMAP, HDBSCAN, scikit-learn, KeyBERT, Sumy, Transformers |
-| **Database** | SQLite (development)  → PostgreSQL (if possible under the deadline) |
-| **External APIs** | Semantic Scholar, arXiv, Crossref, OpenAlex, WikiCFP |
-| **Testing** | Pytest (backend), Jest (frontend) |
-| **Deployment** | GitHub Web Hosting (until something better is found) |
+| **Frontend** | Flask, HTML, CSS, Vanilla JS |
+| **Backend** | ML Model (Python 3.11), Uvicorn (server), Postgres (database) |
+| **ML Libraries** | Sentence-Transformers, Transformers, pgvectors |
+| **Database** | PostgreSQL |
+| **External APIs** | OpenAlex API |
 | **Version Control** | Git & GitHub for code and documentation |
+| Parallelism | ThreadPoolExecutor |
 
 ---
 
-## 🖥️ Dashboard Overview (Frontend Pages)
+## 🖥️ Internal Logic
 
-| Page | Purpose |
-|------|----------|
-| **Discover** | Search papers, view topic clusters, and summaries. |
-| **Authors** | View leading authors, their profiles, citations, and collaboration networks. |
-| **Conferences** | Explore upcoming conferences with ranking, deadlines, and topics. |
-| **Publish** | Upload your research paper to get recommended conferences and publishing steps. |
-| **Guide / Export** | Download a personalized “Research Guidance” PDF summarizing findings. |
+### **1️⃣ Query or Uploaded Paper → Embedding**
+The user input (text or extracted PDF content) is encoded
 
----
+### **2️⃣ Hybrid Paper Scoring**
 
-## 📍 Key Features Summary
+#### 🟣 Direct vector similarity  
+`paper_score_direct = cosine_similarity(query_vector, paper_embedding)`
 
-✅ AI-based search and clustering of research papers  
-✅ Topic-wise summaries and keyword insights  
-✅ Author information and collaboration networks    
-✅ Paper-to-conference recommendation engine  
-✅ Step-by-step publishing roadmap (subject to availability)  
-✅ Downloadable “Research Guidance Report” (PDF)
+#### 🔵 Concept-weighted similarity
+Each concept has its own embedding and weight within a paper:
+`concept_score = avg(similarity(query, concept) × weight)`
 
----
+##### 🟢 Final Score:
+`paper_score = α × paper_score_direct + (1 - α) × concept_score`
 
-## 📚 What Will I Learn?
+### **3️⃣ Author Scoring (Order-Weighted)**
+author_order approximates contribution:
+`author_weight = 1 / author_order`
 
-- Using transformer models and testing their accuracy.
-- AI-model training for finding relevant research papers.
-- Creating interactive visualizations with D3.js and Plotly.
+`author_score = Σ(final_paper_score × author_weight)`
 
+More aligned → higher score.
 
 ---
 
-## 📝 Notes
-- Might switch to a different database if needed (PostgreSQL).
-- Deployment options may evolve based on project needs and deadlines.
-- Might switch to different AI/NLP libraries if better suited for tasks.
-- Might use a different frontend framework as I am not that familiar with React.js.
+### **5️⃣ UI & Response Handling**
+
+- First results load instantly  
+- Next results preload **before user scrolls**  
+- Pagination is **cached**, not re-run  
+- Panels scroll independently (page never scrolls)
+
+---
+
+### 🛠️ Key Challenges & Solutions
+
+| Challenge                   | Solution                                                   |
+| --------------------------- | ---------------------------------------------------------- |
+| Keyword-based irrelevance   | Hybrid semantic + concept matching                         |
+| API rate limits             | Threaded ingestion with retry + batching                   |
+| Missing structured metadata | Custom OpenAlex normalization layer                        |
+| UI sluggishness             | Prefetch-based pagination + client caching                 |
+| Fair author scoring         | Formula based on `contribution order × semantic relevance` |
+
+---
+
+## 📝 Future Improvements
+- Add user accounts for saving searches and preferences.
+- Integrate more data sources (e.g., PubMed, IEEE Xplore).
+- Implement advanced visualization (e.g., network graphs for authors).
+- Enhance NLP summaries with more context-aware models.

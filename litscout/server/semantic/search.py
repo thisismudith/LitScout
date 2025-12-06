@@ -628,8 +628,165 @@ def search_papers_hybrid(
         "total_papers": total_papers,
     }
 
+
+def search_authors_from_papers(
+    query: str,
+    *,
+    limit: int = 10,
+    offset: int = 0,
+    paper_weight: float = 0.8,
+    concept_weight: float = 0.2,
+    top_k_concepts: int = 10,
+    top_k_papers_per_concept: int = 10,
+) -> Dict[str, Any]:
+    # We want enough papers to cover the requested author window.
+    base_limit = offset + limit
+    if base_limit <= 0:
+        base_limit = limit
+
+    # 1) Get top papers via hybrid search
+    paper_results = search_papers_hybrid(
+        query=query,
+        limit=base_limit,
+        offset=0,
+        paper_weight=paper_weight,
+        concept_weight=concept_weight,
+        top_k_concepts=top_k_concepts,
+        top_k_papers_per_concept=top_k_papers_per_concept,
+    )
+
+    papers = paper_results["papers"]
+    if not papers:
+        log.info(
+            f"[authors] Search '{query}' → 0 papers, skipping author aggregation."
+        )
+        return {
+            "authors": [],
+            "limit": limit,
+            "offset": offset,
+            "total_authors": 0,
+        }
+
+    # Map paper_id -> combined_score
+    paper_score_map: Dict[int, float] = {
+        int(p["paper_id"]): float(p["combined_score"]) for p in papers
+    }
+    paper_ids: List[int] = list(paper_score_map.keys())
+
+    # 2) Fetch authors for those papers in a single query
+    conn = get_conn()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute(
+        """
+        SELECT
+            pa.paper_id,
+            pa.author_id,
+            pa.author_order,
+            a.full_name,
+            a.works_counted,
+            a.cited_by_count,
+            a.external_ids,
+            a.last_known_institutions
+        FROM paper_authors pa
+        JOIN authors a ON a.id = pa.author_id
+        WHERE pa.paper_id = ANY(%s)
+        ORDER BY pa.author_order ASC;
+        """,
+        (paper_ids,),
+    )
+
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    if not rows:
+        log.info(
+            f"[authors] Search '{query}' → found papers but no author rows "
+            f"for paper_ids={paper_ids[:10]}..."
+        )
+        return {
+            "authors": [],
+            "limit": limit,
+            "offset": offset,
+            "total_authors": 0,
+        }
+
+    # 3) Aggregate per author
+    author_map: Dict[int, Dict[str, Any]] = {}
+
+    for r in rows:
+        paper_id = int(r["paper_id"])
+        author_id = int(r["author_id"])
+        author_order = int(r["author_order"]) if r["author_order"] else 1
+
+        paper_score = paper_score_map.get(paper_id, 0.0)
+        # Position weight: first author gets full weight, second gets 1/2, etc.
+        position_weight = 1.0 / float(author_order)
+        contribution = paper_score * position_weight
+
+        if author_id not in author_map:
+            # Extract last_known_institution name (if present)
+            last_inst_name = None
+            last_insts = r.get("last_known_institutions") or []
+            if isinstance(last_insts, list) and last_insts:
+                cand = last_insts[0] or {}
+                last_inst_name = cand.get("display_name") or cand.get("name")
+
+            # External IDs → OpenAlex URL
+            openalex_url = None
+            ext = r.get("external_ids") or {}
+            if isinstance(ext, dict):
+                openalex_id = ext.get("openalex")
+                if openalex_id:
+                    # If it's already a full URL, keep it; else prefix
+                    if isinstance(openalex_id, str) and openalex_id.startswith("http"):
+                        openalex_url = openalex_id
+                    else:
+                        openalex_url = f"https://openalex.org/{openalex_id}"
+
+            author_map[author_id] = {
+                "author_id": author_id,
+                "full_name": r["full_name"],
+                "works_counted": r.get("works_counted"),
+                "cited_by_count": r.get("cited_by_count"),
+                "last_known_institution": last_inst_name,
+                "openalex_url": openalex_url,
+                "score": 0.0,
+                "paper_ids": [],
+            }
+
+        entry = author_map[author_id]
+        entry["score"] += contribution
+        if paper_id not in entry["paper_ids"]:
+            entry["paper_ids"].append(paper_id)
+
+    # 4) Sort & paginate
+    all_authors: List[Dict[str, Any]] = list(author_map.values())
+    all_authors.sort(key=lambda a: a["score"], reverse=True)
+
+    total_authors = len(all_authors)
+    start = offset
+    end = offset + limit
+    paginated = all_authors[start:end]
+
+    log.info(
+        f"[authors] Search '{query}' → {total_authors} unique authors, "
+        f"returning {len(paginated)} (limit={limit}, offset={offset}, "
+        f"paper_weight={paper_weight}, concept_weight={concept_weight}, "
+        f"top_k_concepts={top_k_concepts}, "
+        f"top_k_papers_per_concept={top_k_papers_per_concept})."
+    )
+
+    return {
+        "authors": paginated,
+        "limit": limit,
+        "offset": offset,
+        "total_authors": total_authors,
+    }
+
 def search_sources_from_papers(
-    query: str, *, limit: int, offset: int, paper_weight: float = 0.6, concept_weight: float = 0.4,
+    query: str, *, paper_weight: float = 0.6, concept_weight: float = 0.4,
     top_k_concepts: int = 10, top_k_papers_per_concept: int = 10
 ) -> Dict[str, Any]:
     """
@@ -671,18 +828,13 @@ def search_sources_from_papers(
     source_list.sort(key=lambda x: x["aggregate_score"], reverse=True)
 
     total_sources = len(source_list)
-    start = offset
-    end = offset + limit
-    paginated_sources = source_list[start:end]
 
     log.info(
         f"Search yielded {total_sources} unique sources, "
-        f"returning {len(paginated_sources)} (limit={limit}, offset={offset})."
+        f"returning {len(source_list)}."
     )
 
     return {
-        "sources": paginated_sources,
-        "limit": limit,
-        "offset": offset,
+        "sources": source_list,
         "total_sources": total_sources,
     }
